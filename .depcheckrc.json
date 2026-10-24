@@ -1,0 +1,9 @@
+{
+  "ignores": [
+    "autoprefixer",
+    "eslint-config-next",
+    "eslint-import-resolver-typescript",
+    "eslint-plugin-jsx-a11y",
+    "postcss"
+  ]
+}

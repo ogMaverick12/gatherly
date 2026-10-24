@@ -134,7 +134,7 @@ Recorded honestly rather than quietly:
    [`DELIVERY_OUTCOMES.md`](DELIVERY_OUTCOMES.md#verification-summary). The suite grew, the branch
    coverage improved, and the statement and line figures moved down slightly because the newly
    added UI and route code is not fully exercised by unit tests. The thresholds in
-   `vitest.config.ts` (90 / 70 / 90 / 90) are met.
+   `vitest.config.mts` (90 / 70 / 90 / 90) are met.
 3. **`npm audit --omit=dev --audit-level=high` now reports nothing at all.** The brief predicted
    a clean production audit; the current state is `0 vulnerabilities` for production dependencies,
    after the PostCSS override described in [`../SECURITY.md`](../SECURITY.md#3-dependency-posture)

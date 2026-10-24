@@ -17,7 +17,7 @@ npm run check
 ```
 
 That is lint, typecheck, `prettier --check`, and the unit tests with coverage.
-Coverage thresholds live in `vitest.config.ts` and are never lowered: a gap is
+Coverage thresholds live in `vitest.config.mts` and are never lowered: a gap is
 closed with more tests, not with a smaller number.
 
 ## What each layer is allowed to do

@@ -335,7 +335,7 @@ variants and the contrast tests operate on a single source of truth.
 | Accessibility    | Vitest                   | WCAG contrast across the light, dark and calm themes                                                   |
 | End to end       | Playwright               | Landing to plan, persistence across a reload, CSV and share, keyboard-only navigation                  |
 
-Coverage thresholds (90 / 70 / 90 / 90) are enforced by `vitest.config.ts`, so a drop below them
+Coverage thresholds (90 / 70 / 90 / 90) are enforced by `vitest.config.mts`, so a drop below them
 fails the run.
 
 ---

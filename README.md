@@ -166,6 +166,48 @@ public/sw.js             service worker: shell cache only, never /api/*
 
 ---
 
+## Why each dependency
+
+Every package in `dependencies` and `devDependencies`, with the reason it is here. A dependency
+without a row is a dependency that should not be in `package.json`.
+
+| Package                             | Scope   | Why it is here                                                                                     |
+| ----------------------------------- | ------- | -------------------------------------------------------------------------------------------------- |
+| `@google/genai`                     | runtime | SDK behind the optional Gemini provider (`src/lib/ai/gemini.ts`).                                  |
+| `@hookform/resolvers`               | runtime | `zodResolver` so the intake form validates with the same Zod schema the plan uses.                 |
+| `next`                              | runtime | App Router framework: pages, metadata, the streaming API handlers, the service worker route.       |
+| `react`                             | runtime | UI runtime for the client workspace components.                                                    |
+| `react-dom`                         | runtime | The DOM renderer React needs in the browser.                                                       |
+| `react-hook-form`                   | runtime | Intake form state, field errors and per-step validation.                                           |
+| `zod`                               | runtime | Single source of truth for the plan, API payload and LLM output schemas.                           |
+| `@axe-core/playwright`              | dev     | axe accessibility sweeps inside the Playwright journeys.                                           |
+| `@eslint/eslintrc`                  | dev     | `FlatCompat`, which loads the Next.js legacy config under ESLint 9.                                |
+| `@playwright/test`                  | dev     | The end-to-end journeys (`npm run test:e2e`).                                                      |
+| `@testing-library/jest-dom`         | dev     | DOM matchers, imported once in `tests/setup.ts`.                                                   |
+| `@testing-library/react`            | dev     | Renders components into jsdom for the component suite.                                             |
+| `@testing-library/user-event`       | dev     | User-like typing, clicking and focus moves in component tests.                                     |
+| `@types/node`                       | dev     | Node typings for the Next.js config, the Playwright config and the scripts.                        |
+| `@types/react`                      | dev     | React typings for strict `tsc --noEmit`.                                                           |
+| `@types/react-dom`                  | dev     | React DOM typings for strict `tsc --noEmit`.                                                       |
+| `@vitest/coverage-v8`               | dev     | The v8 coverage provider that enforces the per-area thresholds.                                    |
+| `autoprefixer`                      | dev     | Loaded by `postcss.config.mjs` to add vendor prefixes to the CSS output.                           |
+| `eslint`                            | dev     | The lint gate (`eslint . --max-warnings=0`).                                                       |
+| `eslint-config-next`                | dev     | Loaded by `eslint.config.mjs` through `compat.extends('next/core-web-vitals', 'next/typescript')`. |
+| `eslint-import-resolver-typescript` | dev     | Loaded by `eslint.config.mjs`; resolves `@/` imports so `import/no-cycle` can see them.            |
+| `eslint-plugin-import`              | dev     | Supplies `import/no-cycle`, `no-duplicates` and `no-self-import`.                                  |
+| `eslint-plugin-jsx-a11y`            | dev     | Loaded by `eslint.config.mjs` via `plugin:jsx-a11y/recommended`.                                   |
+| `eslint-plugin-vitest`              | dev     | `vitest/no-focused-tests` and `no-identical-title`, so a focused test cannot ship.                 |
+| `fast-check`                        | dev     | Property tests for money rounding and allocator invariants.                                        |
+| `jest-axe`                          | dev     | axe assertions inside the component accessibility tests.                                           |
+| `jsdom`                             | dev     | The browser environment the Vitest component suite runs in.                                        |
+| `postcss`                           | dev     | The CSS plugin host named by `postcss.config.mjs`; the `overrides.postcss` entry pins it.          |
+| `prettier`                          | dev     | The `format:check` gate and formatting that matches editors.                                       |
+| `tailwindcss`                       | dev     | Utility CSS loaded by `postcss.config.mjs` and themed in `tailwind.config.ts`.                     |
+| `typescript`                        | dev     | Strict typecheck via `tsc --noEmit`.                                                               |
+| `vitest`                            | dev     | The unit and component runner and the coverage gate.                                               |
+
+---
+
 ## Verification
 
 Every measured number lives in one place:
@@ -182,7 +224,7 @@ Every measured number lives in one place:
 | `npm run test:e2e`      | The Playwright journeys pass, including the accessibility sweeps    |
 | `npm audit --omit=dev`  | No known vulnerabilities in the shipped dependencies                |
 
-Coverage thresholds are enforced in `vitest.config.ts` (90 / 70 / 90 / 90), so a regression below
+Coverage thresholds are enforced in `vitest.config.mts` (90 / 70 / 90 / 90), so a regression below
 those numbers fails the test run rather than being reported after the fact.
 
 ---
