@@ -7,6 +7,9 @@ import {
   withTimeout,
 } from '@/lib/security/guards';
 import { generateWithRetry, selectProvider } from '@/lib/ai';
+import { kindOfFailure } from '@/lib/ai/errors';
+import { providerErrorNotice } from '@/lib/ai/notices';
+import type { ProviderErrorKind } from '@/lib/ai/provider';
 import { CHAT_SYSTEM_PROMPT } from '@/lib/ai/prompts';
 import { buildBasicAnswer, classifyIntent } from '@/features/assistant/services';
 
@@ -24,6 +27,7 @@ export const dynamic = 'force-dynamic';
 export async function POST(request: Request): Promise<Response> {
   const startedAt = Date.now();
   let status = 200;
+  let providerError: ProviderErrorKind | null = null;
   try {
     const rate = await enforceRateLimit(request, 'chat');
     const body = await readJsonBody(request, ChatRequestSchema);
@@ -50,8 +54,9 @@ export async function POST(request: Request): Promise<Response> {
         content = result.content;
         mode = 'provider';
         notices.push(...result.notices);
-      } catch {
-        notices.push('The AI provider could not be reached, so this answer comes from Basic mode.');
+      } catch (error) {
+        providerError = kindOfFailure(error);
+        notices.push(providerErrorNotice(providerError, 'so this answer comes from Basic mode.'));
       }
     } else if (selection.notice) {
       notices.push(selection.notice);
@@ -65,7 +70,7 @@ export async function POST(request: Request): Promise<Response> {
         };
         send('mode', { provider: selection.provider.id, live: selection.live });
         send('delta', { text: content });
-        send('done', { mode, notices });
+        send('done', { mode, notices, providerError });
         controller.close();
       },
     });
@@ -85,6 +90,6 @@ export async function POST(request: Request): Promise<Response> {
     status = response.status;
     return response;
   } finally {
-    logRequest('chat', status, Date.now() - startedAt, request);
+    logRequest('chat', status, Date.now() - startedAt, request, providerError ?? undefined);
   }
 }

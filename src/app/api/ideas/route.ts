@@ -7,7 +7,10 @@ import {
   readJsonBody,
   withTimeout,
 } from '@/lib/security/guards';
-import { generateWithRetry, selectProvider } from '@/lib/ai';
+import { extractJson, generateWithRetry, selectProvider } from '@/lib/ai';
+import { kindOfFailure } from '@/lib/ai/errors';
+import { providerErrorNotice } from '@/lib/ai/notices';
+import type { ProviderErrorKind } from '@/lib/ai/provider';
 import { IDEAS_SYSTEM_PROMPT } from '@/lib/ai/prompts';
 import { generateIdeas } from '@/features/ideas/services';
 
@@ -24,6 +27,7 @@ export const dynamic = 'force-dynamic';
 export async function POST(request: Request): Promise<Response> {
   const startedAt = Date.now();
   let status = 200;
+  let providerError: ProviderErrorKind | null = null;
   try {
     const rate = await enforceRateLimit(request, 'ideas');
     const body = await readJsonBody(request, IdeasRequestSchema);
@@ -46,7 +50,13 @@ export async function POST(request: Request): Promise<Response> {
     if (!selection.live) {
       if (selection.notice) notices.push(selection.notice);
       return jsonResponse(
-        { mode: 'basic', provider: selection.provider.id, ideas: basicIdeas, notices },
+        {
+          mode: 'basic',
+          provider: selection.provider.id,
+          ideas: basicIdeas,
+          notices,
+          providerError,
+        },
         { headers: rate.headers },
       );
     }
@@ -63,14 +73,21 @@ export async function POST(request: Request): Promise<Response> {
         }),
       );
 
-      const parsed = ProviderIdeasSchema.safeParse(JSON.parse(result.content) as unknown);
+      const parsed = ProviderIdeasSchema.safeParse(extractJson(result.content));
 
       if (!parsed.success) {
+        providerError = 'bad_output';
         notices.push(
-          'The AI answer did not match the expected shape, so the deterministic ideas are shown instead.',
+          providerErrorNotice(providerError, 'so the deterministic ideas are shown instead.'),
         );
         return jsonResponse(
-          { mode: 'basic', provider: selection.provider.id, ideas: basicIdeas, notices },
+          {
+            mode: 'basic',
+            provider: selection.provider.id,
+            ideas: basicIdeas,
+            notices,
+            providerError,
+          },
           { headers: rate.headers },
         );
       }
@@ -89,15 +106,23 @@ export async function POST(request: Request): Promise<Response> {
             source: 'provider' as const,
           })),
           notices,
+          providerError,
         },
         { headers: rate.headers },
       );
-    } catch {
+    } catch (error) {
+      providerError = kindOfFailure(error);
       notices.push(
-        'The AI provider could not be reached, so the deterministic ideas are shown instead.',
+        providerErrorNotice(providerError, 'so the deterministic ideas are shown instead.'),
       );
       return jsonResponse(
-        { mode: 'basic', provider: selection.provider.id, ideas: basicIdeas, notices },
+        {
+          mode: 'basic',
+          provider: selection.provider.id,
+          ideas: basicIdeas,
+          notices,
+          providerError,
+        },
         { headers: rate.headers },
       );
     }
@@ -106,6 +131,6 @@ export async function POST(request: Request): Promise<Response> {
     status = response.status;
     return response;
   } finally {
-    logRequest('ideas', status, Date.now() - startedAt, request);
+    logRequest('ideas', status, Date.now() - startedAt, request, providerError ?? undefined);
   }
 }

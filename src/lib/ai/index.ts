@@ -1,3 +1,4 @@
+import { readConfig } from './config';
 import { BasicProvider } from './basic';
 import { GeminiProvider } from './gemini';
 import { OpenRouterProvider } from './openrouter';
@@ -8,6 +9,8 @@ export { BasicProvider } from './basic';
 export { GeminiProvider } from './gemini';
 export { OpenRouterProvider } from './openrouter';
 export { buildUserMessage, SYSTEM_RULES } from './prompts';
+export { DEFAULT_GEMINI_MODEL, DEFAULT_OPENROUTER_MODEL, readConfig } from './config';
+export { extractJson } from './json';
 
 export interface ProviderSelection {
   readonly provider: Provider;
@@ -18,24 +21,19 @@ export interface ProviderSelection {
 }
 
 /**
- * Choose a provider from the environment.
+ * Choose a provider from the validated environment.
  *
  * Basic mode is the default and the fallback: if the configured provider
  * has no key, or the call fails, the route answers deterministically and
  * says so.
  */
 export function selectProvider(): ProviderSelection {
-  const requested = (process.env['GATHERLY_AI_PROVIDER'] ?? 'basic').toLowerCase();
-  const geminiKey = process.env['GEMINI_API_KEY'];
-  const openRouterKey = process.env['OPENROUTER_API_KEY'];
+  const config = readConfig();
 
-  if (requested === 'gemini') {
-    if (geminiKey) {
+  if (config.aiProvider === 'gemini') {
+    if (config.geminiApiKey) {
       return {
-        provider: new GeminiProvider(
-          geminiKey,
-          process.env['GATHERLY_GEMINI_MODEL'] ?? 'gemini-2.0-flash',
-        ),
+        provider: new GeminiProvider(config.geminiApiKey, config.geminiModel),
         live: true,
         notice: null,
       };
@@ -47,13 +45,10 @@ export function selectProvider(): ProviderSelection {
     };
   }
 
-  if (requested === 'openrouter') {
-    if (openRouterKey) {
+  if (config.aiProvider === 'openrouter') {
+    if (config.openRouterApiKey) {
       return {
-        provider: new OpenRouterProvider(
-          openRouterKey,
-          process.env['GATHERLY_OPENROUTER_MODEL'] ?? 'google/gemini-2.0-flash-001',
-        ),
+        provider: new OpenRouterProvider(config.openRouterApiKey, config.openRouterModel),
         live: true,
         notice: null,
       };

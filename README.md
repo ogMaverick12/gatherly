@@ -62,14 +62,14 @@ birthday and a community gathering - so you can see the workspace in under a min
 
 All variables are read **on the server only**; there is deliberately no `NEXT_PUBLIC_` variant.
 
-| Variable                                              | Default                       | Purpose                                  |
-| ----------------------------------------------------- | ----------------------------- | ---------------------------------------- |
-| `GATHERLY_AI_PROVIDER`                                | `basic`                       | `basic`, `gemini` or `openrouter`        |
-| `GEMINI_API_KEY`                                      | -                             | Server-only key for Google Gemini        |
-| `OPENROUTER_API_KEY`                                  | -                             | Server-only key for OpenRouter           |
-| `GATHERLY_GEMINI_MODEL`                               | `gemini-2.0-flash`            | Model id                                 |
-| `GATHERLY_OPENROUTER_MODEL`                           | `google/gemini-2.0-flash-001` | Model id                                 |
-| `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` | -                             | Shared-store rate limiting in production |
+| Variable                                              | Default                   | Purpose                                  |
+| ----------------------------------------------------- | ------------------------- | ---------------------------------------- |
+| `GATHERLY_AI_PROVIDER`                                | `basic`                   | `basic`, `gemini` or `openrouter`        |
+| `GEMINI_API_KEY`                                      | -                         | Server-only key for Google Gemini        |
+| `OPENROUTER_API_KEY`                                  | -                         | Server-only key for OpenRouter           |
+| `GATHERLY_GEMINI_MODEL`                               | `gemini-3.6-flash`        | Model id (2.0 ids were retired)          |
+| `GATHERLY_OPENROUTER_MODEL`                           | `google/gemini-3.8-flash` | Model id                                 |
+| `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` | -                         | Shared-store rate limiting in production |
 
 **Rate limiting in production:** the shared Upstash store is the production configuration, and the
 in-process bucket is the local default. The live mode is never assumed - `GET /api/health` answers
@@ -153,7 +153,7 @@ src/lib/                 shared utilities
   plan.ts plan-store.ts  versioned plan schema and the browser store
   money.ts dates.ts      integer minor units, ISO date-only helpers
   share.ts csv.ts ics.ts download.ts
-  ai/                    Provider interface, Basic, Gemini, OpenRouter, prompts
+  ai/                    Provider interface, config, Basic, Gemini, OpenRouter, prompts
   security/              guards, rate limiting, sanitising
   i18n/                  en, hi, bn
 src/instrumentation.ts   startup hook: one warning if the shared limiter is off

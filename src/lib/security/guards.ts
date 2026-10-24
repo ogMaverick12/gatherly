@@ -1,4 +1,5 @@
 import type { z } from 'zod';
+import type { ProviderErrorKind } from '../ai/provider';
 import { getRateLimiter } from './rate-limit';
 
 /**
@@ -209,15 +210,16 @@ export async function withTimeout<T>(work: Promise<T>, ms: number = ROUTE_TIMEOU
 /**
  * Log one line per request.
  *
- * Only the route, the status, the duration and the correlation id are
- * written. Bodies, prompts, keys and the user's own words never reach the
- * log.
+ * Only the route, the status, the duration, the correlation id and - when a
+ * provider failed - its failure kind are written. Bodies, prompts, keys,
+ * provider messages and the user's own words never reach the log.
  */
 export function logRequest(
   route: string,
   status: number,
   durationMs: number,
   request: Request,
+  providerError?: ProviderErrorKind,
 ): void {
   console.warn(
     JSON.stringify({
@@ -226,6 +228,7 @@ export function logRequest(
       status,
       durationMs,
       correlationId: correlationId(request),
+      ...(providerError ? { providerError } : {}),
     }),
   );
 }

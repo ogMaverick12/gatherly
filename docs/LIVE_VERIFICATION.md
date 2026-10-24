@@ -68,3 +68,23 @@ No deployment of this app exists yet, so the `shared` mode has not been observed
 `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` by hand on the deployment; once deployed,
 `GET /api/health` is expected to report `shared`, and that observation belongs here. Until then the
 local build runs the documented per-instance default, and `SECURITY.md` says so explicitly.
+
+## Model ids
+
+The defaults were checked on **2026-10-24**. A retired model id is a 404 at request time, which the
+routes report as the `model_not_found` kind rather than as a network failure, and
+`node scripts/live-smoke.mjs` stops with `MODEL NOT FOUND: <id> - set GATHERLY_GEMINI_MODEL`.
+
+| Provider   | Default id                | Why this id                                                                                                   | Source                                               |
+| ---------- | ------------------------- | ------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
+| Gemini     | `gemini-3.6-flash`        | Google's listed replacement for `gemini-2.0-flash` and `gemini-2.0-flash-001`, which shut down on 1 June 2026 | <https://ai.google.dev/gemini-api/docs/deprecations> |
+| OpenRouter | `google/gemini-3.8-flash` | The newest Google flash model in OpenRouter's public catalogue (created 2 September 2026), read without a key | <https://openrouter.ai/api/v1/models>                |
+
+Both ids are overridable with `GATHERLY_GEMINI_MODEL` and `GATHERLY_OPENROUTER_MODEL`, and both are
+validated in `src/lib/ai/config.ts`.
+
+The Gemini adapter sends `thinkingConfig.thinkingLevel` at the lowest level the default model allows
+(`minimal`, supported by Gemini 3.6 Flash), because thinking tokens count against `maxOutputTokens`.
+Gemini 3.8 Flash does not support `minimal`, so pointing the Gemini model at 3.8 requires a different
+level in `src/lib/ai/gemini.ts`; the table is on
+<https://ai.google.dev/gemini-api/docs/generate-content/thinking>.

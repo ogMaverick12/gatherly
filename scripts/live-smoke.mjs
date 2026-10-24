@@ -32,6 +32,12 @@ const PROVIDERS = [
   { id: 'openrouter', keyName: 'OPENROUTER_API_KEY', modelName: 'GATHERLY_OPENROUTER_MODEL' },
 ];
 
+/** Mirrors src/lib/ai/config.ts, so a missing env still prints the id that failed. */
+const DEFAULT_MODELS = {
+  gemini: 'gemini-3.6-flash',
+  openrouter: 'google/gemini-3.8-flash',
+};
+
 const results = [];
 
 function say(message) {
@@ -112,6 +118,11 @@ async function startServer(providerId, env) {
   return { child, ready };
 }
 
+/** The routes report the failure kind, so a missing model is not guessed from prose. */
+function modelIsMissing(status, parsed) {
+  return status === 404 || parsed?.providerError === 'model_not_found';
+}
+
 /** Call one route and return the parsed body plus the raw text. */
 async function callRoute(route, body) {
   const response = await fetch(`${BASE}${route}`, {
@@ -173,6 +184,7 @@ const IDEAS_CONTEXT = {
 
 async function checkProvider(provider) {
   const key = process.env[provider.keyName];
+  const model = process.env[provider.modelName] ?? DEFAULT_MODELS[provider.id];
   const checks = [];
 
   if (!key) {
@@ -199,6 +211,11 @@ async function checkProvider(provider) {
     const parse = await callRoute('/api/parse', {
       text: 'A wedding on 5 December for 120 guests in Pune, about 8 lakh rupees.',
     });
+    if (modelIsMissing(parse.status, parse.parsed)) {
+      say(`MODEL NOT FOUND: ${model} - set ${provider.modelName}`);
+      checks.push({ route: '/api/parse', result: 'fail', detail: `model not found: ${model}` });
+      return checks;
+    }
     const parseOk =
       parse.status === 200 &&
       parse.parsed?.mode === 'provider' &&
@@ -222,6 +239,11 @@ async function checkProvider(provider) {
       planSummary: PLAN_SUMMARY,
       context: IDEAS_CONTEXT,
     });
+    if (modelIsMissing(ideas.status, ideas.parsed)) {
+      say(`MODEL NOT FOUND: ${model} - set ${provider.modelName}`);
+      checks.push({ route: '/api/ideas', result: 'fail', detail: `model not found: ${model}` });
+      return checks;
+    }
     const ideasOk =
       ideas.status === 200 &&
       ideas.parsed?.mode === 'provider' &&
@@ -253,6 +275,11 @@ async function checkProvider(provider) {
     const modeFrame = frames.find((frame) => frame.name === 'mode');
     const deltaFrame = frames.find((frame) => frame.name === 'delta');
     const doneFrame = frames.find((frame) => frame.name === 'done');
+    if (modelIsMissing(chat.status, doneFrame?.data)) {
+      say(`MODEL NOT FOUND: ${model} - set ${provider.modelName}`);
+      checks.push({ route: '/api/chat', result: 'fail', detail: `model not found: ${model}` });
+      return checks;
+    }
     const chatOk =
       chat.status === 200 &&
       modeFrame?.data?.provider === provider.id &&

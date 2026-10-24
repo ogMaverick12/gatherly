@@ -1,4 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import type * as GenAiModule from '@google/genai';
+import { ApiError } from '@google/genai';
 import { GeminiProvider } from '@/lib/ai/gemini';
 import { OpenRouterProvider } from '@/lib/ai/openrouter';
 import { ProviderError, type GenerationRequest } from '@/lib/ai/provider';
@@ -13,11 +15,15 @@ const REQUEST: GenerationRequest = {
 
 const generateContent = vi.fn();
 
-vi.mock('@google/genai', () => ({
-  GoogleGenAI: class {
-    models = { generateContent };
-  },
-}));
+vi.mock('@google/genai', async () => {
+  const actual = await vi.importActual<typeof GenAiModule>('@google/genai');
+  return {
+    ...actual,
+    GoogleGenAI: class {
+      models = { generateContent };
+    },
+  };
+});
 
 afterEach(() => {
   generateContent.mockReset();
@@ -50,6 +56,19 @@ describe('the Gemini adapter', () => {
     expect(call.config.systemInstruction.parts[0]?.text).toBe('system');
   });
 
+  it('asks for the lowest thinking level and room for the answer', async () => {
+    generateContent.mockResolvedValue({ text: 'ok' });
+    const provider = new GeminiProvider('key', 'gemini-3.6-flash');
+
+    await provider.generate(REQUEST);
+
+    const call = generateContent.mock.calls[0]?.[0] as {
+      config: { thinkingConfig?: unknown; maxOutputTokens?: number };
+    };
+    expect(call.config.thinkingConfig).toEqual({ thinkingLevel: 'MINIMAL' });
+    expect(call.config.maxOutputTokens).toBe(2048);
+  });
+
   it('keeps the user text inside the delimited data block', async () => {
     generateContent.mockResolvedValue({ text: 'ok' });
     const provider = new GeminiProvider('key', 'gemini-2.0-flash');
@@ -64,21 +83,25 @@ describe('the Gemini adapter', () => {
 
   it('refuses an empty answer', async () => {
     generateContent.mockResolvedValue({ text: '   ' });
-    const provider = new GeminiProvider('key', 'gemini-2.0-flash');
+    const provider = new GeminiProvider('key', 'gemini-3.6-flash');
 
-    await expect(provider.generate(REQUEST)).rejects.toBeInstanceOf(ProviderError);
+    await expect(provider.generate(REQUEST)).rejects.toMatchObject({
+      name: 'ProviderError',
+      kind: 'bad_output',
+      retryable: false,
+    });
   });
 
   it('marks a rate limit as retryable', async () => {
-    generateContent.mockRejectedValue(new Error('429 rate limit reached'));
-    const provider = new GeminiProvider('key', 'gemini-2.0-flash');
+    generateContent.mockRejectedValue(new ApiError({ message: 'rate limited', status: 429 }));
+    const provider = new GeminiProvider('key', 'gemini-3.6-flash');
 
     await expect(provider.generate(REQUEST)).rejects.toMatchObject({ retryable: true });
   });
 
   it('marks a bad request as not retryable', async () => {
-    generateContent.mockRejectedValue(new Error('400 invalid argument'));
-    const provider = new GeminiProvider('key', 'gemini-2.0-flash');
+    generateContent.mockRejectedValue(new ApiError({ message: 'invalid argument', status: 400 }));
+    const provider = new GeminiProvider('key', 'gemini-3.6-flash');
 
     await expect(provider.generate(REQUEST)).rejects.toMatchObject({ retryable: false });
   });

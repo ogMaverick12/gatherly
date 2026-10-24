@@ -10,6 +10,15 @@ export type ProviderId = 'gemini' | 'openrouter' | 'basic';
 
 export type GenerationMode = 'basic' | 'provider';
 
+/**
+ * Why a provider call failed, in the terms the routes and the log use.
+ *
+ * The kind is the only provider detail that leaves the adapter: never the
+ * provider's message, which can echo the request.
+ */
+export type ProviderErrorKind =
+  'timeout' | 'rate_limited' | 'model_not_found' | 'auth' | 'bad_output' | 'server' | 'network';
+
 export interface GenerationRequest {
   /** A short machine-readable intent such as "chat" or "ideas". */
   readonly intent: string;
@@ -41,6 +50,7 @@ export class ProviderError extends Error {
   constructor(
     message: string,
     readonly retryable: boolean = false,
+    readonly kind: ProviderErrorKind = 'network',
   ) {
     super(message);
     this.name = 'ProviderError';

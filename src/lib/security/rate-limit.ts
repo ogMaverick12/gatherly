@@ -9,6 +9,7 @@
  * environment variables are present.
  */
 
+import { readConfig } from '../ai/config';
 import { UpstashRateLimiter } from './upstash-limiter';
 
 export interface RateLimitResult {
@@ -83,9 +84,8 @@ export type RateLimitMode = 'shared' | 'per-instance';
  * without reading the logs.
  */
 export function rateLimitMode(): RateLimitMode {
-  const url = process.env['UPSTASH_REDIS_REST_URL'];
-  const token = process.env['UPSTASH_REDIS_REST_TOKEN'];
-  return url && token ? 'shared' : 'per-instance';
+  const config = readConfig();
+  return config.upstashUrl && config.upstashToken ? 'shared' : 'per-instance';
 }
 
 /**
@@ -112,11 +112,10 @@ let limiter: RateLimiter | null = null;
 export function getRateLimiter(): RateLimiter {
   if (limiter) return limiter;
 
-  const url = process.env['UPSTASH_REDIS_REST_URL'];
-  const token = process.env['UPSTASH_REDIS_REST_TOKEN'];
+  const config = readConfig();
 
-  if (url && token) {
-    limiter = new UpstashRateLimiter(url, token);
+  if (config.upstashUrl && config.upstashToken) {
+    limiter = new UpstashRateLimiter(config.upstashUrl, config.upstashToken);
   } else {
     limiter = new InMemoryRateLimiter();
   }

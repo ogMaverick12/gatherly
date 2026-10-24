@@ -194,10 +194,38 @@ describe('the ideas route', () => {
     selectProvider.mockReturnValue(selection);
 
     const response = await ideas(request({ planSummary: 'x', context }));
-    const body = (await response.json()) as { mode: string; notices: string[] };
+    const body = (await response.json()) as {
+      mode: string;
+      notices: string[];
+      providerError: string;
+    };
 
     expect(body.mode).toBe('basic');
-    expect(body.notices.join(' ')).toContain('did not match the expected shape');
+    expect(body.notices.join(' ')).toContain('could not be read');
+    expect(body.providerError).toBe('bad_output');
+  });
+
+  it('accepts ideas the model wrapped in a markdown fence', async () => {
+    const selection = basicSelection({ live: true, notice: null });
+    selection.provider.generate = vi.fn(async () => ({
+      mode: 'provider' as const,
+      provider: 'gemini' as const,
+      content:
+        '```json\n{"ideas":[{"title":"A title","body":"A body","rationale":"Because","tags":["food"]}]}\n```',
+      notices: [],
+    }));
+    selectProvider.mockReturnValue(selection);
+
+    const response = await ideas(request({ planSummary: 'x', context }));
+    const body = (await response.json()) as {
+      mode: string;
+      ideas: { title: string }[];
+      providerError: string | null;
+    };
+
+    expect(body.mode).toBe('provider');
+    expect(body.ideas[0]?.title).toBe('A title');
+    expect(body.providerError).toBeNull();
   });
 
   it('uses the provider ideas when they validate', async () => {
@@ -254,10 +282,15 @@ describe('the parse route', () => {
     selectProvider.mockReturnValue(selection);
 
     const response = await parse(request({ text: 'A wedding for 120 people in December' }));
-    const body = (await response.json()) as { mode: string; notices: string[] };
+    const body = (await response.json()) as {
+      mode: string;
+      notices: string[];
+      providerError: string;
+    };
 
     expect(body.mode).toBe('basic');
-    expect(body.notices.join(' ')).toContain('did not match the expected shape');
+    expect(body.notices.join(' ')).toContain('could not be read');
+    expect(body.providerError).toBe('bad_output');
   });
 
   it('uses the provider fields when they validate', async () => {
