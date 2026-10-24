@@ -1,0 +1,29 @@
+import Link from 'next/link';
+import { Wordmark } from './Wordmark';
+
+export function SiteFooter() {
+  return (
+    <footer className="no-print mt-16 border-t border-line bg-paper-raised">
+      <div className="mx-auto flex max-w-6xl flex-col gap-4 px-5 py-10 text-sm text-ink-muted sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <Wordmark className="text-ink" />
+          <p className="mt-2 max-w-prose">
+            Your plan stays on this device. No account, no upload, no tracking.
+          </p>
+        </div>
+        <ul className="flex flex-wrap items-center gap-5">
+          <li>
+            <Link href="/intake" className="underline-offset-4 hover:text-ink hover:underline">
+              Start a plan
+            </Link>
+          </li>
+          <li>
+            <Link href="/plan" className="underline-offset-4 hover:text-ink hover:underline">
+              Open your plan
+            </Link>
+          </li>
+        </ul>
+      </div>
+    </footer>
+  );
+}

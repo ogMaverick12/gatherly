@@ -1,0 +1,20 @@
+{
+  "name": "Gatherly",
+  "short_name": "Gatherly",
+  "description": "Plan a celebration without losing the day. Your plan stays on your device.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#FBF6EE",
+  "theme_color": "#FBF6EE",
+  "categories": ["productivity", "lifestyle"],
+  "icons": [
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

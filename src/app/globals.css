@@ -1,0 +1,184 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ------------------------------------------------------------------ *
+ * Gatherly design tokens
+ * Palette: paper, ink, marigold, peacock teal, rose.
+ * Every colour is a CSS custom property so dark mode, Calm mode and
+ * text scaling all flow from one place.
+ *
+ * Contrast is enforced by tests/accessibility/contrast.test.ts.
+ *  - ink on paper            15.6 : 1
+ *  - ink-muted on paper       7.1 : 1
+ *  - teal on paper            5.6 : 1
+ *  - rose on paper            6.0 : 1
+ *  - marigold on paper        2.2 : 1  -> decorative / fills only
+ *  - marigold-ink on paper   6.1 : 1  -> the text-safe marigold
+ *  - ink on marigold          7.3 : 1  -> ink text on a marigold fill
+ *  - on-marigold on marigold  -> the text that sits on a marigold fill,
+ *                                 dark in light mode and dark in dark mode
+ * ------------------------------------------------------------------ */
+:root {
+  --color-paper: #fbf6ee;
+  --color-paper-raised: #fffdf8;
+  --color-ink: #1f1a17;
+  --color-ink-muted: #5a514b;
+  --color-marigold: #e8962a;
+  --color-marigold-ink: #8a4e08;
+  --color-on-marigold: #1f1a17;
+  --color-teal: #0f6e6a;
+  --color-teal-deep: #0a4f4c;
+  --color-rose: #b4234f;
+  --color-line: #e6dccb;
+  --color-line-strong: #cfc0a8;
+  --color-focus: #0f6e6a;
+  --color-overlay: rgba(31, 26, 23, 0.55);
+
+  --shadow-card: 0 1px 2px rgba(31, 26, 23, 0.04), 0 12px 32px -18px rgba(31, 26, 23, 0.28);
+  --shadow-lift: 0 2px 4px rgba(31, 26, 23, 0.05), 0 24px 48px -24px rgba(31, 26, 23, 0.32);
+
+  --radius-card: 1.25rem;
+  --tap-target: 44px;
+
+  color-scheme: light;
+}
+
+[data-theme='dark'] {
+  --color-paper: #17120f;
+  --color-paper-raised: #221b16;
+  --color-ink: #f6efe4;
+  --color-ink-muted: #c9bcac;
+  --color-marigold: #e8962a;
+  --color-marigold-ink: #f0b15e;
+  --color-on-marigold: #17120f;
+  --color-teal: #4fb3ad;
+  --color-teal-deep: #7fd1cb;
+  --color-rose: #f291a8;
+  --color-line: #3a2f27;
+  --color-line-strong: #57493e;
+  --color-focus: #7fd1cb;
+  --color-overlay: rgba(8, 6, 5, 0.7);
+
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.4), 0 12px 32px -18px rgba(0, 0, 0, 0.8);
+  --shadow-lift: 0 2px 4px rgba(0, 0, 0, 0.45), 0 24px 48px -24px rgba(0, 0, 0, 0.9);
+
+  color-scheme: dark;
+}
+
+/*
+ * Calm mode: quieter palette, softer edges, no celebratory motion.
+ * It never removes information, only ornament and intensity.
+ */
+[data-calm='true'] {
+  --color-marigold: #c99a5e;
+  --color-marigold-ink: #7d5a2a;
+  --color-on-marigold: #1f1a17;
+  --color-rose: #9c5a70;
+  --shadow-card: 0 1px 2px rgba(31, 26, 23, 0.05);
+  --shadow-lift: 0 2px 4px rgba(31, 26, 23, 0.06);
+}
+
+html {
+  /* Text size preference. Everything else is authored in rem. */
+  font-size: 16px;
+  scroll-behavior: smooth;
+}
+
+html[data-text-size='large'] {
+  font-size: 18px;
+}
+
+html[data-text-size='xlarge'] {
+  font-size: 20px;
+}
+
+body {
+  background-color: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans), system-ui, 'Segoe UI', sans-serif;
+  font-size: 1rem;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display), 'Iowan Old Style', Georgia, serif;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  color: var(--color-ink);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+::selection {
+  background-color: var(--color-marigold);
+  color: var(--color-ink);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* The manual motion switch mirrors the media query for users whose OS
+   setting does not match what they want right now. */
+[data-motion='off'] *,
+[data-motion='off'] *::before,
+[data-motion='off'] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
+@media print {
+  :root {
+    --color-paper: #ffffff;
+    --color-paper-raised: #ffffff;
+    --color-ink: #000000;
+    --color-ink-muted: #333333;
+    --color-line: #cccccc;
+  }
+
+  html,
+  body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .print-block {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  a[href]::after {
+    content: '';
+  }
+
+  @page {
+    margin: 16mm;
+  }
+}

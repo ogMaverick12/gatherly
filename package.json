@@ -1,0 +1,67 @@
+{
+  "name": "gatherly",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Gatherly - a calm, global event-planning companion for weddings, birthdays and community gatherings.",
+  "engines": {
+    "node": ">=20.9.0"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint . --max-warnings=0",
+    "typecheck": "tsc --noEmit",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "check": "npm run lint && npm run typecheck && npm run format:check && npm run test:coverage",
+    "e2e": "playwright test",
+    "test:e2e": "playwright test",
+    "e2e:install": "playwright install chromium"
+  },
+  "overrides": {
+    "postcss": "$postcss",
+    "postcss-selector-parser": "^7.1.6",
+    "@typescript-eslint/utils": "^8.72.0",
+    "@typescript-eslint/typescript-estree": "^8.72.0"
+  },
+  "dependencies": {
+    "@google/genai": "^2.30.0",
+    "@hookform/resolvers": "^3.9.1",
+    "next": "^15.1.7",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-hook-form": "^7.54.2",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.14.0",
+    "@eslint/eslintrc": "^3.3.1",
+    "@playwright/test": "^1.49.1",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.2.0",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/node": "^22.13.4",
+    "@types/react": "^19.0.8",
+    "@types/react-dom": "^19.0.3",
+    "@vitest/coverage-v8": "^5.0.5",
+    "autoprefixer": "^10.4.20",
+    "eslint": "^9.20.1",
+    "eslint-config-next": "^15.1.7",
+    "eslint-import-resolver-typescript": "^4.4.5",
+    "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "eslint-plugin-vitest": "^0.5.4",
+    "fast-check": "^4.10.2",
+    "jest-axe": "^11.0.0",
+    "jsdom": "^26.0.0",
+    "postcss": "^8.5.23",
+    "prettier": "^3.9.10",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.7.3",
+    "vitest": "^5.0.5"
+  }
+}
