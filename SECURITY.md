@@ -69,6 +69,16 @@ The `RateLimiter` interface has two implementations:
   development and for a single long-running server, and it is _not_ sufficient for serverless,
   where each instance would keep its own bucket.
 
+The shared window is **fixed**, set by one atomic Lua `EVAL`: the counter is incremented and the
+expiry is set only when the key is created, so later requests cannot extend the window. A key found
+without an expiry is given one. When the store fails, the result is marked `degraded: true`, the
+request is allowed, and one `rate_limit_fail_open` line is written a minute with no request data.
+
+A **client key** is `x-real-ip` when the platform sets it, otherwise the **last** entry of
+`x-forwarded-for` (the address the nearest trusted proxy saw), otherwise one local bucket. A
+client-supplied first entry is never used, so rotating it cannot buy a fresh bucket. This assumes a
+single trusted proxy in front of the app, as on Vercel.
+
 The mode is **observable**, not hidden in a log file:
 
 - `GET /api/health` answers `{ ok, mode, rateLimit }`, where `rateLimit` is `shared` when the

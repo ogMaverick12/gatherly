@@ -9,12 +9,16 @@
  * environment variables are present.
  */
 
+import { UpstashRateLimiter } from './upstash-limiter';
+
 export interface RateLimitResult {
   readonly allowed: boolean;
   readonly remaining: number;
   readonly limit: number;
   /** Milliseconds until the caller may try again. */
   readonly retryAfterMs: number;
+  /** True when the shared store could not answer and the call was let through. */
+  readonly degraded?: boolean;
 }
 
 export interface RateLimiter {
@@ -65,60 +69,7 @@ export class InMemoryRateLimiter implements RateLimiter {
   }
 }
 
-interface UpstashResponse {
-  result?: unknown;
-  error?: string;
-}
-
-export class UpstashRateLimiter implements RateLimiter {
-  readonly kind = 'upstash' as const;
-
-  constructor(
-    private readonly url: string,
-    private readonly token: string,
-    private readonly capacity = 20,
-    private readonly windowMs = 60_000,
-  ) {}
-
-  async check(key: string): Promise<RateLimitResult> {
-    const redisKey = `gatherly:ratelimit:${key}`;
-    const pipeline = [
-      ['INCR', redisKey],
-      ['PEXPIRE', redisKey, String(this.windowMs)],
-      ['PTTL', redisKey],
-    ];
-
-    const response = await fetch(`${this.url}/pipeline`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${this.token}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(pipeline),
-      signal: AbortSignal.timeout(3000),
-      cache: 'no-store',
-    });
-
-    if (!response.ok) {
-      // Fail open rather than lock the app out when the limiter store is
-      // unreachable; the request is still bounded by the body cap and the
-      // provider timeout.
-      return { allowed: true, remaining: this.capacity, limit: this.capacity, retryAfterMs: 0 };
-    }
-
-    const payload = (await response.json()) as UpstashResponse;
-    const results = Array.isArray(payload.result) ? payload.result : [];
-    const count = Number(results[0] ?? 0);
-    const ttl = Number(results[2] ?? this.windowMs);
-
-    return {
-      allowed: count <= this.capacity,
-      remaining: Math.max(0, this.capacity - count),
-      limit: this.capacity,
-      retryAfterMs: Math.max(0, ttl),
-    };
-  }
-}
+export { UpstashRateLimiter };
 
 export type RateLimitMode = 'shared' | 'per-instance';
 

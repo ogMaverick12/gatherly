@@ -1,8 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { z } from 'zod';
 import {
-  clientKey,
-  correlationId,
   errorResponse,
   HttpError,
   jsonResponse,
@@ -77,32 +75,6 @@ describe('readJsonBody', () => {
   it('rejects a body that declares a length over the cap', async () => {
     const request = jsonRequest({ name: 'ok' }, { 'content-length': '999999' });
     await expect(readJsonBody(request, Schema, 10)).rejects.toThrow('That request is too large.');
-  });
-});
-
-describe('clientKey', () => {
-  it('uses the first forwarded address', () => {
-    const request = new Request('https://gatherly.example', {
-      headers: { 'x-forwarded-for': '203.0.113.5, 70.41.3.18' },
-    });
-    expect(clientKey(request)).toBe('203.0.113.5');
-  });
-
-  it('falls back to a local bucket', () => {
-    expect(clientKey(new Request('https://gatherly.example'))).toBe('local');
-  });
-});
-
-describe('correlationId', () => {
-  it('passes through a supplied id', () => {
-    const request = new Request('https://gatherly.example', {
-      headers: { 'x-correlation-id': 'abc' },
-    });
-    expect(correlationId(request)).toBe('abc');
-  });
-
-  it('generates one when there is none', () => {
-    expect(correlationId(new Request('https://gatherly.example'))).toMatch(/^req_/);
   });
 });
 

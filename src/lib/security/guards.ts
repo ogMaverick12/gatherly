@@ -119,14 +119,25 @@ export async function readJsonBody<TSchema extends z.ZodTypeAny>(
   return parsed.data;
 }
 
-/** A stable key for the caller. Proxies set `x-forwarded-for`; locally it is one bucket. */
+/**
+ * A stable key for the caller.
+ *
+ * `x-real-ip` is set by the platform. Otherwise the LAST `x-forwarded-for`
+ * entry is used: a proxy that appends leaves the earlier entries under the
+ * client's control, so reading the first one would let a caller rotate it and
+ * get a fresh bucket on every request.
+ */
 export function clientKey(request: Request): string {
+  const realIp = request.headers.get('x-real-ip')?.trim();
+  if (realIp) return realIp;
+
   const forwarded = request.headers.get('x-forwarded-for');
   if (forwarded) {
-    const first = forwarded.split(',')[0]?.trim();
-    if (first) return first;
+    const hops = forwarded.split(',').map((hop) => hop.trim());
+    const nearest = hops.filter((hop) => hop.length > 0).pop();
+    if (nearest) return nearest;
   }
-  return request.headers.get('x-real-ip') ?? 'local';
+  return 'local';
 }
 
 export async function enforceRateLimit(
@@ -153,8 +164,20 @@ export async function enforceRateLimit(
   return { headers };
 }
 
+/** The shape a client-supplied correlation id must have before it is logged. */
+const CORRELATION_ID_PATTERN = /^[A-Za-z0-9_-]{8,64}$/;
+
+/**
+ * The id echoed in the request log.
+ *
+ * A client value is only trusted when it is that shape: it is written into a
+ * log line, so anything else could forge or break the line. Otherwise a fresh
+ * random id is generated for this request.
+ */
 export function correlationId(request: Request): string {
-  return request.headers.get('x-correlation-id') ?? `req_${Date.now().toString(36)}`;
+  const supplied = request.headers.get('x-correlation-id');
+  if (supplied && CORRELATION_ID_PATTERN.test(supplied)) return supplied;
+  return `req_${crypto.randomUUID()}`;
 }
 
 /** The route budget. A provider gets 15 s; the route as a whole gets 20 s. */

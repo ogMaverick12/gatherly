@@ -229,6 +229,17 @@ those numbers fails the test run rather than being reported after the fact.
 
 ---
 
+## Security
+
+Rate limiting keys on the address of the **nearest trusted proxy**, never on anything the client
+can choose. `x-real-ip` wins; otherwise the **last** entry of `x-forwarded-for` is used, because a
+proxy that appends leaves the earlier entries under the client's control. This assumes a single
+trusted proxy in front of the app, as on Vercel: behind a different topology, or with an untrusted
+CDN in front, make sure the app is reachable only through the proxy and that it sets one of those
+headers itself. The full threat model is in [`SECURITY.md`](SECURITY.md).
+
+---
+
 ## Documentation
 
 | File                                                     | What it covers                                                     |

@@ -197,7 +197,7 @@ describe('the rate limiter', () => {
   it('counts the requests against the shared store', async () => {
     const fetchMock = vi.fn(
       async (_url: string, _init?: RequestInit) =>
-        new Response(JSON.stringify({ result: [3, 1, 59_000] }), { status: 200 }),
+        new Response(JSON.stringify([{ result: [3, 59_000] }]), { status: 200 }),
     );
     vi.stubGlobal('fetch', fetchMock);
 
@@ -214,7 +214,7 @@ describe('the rate limiter', () => {
   it('blocks the request once the count is over the limit', async () => {
     vi.stubGlobal(
       'fetch',
-      vi.fn(async () => new Response(JSON.stringify({ result: [21, 1, 30_000] }), { status: 200 })),
+      vi.fn(async () => new Response(JSON.stringify([{ result: [21, 30_000] }]), { status: 200 })),
     );
 
     const limiter = new UpstashRateLimiter('https://redis.test', 'token', 20);
@@ -233,8 +233,7 @@ describe('the rate limiter', () => {
     const limiter = new UpstashRateLimiter('https://redis.test', 'token', 20);
     const result = await limiter.check('chat:1.2.3.4');
 
-    expect(result.allowed).toBe(true);
-    expect(result.remaining).toBe(20);
+    expect(result).toMatchObject({ allowed: true, remaining: 20, degraded: true });
   });
 
   it('forgets buckets that have been idle for a long time', async () => {
