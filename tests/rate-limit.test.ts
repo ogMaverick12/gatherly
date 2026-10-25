@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { z } from 'zod';
-import { jsonResponse, withGuards } from '@/lib/security/guards';
+import { jsonResponse } from '@/lib/security/http';
+import { createRoute } from '@/lib/security/route';
 import { setRateLimiter, UpstashRateLimiter } from '@/lib/security/rate-limit';
 
 /**
@@ -127,9 +128,11 @@ describe('the shared limiter window', () => {
     vi.stubGlobal('fetch', redis.fetchMock);
     setRateLimiter(limiterOn(clock));
 
-    const handler = withGuards('chat', z.object({ ok: z.boolean() }), async () =>
-      jsonResponse({ ok: true }),
-    );
+    const handler = createRoute({
+      name: 'chat',
+      schema: z.object({ ok: z.boolean() }),
+      handler: async () => jsonResponse({ ok: true }),
+    });
     const request = () =>
       new Request('https://gatherly.test/api/chat', {
         method: 'POST',

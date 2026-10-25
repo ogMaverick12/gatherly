@@ -1,17 +1,19 @@
-import type { z } from 'zod';
 import type { ProviderErrorKind } from '../ai/provider';
 import { getRateLimiter } from './rate-limit';
 
 /**
  * Shared guards for the API routes.
  *
- * Every route is stateless: a body is read, capped, parsed, validated and
- * answered. Nothing is stored on the server, and every response is marked
- * `no-store` so a proxy or the service worker can never keep a copy.
+ * These are the pieces every route needs regardless of what it answers: a
+ * rate limit, a stable client key, a deadline and one log line.
  */
 
-export const MAX_BODY_BYTES = 16 * 1024;
-
+/**
+ * A failure that maps to a specific HTTP response.
+ *
+ * `headers` exists because a 429 must still carry the limit and the
+ * Retry-After value the caller needs.
+ */
 export class HttpError extends Error {
   constructor(
     readonly status: number,
@@ -25,101 +27,6 @@ export class HttpError extends Error {
   }
 }
 
-export function jsonResponse(
-  data: unknown,
-  init: { status?: number; headers?: Record<string, string> } = {},
-): Response {
-  return new Response(JSON.stringify(data), {
-    status: init.status ?? 200,
-    headers: {
-      'Content-Type': 'application/json; charset=utf-8',
-      'Cache-Control': 'no-store, no-cache, must-revalidate',
-      'X-Content-Type-Options': 'nosniff',
-      'Referrer-Policy': 'strict-origin-when-cross-origin',
-      ...init.headers,
-    },
-  });
-}
-
-export function errorResponse(error: unknown): Response {
-  if (error instanceof HttpError) {
-    return jsonResponse(
-      { error: error.message, details: error.details ?? null },
-      { status: error.status, headers: error.headers },
-    );
-  }
-  return jsonResponse(
-    { error: 'Something went wrong. Please try again.', details: null },
-    { status: 500 },
-  );
-}
-
-async function readBodyWithLimit(request: Request, maxBytes: number): Promise<string> {
-  const contentLength = request.headers.get('content-length');
-  if (contentLength) {
-    const declared = Number(contentLength);
-    if (Number.isFinite(declared) && declared > maxBytes) {
-      throw new HttpError(413, 'That request is too large.');
-    }
-  }
-
-  const body = request.body;
-  if (!body) return '';
-
-  const reader = body.getReader();
-  const chunks: Uint8Array[] = [];
-  let total = 0;
-
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    if (!value) continue;
-    total += value.byteLength;
-    if (total > maxBytes) {
-      await reader.cancel().catch(() => undefined);
-      throw new HttpError(413, 'That request is too large.');
-    }
-    chunks.push(value);
-  }
-
-  const combined = new Uint8Array(total);
-  let offset = 0;
-  for (const chunk of chunks) {
-    combined.set(chunk, offset);
-    offset += chunk.byteLength;
-  }
-  return new TextDecoder().decode(combined);
-}
-
-export async function readJsonBody<TSchema extends z.ZodTypeAny>(
-  request: Request,
-  schema: TSchema,
-  maxBytes = MAX_BODY_BYTES,
-): Promise<z.infer<TSchema>> {
-  const raw = await readBodyWithLimit(request, maxBytes);
-  if (raw.trim() === '') {
-    throw new HttpError(400, 'A JSON body is required.');
-  }
-
-  let json: unknown;
-  try {
-    json = JSON.parse(raw);
-  } catch {
-    throw new HttpError(400, 'That body is not valid JSON.');
-  }
-
-  const parsed = schema.safeParse(json);
-  if (!parsed.success) {
-    throw new HttpError(400, 'Please check the values you sent.', {
-      fields: parsed.error.issues.map((issue) => ({
-        path: issue.path.join('.'),
-        message: issue.message,
-      })),
-    });
-  }
-  return parsed.data;
-}
-
 /**
  * A stable key for the caller.
  *
@@ -127,6 +34,9 @@ export async function readJsonBody<TSchema extends z.ZodTypeAny>(
  * entry is used: a proxy that appends leaves the earlier entries under the
  * client's control, so reading the first one would let a caller rotate it and
  * get a fresh bucket on every request.
+ *
+ * @param request the incoming request
+ * @returns the address the rate limit counts against, or `local`
  */
 export function clientKey(request: Request): string {
   const realIp = request.headers.get('x-real-ip')?.trim();
@@ -141,6 +51,17 @@ export function clientKey(request: Request): string {
   return 'local';
 }
 
+/**
+ * Count this request against the caller's bucket.
+ *
+ * The headers are returned rather than written so they can travel with
+ * whichever response the handler produces, including an error.
+ *
+ * @param request the incoming request
+ * @param route the route name, which is part of the bucket key
+ * @returns the rate limit headers to send
+ * @throws HttpError 429 when the bucket is empty
+ */
 export async function enforceRateLimit(
   request: Request,
   route: string,
@@ -174,6 +95,9 @@ const CORRELATION_ID_PATTERN = /^[A-Za-z0-9_-]{8,64}$/;
  * A client value is only trusted when it is that shape: it is written into a
  * log line, so anything else could forge or break the line. Otherwise a fresh
  * random id is generated for this request.
+ *
+ * @param request the incoming request
+ * @returns a safe correlation id for the log line
  */
 export function correlationId(request: Request): string {
   const supplied = request.headers.get('x-correlation-id');
@@ -189,6 +113,11 @@ export const ROUTE_TIMEOUT_MS = 20_000;
  *
  * The timer is always cleared, so a fast answer does not keep the event
  * loop alive.
+ *
+ * @param work the promise to bound
+ * @param ms the budget in milliseconds
+ * @returns the work's result
+ * @throws HttpError 504 when the budget runs out
  */
 export async function withTimeout<T>(work: Promise<T>, ms: number = ROUTE_TIMEOUT_MS): Promise<T> {
   let timer: ReturnType<typeof setTimeout> | undefined;
@@ -213,6 +142,12 @@ export async function withTimeout<T>(work: Promise<T>, ms: number = ROUTE_TIMEOU
  * Only the route, the status, the duration, the correlation id and - when a
  * provider failed - its failure kind are written. Bodies, prompts, keys,
  * provider messages and the user's own words never reach the log.
+ *
+ * @param route the route name
+ * @param status the response status
+ * @param durationMs how long the request took
+ * @param request the incoming request, read for its correlation id
+ * @param providerError the failure kind, never the provider's message
  */
 export function logRequest(
   route: string,
@@ -231,32 +166,4 @@ export function logRequest(
       ...(providerError ? { providerError } : {}),
     }),
   );
-}
-
-/**
- * Wrap a route handler with the standard guards.
- * The handler receives a validated body and returns a `Response`.
- */
-export function withGuards<TSchema extends z.ZodTypeAny>(
-  route: string,
-  schema: TSchema,
-  handler: (body: z.infer<TSchema>, request: Request) => Promise<Response>,
-): (request: Request) => Promise<Response> {
-  return async (request: Request) => {
-    try {
-      if (request.method !== 'POST') {
-        return jsonResponse({ error: 'Method not allowed.' }, { status: 405 });
-      }
-      const rate = await enforceRateLimit(request, route);
-      const body = await readJsonBody(request, schema);
-      const response = await handler(body, request);
-      for (const [key, value] of Object.entries(rate.headers)) {
-        response.headers.set(key, value);
-      }
-      response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate');
-      return response;
-    } catch (error) {
-      return errorResponse(error);
-    }
-  };
 }

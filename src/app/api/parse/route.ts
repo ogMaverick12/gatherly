@@ -1,109 +1,59 @@
-import { ParseRequestSchema, ParsedFieldsSchema, type ParsedFields } from '@/lib/api-schema';
-import {
-  enforceRateLimit,
-  errorResponse,
-  jsonResponse,
-  logRequest,
-  readJsonBody,
-  withTimeout,
-} from '@/lib/security/guards';
-import { extractJson, generateWithRetry, selectProvider } from '@/lib/ai';
-import { kindOfFailure } from '@/lib/ai/errors';
+import { ParseRequestSchema, ParsedFieldsSchema } from '@/lib/api-schema';
+import { selectProvider } from '@/lib/ai';
 import { providerErrorNotice } from '@/lib/ai/notices';
-import type { ProviderErrorKind } from '@/lib/ai/provider';
+import { generateJson } from '@/lib/ai/provider-json';
 import { PARSE_SYSTEM_PROMPT } from '@/lib/ai/prompts';
+import { jsonResponse } from '@/lib/security/http';
+import { createRoute } from '@/lib/security/route';
 import { parseFreeText } from '@/features/assistant/parse';
-
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-/**
- * POST /api/parse
- *
- * Turns free text into plan fields.
- *
- * Two rules hold on both paths: nothing is inferred about identity,
- * religion, community or region, and every field the user did not state
- * is left empty rather than guessed.
- */
-export async function POST(request: Request): Promise<Response> {
-  const startedAt = Date.now();
-  let status = 200;
-  let providerError: ProviderErrorKind | null = null;
-  try {
-    const rate = await enforceRateLimit(request, 'parse');
-    const body = await readJsonBody(request, ParseRequestSchema);
-
+const BASIC_SUFFIX = 'so the deterministic parse is shown instead.';
+/** POST /api/parse - free text to fields, never guessing what was not said. */
+export const POST = createRoute({
+  name: 'parse',
+  schema: ParseRequestSchema,
+  handler: async (body, { signal, complete }) => {
     const selection = selectProvider();
     const notices: string[] = [];
+    const payload = {
+      mode: 'basic' as const,
+      provider: selection.provider.id,
+      fields: parseFreeText(body.text),
+    };
 
     if (!selection.live) {
       if (selection.notice) notices.push(selection.notice);
-      const fields: ParsedFields = parseFreeText(body.text);
-      return jsonResponse(
-        { mode: 'basic', provider: selection.provider.id, fields, notices, providerError },
-        { headers: rate.headers },
-      );
+      return jsonResponse({ ...payload, notices, providerError: null });
     }
 
-    try {
-      const result = await withTimeout(
-        generateWithRetry(selection.provider, {
-          intent: 'parse',
-          systemPrompt: PARSE_SYSTEM_PROMPT,
-          userText: body.text,
-          planSummary: '',
-          basicAnswer: '',
-          responseFormat: 'json',
-        }),
-      );
+    const result = await generateJson({
+      provider: selection.provider,
+      schema: ParsedFieldsSchema,
+      request: {
+        intent: 'parse',
+        systemPrompt: PARSE_SYSTEM_PROMPT,
+        userText: body.text,
+        planSummary: '',
+        basicAnswer: '',
+        responseFormat: 'json',
+        signal,
+      },
+    });
 
-      const parsed = ParsedFieldsSchema.safeParse(extractJson(result.content));
-
-      if (!parsed.success) {
-        providerError = 'bad_output';
-        notices.push(
-          providerErrorNotice(providerError, 'so the deterministic parse is shown instead.'),
-        );
-        const fields: ParsedFields = parseFreeText(body.text);
-        return jsonResponse(
-          {
-            mode: 'basic',
-            provider: selection.provider.id,
-            fields,
-            notices,
-            providerError,
-          },
-          { headers: rate.headers },
-        );
-      }
-
-      return jsonResponse(
-        {
-          mode: 'provider',
-          provider: selection.provider.id,
-          fields: parsed.data,
-          notices,
-          providerError,
-        },
-        { headers: rate.headers },
-      );
-    } catch (error) {
-      providerError = kindOfFailure(error);
-      notices.push(
-        providerErrorNotice(providerError, 'so the deterministic parse is shown instead.'),
-      );
-      const fields: ParsedFields = parseFreeText(body.text);
-      return jsonResponse(
-        { mode: 'basic', provider: selection.provider.id, fields, notices, providerError },
-        { headers: rate.headers },
-      );
+    if (!result.ok) {
+      complete(result.kind);
+      notices.push(providerErrorNotice(result.kind, BASIC_SUFFIX));
+      return jsonResponse({ ...payload, notices, providerError: result.kind });
     }
-  } catch (error) {
-    const response = errorResponse(error);
-    status = response.status;
-    return response;
-  } finally {
-    logRequest('parse', status, Date.now() - startedAt, request, providerError ?? undefined);
-  }
-}
+
+    return jsonResponse({
+      mode: 'provider',
+      provider: selection.provider.id,
+      fields: result.data,
+      notices,
+      providerError: null,
+    });
+  },
+});

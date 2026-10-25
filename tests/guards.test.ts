@@ -1,12 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { z } from 'zod';
-import {
-  errorResponse,
-  HttpError,
-  jsonResponse,
-  readJsonBody,
-  withGuards,
-} from '@/lib/security/guards';
+import { HttpError } from '@/lib/security/guards';
+import { errorResponse, jsonResponse, readJsonBody } from '@/lib/security/http';
+import { createRoute } from '@/lib/security/route';
 import { InMemoryRateLimiter, setRateLimiter } from '@/lib/security/rate-limit';
 
 const Schema = z.object({ name: z.string().min(1).max(20) });
@@ -78,9 +74,13 @@ describe('readJsonBody', () => {
   });
 });
 
-describe('withGuards', () => {
+describe('createRoute', () => {
   it('rejects a non-POST method', async () => {
-    const handler = withGuards('test', Schema, async () => jsonResponse({ ok: true }));
+    const handler = createRoute({
+      name: 'test',
+      schema: Schema,
+      handler: async () => jsonResponse({ ok: true }),
+    });
     const response = await handler(
       new Request('https://gatherly.example/api/test', { method: 'GET' }),
     );
@@ -88,7 +88,11 @@ describe('withGuards', () => {
   });
 
   it('hands a validated body to the handler', async () => {
-    const handler = withGuards('test', Schema, async (body) => jsonResponse({ name: body.name }));
+    const handler = createRoute({
+      name: 'test',
+      schema: Schema,
+      handler: async (body) => jsonResponse({ name: body.name }),
+    });
     const response = await handler(jsonRequest({ name: 'Ada' }));
     await expect(response.json()).resolves.toEqual({ name: 'Ada' });
   });
@@ -96,7 +100,11 @@ describe('withGuards', () => {
   it('answers a rate-limited request with 429', async () => {
     setRateLimiter(new InMemoryRateLimiter(1, 1));
     try {
-      const handler = withGuards('test', Schema, async () => jsonResponse({ ok: true }));
+      const handler = createRoute({
+        name: 'test',
+        schema: Schema,
+        handler: async () => jsonResponse({ ok: true }),
+      });
       await handler(jsonRequest({ name: 'ok' }));
       const response = await handler(jsonRequest({ name: 'ok' }));
       expect(response.status).toBe(429);
@@ -106,7 +114,11 @@ describe('withGuards', () => {
   });
 
   it('adds the rate limit headers to the response', async () => {
-    const handler = withGuards('test', Schema, async () => jsonResponse({ ok: true }));
+    const handler = createRoute({
+      name: 'test',
+      schema: Schema,
+      handler: async () => jsonResponse({ ok: true }),
+    });
     const response = await handler(jsonRequest({ name: 'ok' }));
     expect(response.headers.get('X-RateLimit-Limit')).toBeTruthy();
     expect(response.headers.get('X-RateLimit-Remaining')).toBeTruthy();
@@ -156,7 +168,11 @@ describe('the rate limiter guard', () => {
       },
     });
     try {
-      const handler = withGuards('chat', Schema, async () => jsonResponse({ ok: true }));
+      const handler = createRoute({
+        name: 'chat',
+        schema: Schema,
+        handler: async () => jsonResponse({ ok: true }),
+      });
       const response = await handler(jsonRequest({ name: 'ok' }));
       expect(response.status).toBe(200);
       expect(seen[0]).toContain('chat:');

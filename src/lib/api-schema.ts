@@ -1,5 +1,12 @@
 import { z } from 'zod';
-import { CityTierSchema, CurrencySchema, EventTypeSchema } from '@/lib/plan';
+import {
+  CityTierSchema,
+  CurrencySchema,
+  DietaryNeedSchema,
+  EventTypeSchema,
+  PrioritySchema,
+} from '@/lib/plan';
+import type { PlanSnapshot } from '@/features/assistant/services';
 
 /**
  * Request and response schemas for the API routes.
@@ -17,7 +24,10 @@ export const PlanSummarySchema = z
     message: 'The plan summary must not contain user input delimiters.',
   });
 
-export const SnapshotSchema = z
+// Annotated with the domain type so a validated body can be handed to the
+// assistant's services without a cast: the schema is the only place the two
+// shapes are allowed to meet.
+export const SnapshotSchema: z.ZodType<PlanSnapshot> = z
   .object({
     eventType: EventTypeSchema,
     eventDate: z.string().max(10).nullable(),
@@ -77,8 +87,8 @@ export const IdeasRequestSchema = z
         currency: CurrencySchema,
         budgetMinor: z.number().int().min(0).max(100_000_000_000),
         perGuestMinor: z.number().int().min(0).max(100_000_000_000),
-        priorities: z.array(z.string().max(40)).max(8),
-        dietary: z.array(z.string().max(40)).max(16),
+        priorities: z.array(PrioritySchema).max(8),
+        dietary: z.array(DietaryNeedSchema).max(16),
         month: z.number().int().min(1).max(12).nullable(),
       })
       .strict(),
@@ -105,6 +115,8 @@ export const ProviderIdeasSchema = z
     ideas: z.array(ProviderIdeaSchema).max(8),
   })
   .strict();
+
+export type ProviderIdea = z.infer<typeof ProviderIdeaSchema>;
 
 export const ParsedFieldsSchema = z
   .object({

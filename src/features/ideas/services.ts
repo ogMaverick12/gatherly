@@ -6,6 +6,7 @@ import {
   type Idea,
   type Priority,
 } from '@/lib/plan';
+import type { ProviderIdea } from '@/lib/api-schema';
 import { formatMinor } from '@/lib/money';
 
 /**
@@ -314,6 +315,24 @@ function tierNote(tier: CityTier): string {
   if (tier === 'tier1') return 'a high-cost city, where permits and peak-season dates go early';
   if (tier === 'tier2') return 'a regional city, where the venue calendar fills a few months out';
   return 'a smaller town, where the local suppliers know each other and the dates move slower';
+}
+
+/**
+ * Turn validated model ideas into the shape the app stores and shows.
+ *
+ * @param ideas the schemas' ideas, already checked by the route
+ * @returns the same ideas with an id and the provider source
+ */
+export function providerIdeas(ideas: readonly ProviderIdea[]): Idea[] {
+  return ideas.map((idea, index) => ({
+    id: `provider-idea-${index + 1}`,
+    title: idea.title,
+    body: idea.body,
+    rationale: idea.rationale,
+    costImpactMinor: null,
+    tags: idea.tags,
+    source: 'provider',
+  }));
 }
 
 export function generateIdeas(context: IdeaContext): Idea[] {

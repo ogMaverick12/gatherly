@@ -164,7 +164,7 @@ number.
 ```mermaid
 sequenceDiagram
   participant C as Client
-  participant G as withGuards
+  participant G as route factory
   participant L as RateLimiter
   participant P as Provider
   participant B as BasicProvider

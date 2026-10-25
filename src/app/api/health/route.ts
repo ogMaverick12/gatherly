@@ -1,6 +1,7 @@
 import { selectProvider } from '@/lib/ai';
-import { enforceRateLimit, errorResponse, jsonResponse, logRequest } from '@/lib/security/guards';
+import { jsonResponse } from '@/lib/security/http';
 import { rateLimitMode } from '@/lib/security/rate-limit';
+import { createGetRoute } from '@/lib/security/route';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -15,22 +16,12 @@ export const dynamic = 'force-dynamic';
  *
  * It reports state and nothing else: no keys, no request data, no plan.
  */
-export async function GET(request: Request): Promise<Response> {
-  const startedAt = Date.now();
-  let status = 200;
-  try {
-    const rate = await enforceRateLimit(request, 'health');
-    const selection = selectProvider();
-
-    return jsonResponse(
-      { ok: true, mode: selection.provider.id, rateLimit: rateLimitMode() },
-      { headers: rate.headers },
-    );
-  } catch (error) {
-    const response = errorResponse(error);
-    status = response.status;
-    return response;
-  } finally {
-    logRequest('health', status, Date.now() - startedAt, request);
-  }
-}
+export const GET = createGetRoute({
+  name: 'health',
+  handler: () =>
+    jsonResponse({
+      ok: true,
+      mode: selectProvider().provider.id,
+      rateLimit: rateLimitMode(),
+    }),
+});
