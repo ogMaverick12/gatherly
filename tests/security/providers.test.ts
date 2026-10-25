@@ -32,6 +32,9 @@ function providerThat(
       provider.attempts += 1;
       return behaviour(provider.attempts);
     },
+    async *stream(): AsyncIterable<string> {
+      yield 'streamed';
+    },
   };
   return provider;
 }

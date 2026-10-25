@@ -8,6 +8,7 @@ import {
   type ProviderErrorKind,
 } from './provider';
 import { buildUserMessage } from './prompts';
+import { combineSignals } from './signal';
 
 /**
  * The thinking setting for every call.
@@ -63,7 +64,7 @@ export class GeminiProvider implements Provider {
     try {
       const response = await client.models.generateContent({
         model: this.model,
-        contents: [{ role: 'user', parts: [{ text: buildUserMessage(request) }] }],
+        contents: this.contents(request),
         config: this.requestConfig(request),
       });
 
@@ -83,6 +84,36 @@ export class GeminiProvider implements Provider {
     }
   }
 
+  async *stream(request: GenerationRequest): AsyncIterable<string> {
+    const client = new GoogleGenAI({ apiKey: this.apiKey });
+
+    try {
+      const chunks = await client.models.generateContentStream({
+        model: this.model,
+        contents: this.contents(request),
+        config: this.requestConfig(request),
+      });
+
+      let sent = 0;
+      for await (const chunk of chunks) {
+        const text = chunk.text;
+        if (!text) continue;
+        sent += text.length;
+        yield text;
+      }
+
+      if (sent === 0) {
+        throw new ProviderError('The provider returned an empty answer.', false, 'bad_output');
+      }
+    } catch (error) {
+      throw asProviderError(error);
+    }
+  }
+
+  private contents(request: GenerationRequest) {
+    return [{ role: 'user', parts: [{ text: buildUserMessage(request) }] }];
+  }
+
   private requestConfig(request: GenerationRequest): GenerateContentConfig {
     return {
       systemInstruction: {
@@ -93,7 +124,7 @@ export class GeminiProvider implements Provider {
       maxOutputTokens: MAX_OUTPUT_TOKENS,
       thinkingConfig: { thinkingLevel: THINKING_LEVEL },
       ...(request.responseFormat === 'json' ? { responseMimeType: 'application/json' } : {}),
-      abortSignal: AbortSignal.timeout(this.timeoutMs),
+      abortSignal: combineSignals([AbortSignal.timeout(this.timeoutMs), request.signal]),
     };
   }
 }

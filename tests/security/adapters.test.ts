@@ -14,19 +14,39 @@ const REQUEST: GenerationRequest = {
 };
 
 const generateContent = vi.fn();
+const generateContentStream = vi.fn();
 
 vi.mock('@google/genai', async () => {
   const actual = await vi.importActual<typeof GenAiModule>('@google/genai');
   return {
     ...actual,
     GoogleGenAI: class {
-      models = { generateContent };
+      models = { generateContent, generateContentStream };
     },
   };
 });
 
+/** Every text chunk of a stream, in the order the provider sent it. */
+async function collect(stream: AsyncIterable<string>): Promise<string[]> {
+  const chunks: string[] = [];
+  for await (const chunk of stream) chunks.push(chunk);
+  return chunks;
+}
+
+/** A response body that arrives in the given pieces, split wherever asked. */
+function streamedBody(pieces: readonly string[]): ReadableStream<Uint8Array> {
+  const encoder = new TextEncoder();
+  return new ReadableStream<Uint8Array>({
+    start(controller) {
+      for (const piece of pieces) controller.enqueue(encoder.encode(piece));
+      controller.close();
+    },
+  });
+}
+
 afterEach(() => {
   generateContent.mockReset();
+  generateContentStream.mockReset();
   vi.unstubAllGlobals();
 });
 
@@ -104,6 +124,51 @@ describe('the Gemini adapter', () => {
     const provider = new GeminiProvider('key', 'gemini-3.6-flash');
 
     await expect(provider.generate(REQUEST)).rejects.toMatchObject({ retryable: false });
+  });
+
+  it('streams the chunks the model sent', async () => {
+    generateContentStream.mockResolvedValue(
+      (async function* () {
+        yield { text: 'One. ' };
+        yield { text: '' };
+        yield { text: 'Two.' };
+      })(),
+    );
+    const provider = new GeminiProvider('key', 'gemini-3.6-flash');
+
+    await expect(collect(provider.stream(REQUEST))).resolves.toEqual(['One. ', 'Two.']);
+  });
+
+  it('refuses a stream that never produced text', async () => {
+    generateContentStream.mockResolvedValue(
+      (async function* () {
+        yield { text: '' };
+      })(),
+    );
+    const provider = new GeminiProvider('key', 'gemini-3.6-flash');
+
+    await expect(collect(provider.stream(REQUEST))).rejects.toMatchObject({
+      kind: 'bad_output',
+    });
+  });
+
+  it('passes the caller signal to the streaming call', async () => {
+    generateContentStream.mockResolvedValue(
+      (async function* () {
+        yield { text: 'ok' };
+      })(),
+    );
+    const controller = new AbortController();
+    const provider = new GeminiProvider('key', 'gemini-3.6-flash');
+
+    await collect(provider.stream({ ...REQUEST, signal: controller.signal }));
+
+    const call = generateContentStream.mock.calls[0]?.[0] as {
+      config: { abortSignal?: AbortSignal };
+    };
+    expect(call.config.abortSignal?.aborted).toBe(false);
+    controller.abort();
+    expect(call.config.abortSignal?.aborted).toBe(true);
   });
 });
 
@@ -193,5 +258,48 @@ describe('the OpenRouter adapter', () => {
     const provider = new OpenRouterProvider('key', 'model');
 
     await expect(provider.generate(REQUEST)).rejects.toMatchObject({ retryable: true });
+  });
+
+  it('reads the stream through comments, [DONE] and a frame split across chunks', async () => {
+    const fetchMock = vi.fn(
+      async (_url: string, _init?: RequestInit) =>
+        new Response(
+          streamedBody([
+            ': keep-alive\n\n',
+            'data: {"choices":[{"delta":{"content":"One. "}}]}\n\n',
+            'data: {"choices":[{"delta":{"conte',
+            'nt":"Two."}}]}\n\n',
+            'data: [DONE]\n\n',
+            'data: {"choices":[{"delta":{"content":"ignored"}}]}\n\n',
+          ]),
+          { status: 200, headers: { 'Content-Type': 'text/event-stream' } },
+        ),
+    );
+    vi.stubGlobal('fetch', fetchMock);
+    const provider = new OpenRouterProvider('key', 'model');
+
+    const chunks = await collect(provider.stream(REQUEST));
+
+    expect(chunks).toEqual(['One. ', 'Two.']);
+    const init = fetchMock.mock.calls[0]?.[1];
+    expect(JSON.parse(String(init?.body)).stream).toBe(true);
+  });
+
+  it('refuses a stream with no usable chunk', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(
+        async () =>
+          new Response(streamedBody(['data: {"error":"nope"}\n\n', 'data: [DONE]\n\n']), {
+            status: 200,
+            headers: { 'Content-Type': 'text/event-stream' },
+          }),
+      ),
+    );
+    const provider = new OpenRouterProvider('key', 'model');
+
+    await expect(collect(provider.stream(REQUEST))).rejects.toMatchObject({
+      kind: 'bad_output',
+    });
   });
 });

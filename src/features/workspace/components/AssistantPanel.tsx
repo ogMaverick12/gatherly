@@ -9,47 +9,24 @@ import {
   classifyIntent,
   renderSnapshotForModel,
 } from '@/features/assistant/services';
+import { AssistantLog } from './AssistantLog';
+import {
+  applyFrame,
+  emptyAnswer,
+  readEventStream,
+  type Mode,
+  type StreamedAnswer,
+} from './assistant-stream';
 
-interface StreamEvent {
-  event: string;
-  data: unknown;
-}
-
-async function readEventStream(response: Response): Promise<StreamEvent[]> {
-  const events: StreamEvent[] = [];
-  const reader = response.body?.getReader();
-  if (!reader) return events;
-
-  const decoder = new TextDecoder();
-  let buffer = '';
-
-  for (;;) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    buffer += decoder.decode(value, { stream: true });
-
-    let boundary = buffer.indexOf('\n\n');
-    while (boundary !== -1) {
-      const chunk = buffer.slice(0, boundary);
-      buffer = buffer.slice(boundary + 2);
-      boundary = buffer.indexOf('\n\n');
-
-      let event = 'message';
-      const dataLines: string[] = [];
-      for (const line of chunk.split('\n')) {
-        if (line.startsWith('event:')) event = line.slice(6).trim();
-        if (line.startsWith('data:')) dataLines.push(line.slice(5).trim());
-      }
-      if (dataLines.length === 0) continue;
-      try {
-        events.push({ event, data: JSON.parse(dataLines.join('\n')) as unknown });
-      } catch {
-        // A malformed frame is ignored rather than breaking the answer.
-      }
-    }
-  }
-
-  return events;
+function newMessage(role: ChatMessage['role'], content: string, mode: Mode | null): ChatMessage {
+  const stamp = Date.now().toString(36);
+  return {
+    id: `chat_${role}_${stamp}`,
+    role,
+    content,
+    mode,
+    createdAt: new Date().toISOString(),
+  };
 }
 
 export function AssistantPanel({
@@ -63,8 +40,19 @@ export function AssistantPanel({
   const t = dictionary;
   const [draft, setDraft] = useState('');
   const [loading, setLoading] = useState(false);
+  const [live, setLive] = useState<StreamedAnswer | null>(null);
   const [notices, setNotices] = useState<readonly string[]>([]);
+  const abortRef = useRef<AbortController | null>(null);
   const listRef = useRef<HTMLDivElement>(null);
+
+  // `scrollTop` rather than `scrollTo`: it is the one form every environment
+  // this panel is rendered in supports, the test DOM included.
+  const scrollToEnd = () => {
+    window.setTimeout(() => {
+      const list = listRef.current;
+      if (list) list.scrollTop = list.scrollHeight;
+    }, 40);
+  };
 
   const ask = async (text: string) => {
     const trimmed = text.trim();
@@ -73,19 +61,13 @@ export function AssistantPanel({
     setDraft('');
     setLoading(true);
     setNotices([]);
+    onSend(newMessage('user', trimmed, null));
 
-    const userMessage: ChatMessage = {
-      id: `chat_user_${Date.now().toString(36)}`,
-      role: 'user',
-      content: trimmed,
-      mode: null,
-      createdAt: new Date().toISOString(),
-    };
-    onSend(userMessage);
+    let answer = emptyAnswer();
+    setLive(answer);
 
-    let answer = '';
-    let mode: 'basic' | 'provider' = 'basic';
-    let streamNotices: string[] = [];
+    const controller = new AbortController();
+    abortRef.current = controller;
 
     try {
       const response = await fetch('/api/chat', {
@@ -96,49 +78,47 @@ export function AssistantPanel({
           planSummary: renderSnapshotForModel(view.snapshot),
           snapshot: view.snapshot,
         }),
+        signal: controller.signal,
       });
 
       if (!response.ok) throw new Error('chat_failed');
 
-      for (const event of await readEventStream(response)) {
-        if (event.event === 'mode') {
-          // The route announces the mode before the answer, so the badge is
-          // never wrong about where the answer came from.
-          const data = event.data as { live?: boolean };
-          if (data.live === false) mode = 'basic';
-        }
-        if (event.event === 'delta') {
-          const data = event.data as { text?: string };
-          if (typeof data.text === 'string') answer = data.text;
-        }
-        if (event.event === 'done') {
-          const data = event.data as { mode?: 'basic' | 'provider'; notices?: string[] };
-          if (data.mode) mode = data.mode;
-          streamNotices = data.notices ?? [];
-        }
-      }
+      await readEventStream(response, (frame) => {
+        answer = applyFrame(answer, frame);
+        setLive(answer);
+        setNotices(answer.notices);
+      });
     } catch {
-      // Offline or the route is unavailable: answer locally with the same
-      // deterministic rules, and say so rather than pretending.
-      answer = buildBasicAnswer(classifyIntent(trimmed), view.snapshot);
-      mode = 'basic';
-      streamNotices = [t.errors.offline];
+      if (controller.signal.aborted) {
+        // The person stopped the answer: keep what is already on screen.
+        answer = { ...answer, notices: [...answer.notices, t.workspace.stopped] };
+      } else {
+        // Offline or the route is unavailable: answer locally with the same
+        // deterministic rules, and say so rather than pretending. Text that
+        // already arrived keeps its own mode; only a fresh Basic answer is
+        // labelled Basic.
+        answer = {
+          mode: answer.content ? answer.mode : 'basic',
+          content: answer.content || buildBasicAnswer(classifyIntent(trimmed), view.snapshot),
+          notices: [t.errors.offline],
+          interrupted: false,
+        };
+      }
     }
 
-    setNotices(streamNotices);
-
-    onSend({
-      id: `chat_assistant_${Date.now().toString(36)}`,
-      role: 'assistant',
-      content: answer,
-      mode,
-      createdAt: new Date().toISOString(),
-    });
-
+    abortRef.current = null;
+    setNotices(answer.notices);
+    setLive(null);
     setLoading(false);
-    window.setTimeout(() => {
-      listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: 'smooth' });
-    }, 40);
+
+    if (answer.content.trim().length > 0) {
+      onSend(newMessage('assistant', answer.content, answer.mode));
+    }
+    scrollToEnd();
+  };
+
+  const stop = () => {
+    abortRef.current?.abort();
   };
 
   return (
@@ -148,36 +128,7 @@ export function AssistantPanel({
         <p className="mt-1 text-sm text-ink-muted">{t.workspace.assistantHelp}</p>
       </div>
 
-      <div
-        ref={listRef}
-        className="max-h-[28rem] space-y-3 overflow-y-auto rounded-card border border-line bg-paper p-4"
-        role="log"
-        aria-live="polite"
-        aria-label={t.workspace.assistantTitle}
-      >
-        {view.plan.chat.length === 0 ? (
-          <p className="text-sm text-ink-muted">{t.workspace.assistantPlaceholder}</p>
-        ) : (
-          view.plan.chat.map((message) => (
-            <div
-              key={message.id}
-              className={`max-w-[85%] rounded-card border p-3 text-sm ${
-                message.role === 'user'
-                  ? 'ml-auto border-teal/40 bg-teal/10'
-                  : 'border-line bg-raised'
-              }`}
-            >
-              <p className="whitespace-pre-wrap text-ink">{message.content}</p>
-              {message.mode ? (
-                <p className="mt-1.5 text-[0.65rem] font-semibold uppercase tracking-[0.12em] text-ink-muted">
-                  {message.mode === 'basic' ? t.workspace.basicMode : t.workspace.providerMode}
-                </p>
-              ) : null}
-            </div>
-          ))
-        )}
-        {loading ? <p className="text-sm text-ink-muted">{t.common.loading}</p> : null}
-      </div>
+      <AssistantLog messages={view.plan.chat} live={live} t={t} scrollRef={listRef} />
 
       {notices.length > 0 ? (
         <ul role="status" className="space-y-1 text-sm text-ink-muted">
@@ -217,6 +168,15 @@ export function AssistantPanel({
         >
           {t.workspace.send}
         </button>
+        {loading ? (
+          <button
+            type="button"
+            onClick={stop}
+            className="inline-flex min-h-[44px] items-center justify-center rounded-pill border border-line px-5 py-2 text-sm font-semibold text-ink-muted transition-colors duration-200 hover:border-ink hover:text-ink"
+          >
+            {t.workspace.stop}
+          </button>
+        ) : null}
       </form>
     </div>
   );

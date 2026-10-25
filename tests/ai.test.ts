@@ -30,6 +30,28 @@ describe('the basic provider', () => {
     const result = await new BasicProvider().generate(REQUEST);
     expect(result.notices).toEqual([]);
   });
+
+  it('streams its answer a sentence at a time, without changing it', async () => {
+    const answer = 'Food is 28% of the budget. The caterer is unbooked. Ask for a second tasting.';
+    const chunks: string[] = [];
+
+    for await (const chunk of new BasicProvider().stream({ ...REQUEST, basicAnswer: answer })) {
+      chunks.push(chunk);
+    }
+
+    expect(chunks).toHaveLength(3);
+    expect(chunks.join('')).toBe(answer);
+  });
+
+  it('streams nothing for an empty answer', async () => {
+    const chunks: string[] = [];
+
+    for await (const chunk of new BasicProvider().stream({ ...REQUEST, basicAnswer: '  ' })) {
+      chunks.push(chunk);
+    }
+
+    expect(chunks).toEqual([]);
+  });
 });
 
 describe('selectProvider', () => {

@@ -71,6 +71,10 @@ function rejecting(kind: ProviderErrorKind) {
       generate: vi.fn(async (): Promise<GenerationResult> => {
         throw new ProviderError('provider detail secret', false, kind);
       }),
+      // The chat route streams; the failure has to look the same either way.
+      stream: vi.fn(async function* (): AsyncIterable<string> {
+        throw new ProviderError('provider detail secret', false, kind);
+      }),
     },
     live: true,
     notice: null,

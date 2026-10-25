@@ -15,6 +15,11 @@ export default defineConfig({
   },
   test: {
     environment: 'jsdom',
+    // The axe checks render a whole tab and run the full rule set, and under
+    // the full suite's parallel load they take longer than the 5 s default.
+    // The budget is generous so a slow machine reports a real failure, not a
+    // queue.
+    testTimeout: 15_000,
     setupFiles: ['./tests/setup.ts'],
     include: ['tests/**/*.test.ts', 'tests/**/*.test.tsx'],
     exclude: ['node_modules/**', '.next/**', 'e2e/**'],

@@ -189,6 +189,8 @@ export const en = {
     assistantHelp: 'Ask about the budget, the timeline, the vendors, the food, or what to do next.',
     assistantPlaceholder: 'What should I do next?',
     send: 'Send',
+    stop: 'Stop',
+    stopped: 'Stopped. The answer above may be incomplete.',
     basicMode: 'Basic mode',
     basicModeHelp:
       'No AI provider is configured, so answers come from deterministic rules over your plan. They are honest, not intelligent.',

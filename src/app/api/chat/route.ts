@@ -1,15 +1,7 @@
 import { ChatRequestSchema, type ApiSnapshot } from '@/lib/api-schema';
-import {
-  enforceRateLimit,
-  errorResponse,
-  logRequest,
-  readJsonBody,
-  withTimeout,
-} from '@/lib/security/guards';
-import { generateWithRetry, selectProvider } from '@/lib/ai';
-import { kindOfFailure } from '@/lib/ai/errors';
-import { providerErrorNotice } from '@/lib/ai/notices';
-import type { ProviderErrorKind } from '@/lib/ai/provider';
+import { enforceRateLimit, errorResponse, logRequest, readJsonBody } from '@/lib/security/guards';
+import { selectProvider } from '@/lib/ai';
+import { chatEventStream } from '@/lib/ai/chat-stream';
 import { CHAT_SYSTEM_PROMPT } from '@/lib/ai/prompts';
 import { buildBasicAnswer, classifyIntent } from '@/features/assistant/services';
 
@@ -21,13 +13,12 @@ export const dynamic = 'force-dynamic';
  *
  * A stateless question and answer. The client sends the plan summary it
  * already holds, the server answers, and nothing is stored anywhere.
- * The response is an event stream so the client can show the mode badge
- * before the answer arrives.
+ * The answer is streamed: the mode badge is sent before the provider has
+ * produced anything, then each chunk as it arrives.
  */
 export async function POST(request: Request): Promise<Response> {
   const startedAt = Date.now();
-  let status = 200;
-  let providerError: ProviderErrorKind | null = null;
+
   try {
     const rate = await enforceRateLimit(request, 'chat');
     const body = await readJsonBody(request, ChatRequestSchema);
@@ -35,44 +26,24 @@ export async function POST(request: Request): Promise<Response> {
 
     const selection = selectProvider();
     const basicAnswer = buildBasicAnswer(classifyIntent(body.message), snapshot);
-    const notices: string[] = [];
 
-    let mode: 'basic' | 'provider' = 'basic';
-    let content = basicAnswer;
-
-    if (selection.live) {
-      try {
-        const result = await withTimeout(
-          generateWithRetry(selection.provider, {
-            intent: 'chat',
-            systemPrompt: CHAT_SYSTEM_PROMPT,
-            userText: body.message,
-            planSummary: body.planSummary,
-            basicAnswer,
-          }),
-        );
-        content = result.content;
-        mode = 'provider';
-        notices.push(...result.notices);
-      } catch (error) {
-        providerError = kindOfFailure(error);
-        notices.push(providerErrorNotice(providerError, 'so this answer comes from Basic mode.'));
-      }
-    } else if (selection.notice) {
-      notices.push(selection.notice);
-    }
-
-    const encoder = new TextEncoder();
-    const stream = new ReadableStream<Uint8Array>({
-      start(controller) {
-        const send = (event: string, data: unknown) => {
-          controller.enqueue(encoder.encode(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`));
-        };
-        send('mode', { provider: selection.provider.id, live: selection.live });
-        send('delta', { text: content });
-        send('done', { mode, notices, providerError });
-        controller.close();
+    const stream = chatEventStream({
+      provider: selection.provider,
+      live: selection.live,
+      selectionNotice: selection.notice,
+      basicAnswer,
+      clientSignal: request.signal,
+      request: {
+        intent: 'chat',
+        systemPrompt: CHAT_SYSTEM_PROMPT,
+        userText: body.message,
+        planSummary: body.planSummary,
+        basicAnswer,
       },
+      // The log line is written when the stream ends, so it can carry the
+      // failure kind and the real duration of the answer.
+      onComplete: (providerError) =>
+        logRequest('chat', 200, Date.now() - startedAt, request, providerError ?? undefined),
     });
 
     return new Response(stream, {
@@ -87,9 +58,7 @@ export async function POST(request: Request): Promise<Response> {
     });
   } catch (error) {
     const response = errorResponse(error);
-    status = response.status;
+    logRequest('chat', response.status, Date.now() - startedAt, request);
     return response;
-  } finally {
-    logRequest('chat', status, Date.now() - startedAt, request, providerError ?? undefined);
   }
 }

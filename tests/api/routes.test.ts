@@ -52,6 +52,9 @@ function basicSelection(overrides: Partial<{ live: boolean; notice: string | nul
         content: '',
         notices: [],
       })),
+      stream: vi.fn(async function* (): AsyncIterable<string> {
+        yield 'A basic sentence.';
+      }),
     },
     live: false,
     notice: 'GATHERLY_AI_PROVIDER is set to basic, so answers come from Basic mode.',
@@ -117,7 +120,9 @@ describe('the chat route', () => {
 
   it('falls back to Basic mode when the provider fails', async () => {
     const selection = basicSelection({ live: true, notice: null });
-    selection.provider.generate.mockRejectedValue(new Error('network down'));
+    selection.provider.stream = vi.fn(async function* (): AsyncIterable<string> {
+      throw new Error('network down');
+    });
     selectProvider.mockReturnValue(selection);
 
     const response = await chat(
@@ -132,12 +137,9 @@ describe('the chat route', () => {
 
   it('uses the provider answer when the provider works', async () => {
     const selection = basicSelection({ live: true, notice: null });
-    selection.provider.generate = vi.fn(async () => ({
-      mode: 'provider' as const,
-      provider: 'gemini' as const,
-      content: 'The caterer estimate is the largest line.',
-      notices: [],
-    }));
+    selection.provider.stream = vi.fn(async function* (): AsyncIterable<string> {
+      yield 'The caterer estimate is the largest line.';
+    });
     selectProvider.mockReturnValue(selection);
 
     const response = await chat(

@@ -273,8 +273,16 @@ async function checkProvider(provider) {
     const chatText = await chat.text();
     const frames = readFrames(chatText);
     const modeFrame = frames.find((frame) => frame.name === 'mode');
-    const deltaFrame = frames.find((frame) => frame.name === 'delta');
     const doneFrame = frames.find((frame) => frame.name === 'done');
+    // A streamed answer arrives in more than one delta; one delta would mean
+    // the route is buffering the whole answer again.
+    const deltaFrames = frames.filter(
+      (frame) =>
+        frame.name === 'delta' &&
+        typeof frame.data?.text === 'string' &&
+        frame.data.text.length > 0,
+    );
+    const answerText = deltaFrames.map((frame) => frame.data.text).join('');
     if (modelIsMissing(chat.status, doneFrame?.data)) {
       say(`MODEL NOT FOUND: ${model} - set ${provider.modelName}`);
       checks.push({ route: '/api/chat', result: 'fail', detail: `model not found: ${model}` });
@@ -284,16 +292,16 @@ async function checkProvider(provider) {
       chat.status === 200 &&
       modeFrame?.data?.provider === provider.id &&
       modeFrame?.data?.live === true &&
-      typeof deltaFrame?.data?.text === 'string' &&
-      deltaFrame.data.text.length > 0 &&
+      deltaFrames.length > 1 &&
+      answerText.length > 0 &&
       doneFrame?.data?.mode === 'provider' &&
       !chatText.includes(key);
     checks.push({
       route: '/api/chat',
       result: chatOk ? 'pass' : 'fail',
       detail: chatOk
-        ? `provider=${modeFrame.data.provider}, ${frames.length} frames`
-        : `status=${chat.status}, provider=${modeFrame?.data?.provider}, live=${modeFrame?.data?.live}, mode=${doneFrame?.data?.mode}`,
+        ? `provider=${modeFrame.data.provider}, ${deltaFrames.length} deltas, ${frames.length} frames`
+        : `status=${chat.status}, provider=${modeFrame?.data?.provider}, live=${modeFrame?.data?.live}, deltas=${deltaFrames.length}, mode=${doneFrame?.data?.mode}`,
     });
   } finally {
     server.child.kill();

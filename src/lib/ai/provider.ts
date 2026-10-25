@@ -31,6 +31,12 @@ export interface GenerationRequest {
   readonly basicAnswer: string;
   /** Ask the provider for a JSON object matching a schema. */
   readonly responseFormat?: 'text' | 'json';
+  /**
+   * Stops the upstream call when the client disconnects or the route's own
+   * deadline passes. Without it a browser that closes the tab would keep a
+   * provider request alive and billing.
+   */
+  readonly signal?: AbortSignal;
 }
 
 export interface GenerationResult {
@@ -44,6 +50,13 @@ export interface GenerationResult {
 export interface Provider {
   readonly id: ProviderId;
   generate(request: GenerationRequest): Promise<GenerationResult>;
+  /**
+   * The same answer as text chunks, in the order the model produced them.
+   *
+   * A failure before the first chunk is thrown from here; a failure after
+   * it also throws, and the caller keeps what it has already shown.
+   */
+  stream(request: GenerationRequest): AsyncIterable<string>;
 }
 
 export class ProviderError extends Error {
