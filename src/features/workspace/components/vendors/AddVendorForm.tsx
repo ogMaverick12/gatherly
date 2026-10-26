@@ -1,0 +1,78 @@
+'use client';
+
+import { useState } from 'react';
+import { useAccessibility } from '@/features/accessibility/provider';
+import { VENDOR_CATEGORY_LABELS, type VendorCategoryId } from '@/lib/plan';
+
+/** Adding a vendor by hand, for a category the plan did not list. */
+export function AddVendorForm({
+  onAddVendor,
+}: {
+  onAddVendor: (category: VendorCategoryId, name: string) => void;
+}) {
+  const { dictionary } = useAccessibility();
+  const t = dictionary;
+  const [newCategory, setNewCategory] = useState<VendorCategoryId>('venue');
+  const [newName, setNewName] = useState('');
+
+  return (
+    <section aria-labelledby="add-vendor-heading" className="no-print">
+      <h2 id="add-vendor-heading" className="font-display text-title">
+        {t.workspace.addVendor}
+      </h2>
+      <form
+        className="mt-3 flex flex-wrap items-end gap-3 rounded-card border border-line bg-raised p-4"
+        onSubmit={(event) => {
+          event.preventDefault();
+          const name = newName.trim();
+          onAddVendor(newCategory, name);
+          setNewName('');
+        }}
+      >
+        <div>
+          <label
+            htmlFor="new-vendor-category"
+            className="text-xs font-semibold uppercase tracking-[0.12em] text-ink-muted"
+          >
+            {t.workspace.vendorCategory}
+          </label>
+          <select
+            id="new-vendor-category"
+            value={newCategory}
+            onChange={(event) => setNewCategory(event.target.value as VendorCategoryId)}
+            className="mt-1 min-h-[44px] rounded-card border border-line bg-paper px-3 py-2 text-sm"
+          >
+            {(Object.keys(VENDOR_CATEGORY_LABELS) as VendorCategoryId[]).map((category) => (
+              <option key={category} value={category}>
+                {VENDOR_CATEGORY_LABELS[category]}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="min-w-[12rem] flex-1">
+          <label
+            htmlFor="new-vendor-name"
+            className="text-xs font-semibold uppercase tracking-[0.12em] text-ink-muted"
+          >
+            {t.workspace.vendorName}
+          </label>
+          <input
+            id="new-vendor-name"
+            type="text"
+            value={newName}
+            maxLength={120}
+            onChange={(event) => setNewName(event.target.value)}
+            placeholder="optional"
+            className="mt-1 w-full min-h-[44px] rounded-card border border-line bg-paper px-3 py-2 text-sm"
+          />
+        </div>
+        <button
+          type="submit"
+          className="inline-flex min-h-[44px] items-center justify-center rounded-pill border border-ink px-5 py-2 text-sm font-semibold text-ink transition-colors duration-200 hover:bg-ink hover:text-paper"
+        >
+          {t.workspace.addVendor}
+        </button>
+      </form>
+    </section>
+  );
+}

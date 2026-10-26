@@ -1,0 +1,61 @@
+'use client';
+
+import { useAccessibility } from '@/features/accessibility/provider';
+import type { Risk } from '@/features/risks/services';
+
+/**
+ * The severity dot is decoration: the severity is written in the text as well,
+ * so it survives a monochrome screen or a reader.
+ */
+function RiskRow({ risk }: { risk: Risk }) {
+  const colour =
+    risk.severity === 'high'
+      ? 'var(--color-rose)'
+      : risk.severity === 'medium'
+        ? 'var(--color-marigold)'
+        : 'var(--color-line-strong)';
+
+  return (
+    <li className="rounded-card border border-line bg-raised p-4">
+      <div className="flex items-start gap-3">
+        <span
+          aria-hidden="true"
+          className="mt-1.5 inline-block h-2.5 w-2.5 shrink-0 rounded-full"
+          style={{ backgroundColor: colour }}
+        />
+        <div className="min-w-0">
+          <h3 className="font-semibold text-ink">{risk.title}</h3>
+          <p className="mt-1 text-sm text-ink-muted">{risk.explanation}</p>
+          <p className="mt-2 text-sm text-ink">
+            <span className="font-medium">{risk.area}:</span> {risk.mitigation}
+          </p>
+        </div>
+      </div>
+    </li>
+  );
+}
+
+/** Everything the risk register has to say about this plan. */
+export function RiskList({ risks }: { risks: readonly Risk[] }) {
+  const { dictionary } = useAccessibility();
+  const t = dictionary;
+
+  return (
+    <section aria-labelledby="risks-heading">
+      <h2 id="risks-heading" className="font-display text-title">
+        {t.workspace.risks}
+      </h2>
+      {risks.length === 0 ? (
+        <p className="mt-3 rounded-card border border-line bg-raised p-4 text-sm text-ink-muted">
+          {t.workspace.noRisks}
+        </p>
+      ) : (
+        <ul className="mt-3 grid gap-3 lg:grid-cols-2">
+          {risks.map((risk) => (
+            <RiskRow key={risk.id} risk={risk} />
+          ))}
+        </ul>
+      )}
+    </section>
+  );
+}
