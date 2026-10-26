@@ -18,10 +18,10 @@ holds measured numbers; other documents link here.
 | `npm run lint`          | Clean. ESLint 9 flat config, `--max-warnings=0`, 0 errors, 0 warnings                                                                                                                                                                                                                 |
 | `npm run typecheck`     | Clean. `tsc --noEmit`, strict mode, no errors                                                                                                                                                                                                                                         |
 | `npm run format:check`  | Clean. Prettier                                                                                                                                                                                                                                                                       |
-| `npm test`              | **37 files, 503 tests, 503 passed, 0 failed**                                                                                                                                                                                                                                         |
-| `npm run test:coverage` | **92.86%** statements, **79.15%** branches, **92.2%** functions, **94.56%** lines (thresholds 90 / 70 / 90 / 90, enforced)                                                                                                                                                            |
-| `npm run build`         | Succeeds. Routes: `/`, `/intake`, `/plan`, `/api/chat`, `/api/health`, `/api/ideas`, `/api/parse`. First Load JS: 103 kB shared, 161 kB for `/plan`                                                                                                                                   |
-| `npm run test:e2e`      | **13 passed** (3 journeys, 5 quality flows, 5 accessibility screens)                                                                                                                                                                                                                  |
+| `npm test`              | **51 files, 602 tests, 602 passed, 0 failed**                                                                                                                                                                                                                                         |
+| `npm run test:coverage` | **92.88%** statements, **80.25%** branches, **92.72%** functions, **94.67%** lines (thresholds 90 / 70 / 90 / 90, enforced)                                                                                                                                                           |
+| `npm run build`         | Succeeds. Routes: `/`, `/intake`, `/plan`, `/api/chat`, `/api/health`, `/api/ideas`, `/api/parse`. First Load JS: 103 kB shared, 162 kB for `/plan`                                                                                                                                   |
+| `npm run test:e2e`      | **14 passed** (3 journeys, 5 quality flows, 5 accessibility screens, 1 streamed-chat flow)                                                                                                                                                                                            |
 | `npm audit --omit=dev`  | **0 vulnerabilities**                                                                                                                                                                                                                                                                 |
 | `npm audit`             | **7 vulnerabilities**, all in the development toolchain (Tailwind's braces chain, the Next ESLint config's fast-glob chain). None ships; fixes are breaking major upgrades (Tailwind 4, eslint-config-next@14). Documented in [`../SECURITY.md`](../SECURITY.md#3-dependency-posture) |
 
@@ -29,61 +29,76 @@ holds measured numbers; other documents link here.
 
 ### Tests per file
 
-| File                                       | Tests | What it proves                                                                                                                                 |
-| ------------------------------------------ | ----- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| `tests/accessibility/axe.test.tsx`         | 14    | An automated accessibility check of the landing page, every intake step, all six workspace tabs and the display settings                       |
-| `tests/accessibility/contrast.test.ts`     | 19    | WCAG contrast for the light, dark and calm palettes                                                                                            |
-| `tests/ai.test.ts`                         | 11    | The provider interface, Basic mode, provider selection                                                                                         |
-| `tests/api/routes.test.ts`                 | 18    | The three routes end to end: validation, Basic fallback, SSE events                                                                            |
-| `tests/api/health.test.ts`                 | 9     | The deployment mode, both rate-limit modes, cache headers and the 429 path                                                                     |
-| `tests/assistant.test.ts`                  | 14    | Intent classification and the Basic-mode answer                                                                                                |
-| `tests/budget.test.ts`                     | 15    | Allocation sums exactly to the budget; priorities and packs move the split; scenarios re-price per guest; warnings explain themselves          |
-| `tests/catering.test.ts`                   | 9     | Quantity estimates for food and drink                                                                                                          |
-| `tests/components/accessibility.test.tsx`  | 16    | Display settings, language, Calm mode, reduced motion                                                                                          |
-| `tests/components/basics.test.tsx`         | 25    | Shared component behaviour across the workspace                                                                                                |
-| `tests/components/intake.test.tsx`         | 8     | The four steps, validation, the review, no pack is pre-selected                                                                                |
-| `tests/components/landing.test.tsx`        | 6     | The landing page states what the app is for                                                                                                    |
-| `tests/components/panels-extra.test.tsx`   | 14    | The Vendors and Assistant panels, and the exports                                                                                              |
-| `tests/components/panels.test.tsx`         | 25    | The Overview, Budget, Timeline and Ideas panels                                                                                                |
-| `tests/components/plan-restore.test.tsx`   | 2     | A stored plan is restored on reload with no user action                                                                                        |
-| `tests/components/plan-workspace.test.tsx` | 8     | The workspace shell and the tabs                                                                                                               |
-| `tests/components/vendors.test.tsx`        | 14    | Adding a vendor, saving a quote, changing a status                                                                                             |
-| `tests/csv.test.ts`                        | 9     | Quoting, escaping and formula-injection defence                                                                                                |
-| `tests/dates.test.ts`                      | 11    | ISO date-only parsing, arithmetic, invalid dates rejected                                                                                      |
-| `tests/guards.test.ts`                     | 22    | Method, body cap, malformed JSON, schema failure, rate limit, headers                                                                          |
-| `tests/health.test.ts`                     | 8     | Five weighted parts that sum to 100; the score is 0-100; every part says what was measured                                                     |
-| `tests/i18n.test.ts`                       | 5     | The three dictionaries have the same keys                                                                                                      |
-| `tests/instrumentation.test.ts`            | 2     | The startup hook warns in production without the shared store and stays quiet in the edge runtime                                              |
-| `tests/ics.test.ts`                        | 9     | A valid calendar file with the right dates, folded inside the 75-octet limit                                                                   |
-| `tests/ideas.test.ts`                      | 16    | Deterministic Basic-mode ideas, one set per event type                                                                                         |
-| `tests/money.test.ts`                      | 14    | Integer minor units, allocation by weight, per-currency formatting                                                                             |
-| `tests/parse.test.ts`                      | 13    | Free text to intake fields; nothing is inferred                                                                                                |
-| `tests/plan-store.test.ts`                 | 10    | Storage, hydration, reload, corruption discarded                                                                                               |
-| `tests/plan.test.ts`                       | 13    | The plan schema, `createPlan`, the sample templates, the packs                                                                                 |
-| `tests/property.test.ts`                   | 21    | The invariants a fixed example cannot: the allocator never loses a minor unit, the budget never overspends, a share link survives a round trip |
-| `tests/risks.test.ts`                      | 21    | The risk register and its triggers                                                                                                             |
-| `tests/sanitize.test.ts`                   | 14    | Control characters, zero-width characters, delimiters, CSV injection                                                                           |
-| `tests/security/adapters.test.ts`          | 13    | The Gemini and OpenRouter adapters                                                                                                             |
-| `tests/security/providers.test.ts`         | 19    | Selection, retry-once, timeout, safe logging, rate limiting                                                                                    |
-| `tests/share.test.ts`                      | 15    | Compressed and plain round-trips, invalid payloads, chat and ideas dropped                                                                     |
-| `tests/timeline.test.ts`                   | 14    | Milestones are computed backwards from the event date; a step that can no longer be done on time moves to today                                |
-| `tests/vendors.test.ts`                    | 27    | Status transitions, quote scoring, coverage percentage, WhatsApp encoding                                                                      |
+| File                                          | Tests | What it proves                                                                                                                                 |
+| --------------------------------------------- | ----- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| `tests/accessibility/axe.test.tsx`            | 14    | An automated accessibility check of the landing page, every intake step, all six workspace tabs and the display settings                       |
+| `tests/accessibility/contrast.test.ts`        | 19    | WCAG contrast for the light, dark and calm palettes                                                                                            |
+| `tests/ai.test.ts`                            | 20    | The provider interface, Basic mode, provider selection and the failure kinds                                                                   |
+| `tests/api/chat-stream.test.ts`               | 5     | The chat route's frame order, fallback timing, disconnect and logging                                                                          |
+| `tests/api/health.test.ts`                    | 9     | The deployment mode, both rate-limit modes, cache headers and the 429 path                                                                     |
+| `tests/api/provider-errors.test.ts`           | 11    | Every provider failure kind reaching a route ends as its own notice, never as "could not be reached"                                           |
+| `tests/api/route-factory.test.ts`             | 9     | One guarded factory: ordering, 413 before parse, 405, no-store on every response                                                               |
+| `tests/api/routes.test.ts`                    | 19    | The three routes end to end: validation, Basic fallback, SSE events                                                                            |
+| `tests/assistant.test.ts`                     | 14    | Intent classification and the Basic-mode answer                                                                                                |
+| `tests/budget.test.ts`                        | 15    | Allocation sums exactly to the budget; priorities and packs move the split; scenarios re-price per guest; warnings explain themselves          |
+| `tests/catering.test.ts`                      | 9     | Quantity estimates for food and drink                                                                                                          |
+| `tests/chat-attempt.test.ts`                  | 3     | One attempt: retry only before the first token, then Basic mode                                                                                |
+| `tests/chat-stream.test.ts`                   | 3     | Basic mode streams its answer a sentence at a time                                                                                             |
+| `tests/components/accessibility.test.tsx`     | 16    | Display settings, language, Calm mode, reduced motion                                                                                          |
+| `tests/components/assistant-stream.test.tsx`  | 3     | The live answer bubble, Stop, and a connection that drops mid-answer                                                                           |
+| `tests/components/basics.test.tsx`            | 25    | Shared component behaviour across the workspace                                                                                                |
+| `tests/components/intake.test.tsx`            | 8     | The four steps, validation, the review, no pack is pre-selected                                                                                |
+| `tests/components/landing.test.tsx`           | 6     | The landing page states what the app is for                                                                                                    |
+| `tests/components/panels-extra.test.tsx`      | 14    | The Vendors and Assistant panels, and the exports                                                                                              |
+| `tests/components/panels.test.tsx`            | 25    | The Overview, Budget, Timeline and Ideas panels                                                                                                |
+| `tests/components/plan-restore.test.tsx`      | 2     | A stored plan is restored on reload with no user action                                                                                        |
+| `tests/components/plan-workspace.test.tsx`    | 8     | The workspace shell and the tabs                                                                                                               |
+| `tests/components/vendors.test.tsx`           | 14    | Adding a vendor, saving a quote, changing a status                                                                                             |
+| `tests/csv.test.ts`                           | 9     | Quoting, escaping and formula-injection defence                                                                                                |
+| `tests/dates.test.ts`                         | 11    | ISO date-only parsing, arithmetic, invalid dates rejected                                                                                      |
+| `tests/guards.test.ts`                        | 18    | Method, body cap, malformed JSON, schema failure, rate limit, headers                                                                          |
+| `tests/health.test.ts`                        | 8     | Five weighted parts that sum to 100; the score is 0-100; every part says what was measured                                                     |
+| `tests/i18n.test.ts`                          | 5     | The three dictionaries have the same keys                                                                                                      |
+| `tests/ics.test.ts`                           | 9     | A valid calendar file with the right dates, folded inside the 75-octet limit                                                                   |
+| `tests/ideas.test.ts`                         | 16    | Deterministic Basic-mode ideas, one set per event type                                                                                         |
+| `tests/instrumentation.test.ts`               | 2     | The startup hook warns in production without the shared store and stays quiet in the edge runtime                                              |
+| `tests/json.test.ts`                          | 4     | JSON read out of a fenced, an unfenced and a junk answer                                                                                       |
+| `tests/money.test.ts`                         | 14    | Integer minor units, allocation by weight, per-currency formatting                                                                             |
+| `tests/parse.test.ts`                         | 13    | Free text to intake fields; nothing is inferred                                                                                                |
+| `tests/plan-store.test.ts`                    | 10    | Storage, hydration, reload, corruption discarded                                                                                               |
+| `tests/plan.test.ts`                          | 13    | The plan schema, `createPlan`, the sample templates, the packs                                                                                 |
+| `tests/property.test.ts`                      | 21    | The invariants a fixed example cannot: the allocator never loses a minor unit, the budget never overspends, a share link survives a round trip |
+| `tests/rate-limit.test.ts`                    | 4     | A fake Redis on a virtual clock: the window is set once and opens again when it elapses                                                        |
+| `tests/risks.test.ts`                         | 21    | The risk register and its triggers                                                                                                             |
+| `tests/sanitize.test.ts`                      | 14    | Control characters, zero-width characters, delimiters, CSV injection                                                                           |
+| `tests/security/adapters.test.ts`             | 19    | The Gemini and OpenRouter adapters: request shape, thinking settings, streamed frames                                                          |
+| `tests/security/provider-errors.test.ts`      | 17    | SDK and HTTP failures classified into the kind the user is told about                                                                          |
+| `tests/security/providers.test.ts`            | 19    | Selection, retry-once, timeout, safe logging, rate limiting                                                                                    |
+| `tests/security/rate-limit-fail-open.test.ts` | 4     | The shared limiter fails open, marks the answer degraded and warns once a minute                                                               |
+| `tests/security/request-identity.test.ts`     | 11    | The client key behind a proxy, and the correlation id                                                                                          |
+| `tests/security/upstash-reply.test.ts`        | 1     | The count and expiry read out of whichever pipeline reply shape arrives                                                                        |
+| `tests/share.test.ts`                         | 15    | Compressed and plain round-trips, invalid payloads, chat and ideas dropped                                                                     |
+| `tests/signal.test.ts`                        | 5     | The route deadline and the browser abort combined                                                                                              |
+| `tests/sse.test.ts`                           | 7     | Frames split across network chunks, comments and `[DONE]`                                                                                      |
+| `tests/timeline.test.ts`                      | 14    | Milestones are computed backwards from the event date; a step that can no longer be done on time moves to today                                |
+| `tests/vendors.test.ts`                       | 27    | Status transitions, quote scoring, coverage percentage, WhatsApp encoding                                                                      |
 
-**Total: 503 tests across 37 files.**
+**Total: 602 tests across 51 files.**
 
 ### End-to-end journeys
 
-| File                        | Test                                                | What it proves                                                                                                  |
-| --------------------------- | --------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| `tests/e2e/journey.spec.ts` | landing to a working plan                           | The health ring, the budget maths, a milestone that sticks, a vendor status that moves the coverage             |
-| `tests/e2e/journey.spec.ts` | exports a budget CSV and a share link               | The two files the user takes away                                                                               |
-| `tests/e2e/journey.spec.ts` | the workspace is reachable with the keyboard alone  | Arrow keys move between the six tabs                                                                            |
-| `tests/e2e/quality.spec.ts` | the language can be changed with the keyboard alone | The keyboard alone switches the interface to Hindi                                                              |
-| `tests/e2e/quality.spec.ts` | the plan is still there after an offline reload     | The service worker keeps the shell available offline                                                            |
-| `tests/e2e/quality.spec.ts` | no API answer is kept in the cache                  | The service worker never stores an `/api/*` response                                                            |
-| `tests/e2e/quality.spec.ts` | completing a milestone moves the health score       | The headline number reacts to the work                                                                          |
-| `tests/e2e/quality.spec.ts` | the visible budget adds up to the total             | The displayed categories and contingency add up to the budget                                                   |
-| `tests/e2e/quality.spec.ts` | five accessibility screens                          | `axe` finds no violation on the landing page, the intake form, the workspace, the budget tab or the vendors tab |
+| File                            | Test                                                | What it proves                                                                                                  |
+| ------------------------------- | --------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| `tests/e2e/chat-stream.spec.ts` | the answer grows frame by frame                     | The assistant bubble really is filled by more than one read, not painted at once                                |
+| `tests/e2e/journey.spec.ts`     | landing to a working plan                           | The health ring, the budget maths, a milestone that sticks, a vendor status that moves the coverage             |
+| `tests/e2e/journey.spec.ts`     | exports a budget CSV and a share link               | The two files the user takes away                                                                               |
+| `tests/e2e/journey.spec.ts`     | the workspace is reachable with the keyboard alone  | Arrow keys move between the six tabs                                                                            |
+| `tests/e2e/quality.spec.ts`     | the language can be changed with the keyboard alone | The keyboard alone switches the interface to Hindi                                                              |
+| `tests/e2e/quality.spec.ts`     | the plan is still there after an offline reload     | The service worker keeps the shell available offline                                                            |
+| `tests/e2e/quality.spec.ts`     | no API answer is kept in the cache                  | The service worker never stores an `/api/*` response                                                            |
+| `tests/e2e/quality.spec.ts`     | completing a milestone moves the health score       | The headline number reacts to the work                                                                          |
+| `tests/e2e/quality.spec.ts`     | the visible budget adds up to the total             | The displayed categories and contingency add up to the budget                                                   |
+| `tests/e2e/quality.spec.ts`     | five accessibility screens                          | `axe` finds no violation on the landing page, the intake form, the workspace, the budget tab or the vendors tab |
 
 ---
 

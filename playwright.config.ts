@@ -1,6 +1,10 @@
 import { defineConfig, devices } from '@playwright/test';
 
-const PORT = Number(process.env.PORT ?? 3210);
+// PORT is ignored unless it is a usable port number: an environment that
+// exports PORT=0 would otherwise bind a random port while the readiness probe
+// below waited on http://localhost:0, and the whole run would time out.
+const requestedPort = Number(process.env.PORT);
+const PORT = Number.isInteger(requestedPort) && requestedPort > 0 ? requestedPort : 3210;
 // localhost, not 127.0.0.1: the service worker only registers on a secure
 // context, and the offline flow is one of the promises these tests check.
 const baseURL = `http://localhost:${PORT}`;
