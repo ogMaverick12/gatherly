@@ -6,6 +6,7 @@ const BAND_COLOR: Record<HealthBand, string> = {
   at_risk: 'var(--color-rose)',
 };
 
+// long-function: one view section, kept in one block so its reading order stays visible.
 export function HealthRing({
   score,
   band,

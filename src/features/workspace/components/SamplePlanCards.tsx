@@ -12,6 +12,7 @@ import { EVENT_TYPE_LABELS } from '@/lib/plan';
  *
  * Opening a sample creates a real, editable plan in the browser store. It
  * is not a screenshot and it does not need a network.
+ * long-function: one list sharing the create-then-open handler; a card per file would only move the markup.
  */
 export function SamplePlanCards({ templates }: { templates: readonly SamplePlanTemplate[] }) {
   const router = useRouter();

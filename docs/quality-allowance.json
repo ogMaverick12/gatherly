@@ -1,0 +1,15 @@
+{
+  "$comment": "Counts measured by `npm run stats`. `npm run check` fails when a count rises above these numbers, so the only way to add a long file, a long function or an undocumented export is to lower nothing and explain why in review. Lower a number here as soon as the count drops.",
+  "allowance": {
+    "filesOver200Lines": 5,
+    "functionsOver40Lines": 53,
+    "functionsOver40LinesWithoutReason": 0,
+    "exportsWithoutJsDoc": 165
+  },
+  "notes": {
+    "filesOver200Lines": "Three locale dictionaries (bn, en, hi) are one object literal each, kept whole so the three stay comparable; scripts/live-smoke.mjs and scripts/stats.mjs are development tooling that never ships.",
+    "functionsOver40Lines": "Each one carries a `long-function:` line in the comment above it giving the reason it stays in one block.",
+    "functionsOver40LinesWithoutReason": "Zero: every long function states its reason, so a new one without one fails the gate.",
+    "exportsWithoutJsDoc": "Mostly single-line Zod schemas, label maps and React components whose name and types already say what they are. The services and lib functions that carry behaviour are documented."
+  }
+}

@@ -10,6 +10,7 @@ import type { Currency } from '@/lib/plan';
  *
  * Each card shows the total it would cost and the difference from the current
  * plan, so the trade-off is visible rather than implied.
+ * long-function: one card list over one scenario array, with every card using the same money formatting.
  */
 export function ScenarioCards({
   scenarios,

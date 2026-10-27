@@ -9,6 +9,7 @@ import type { PlanView } from '@/lib/plan-view';
  *
  * The bar and the percentage say the same thing, so the number is never the
  * only signal, and a category with nothing booked says "none" in words.
+ * long-function: one bar: label, fill and percentage are the same measurement and must not drift apart.
  */
 export function VendorCoverage({ view }: { view: PlanView }) {
   const { dictionary } = useAccessibility();

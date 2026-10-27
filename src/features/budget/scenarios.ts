@@ -6,6 +6,7 @@ function scenarioPlan(plan: Plan, patch: Partial<Plan['intake']>): Plan {
   return { ...plan, intake: { ...plan.intake, ...patch } };
 }
 
+// long-function: one pass over the inputs; splitting it would only pass the same state between more functions.
 export function computeScenarios(plan: Plan): BudgetScenario[] {
   const base = computeBudget(plan);
   const { intake } = plan;

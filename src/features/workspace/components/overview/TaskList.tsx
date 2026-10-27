@@ -3,6 +3,7 @@
 import { useAccessibility } from '@/features/accessibility/provider';
 import type { PlanTask } from '@/lib/plan';
 
+// long-function: one view section, kept in one block so its reading order stays visible.
 /** The checklist, with the tick that moves the health score. */
 export function TaskList({
   tasks,

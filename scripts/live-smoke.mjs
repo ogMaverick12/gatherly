@@ -182,6 +182,7 @@ const IDEAS_CONTEXT = {
   month: 12,
 };
 
+// long-function: one probe per provider: request, classified failure and printed evidence are one sequential run.
 async function checkProvider(provider) {
   const key = process.env[provider.keyName];
   const model = process.env[provider.modelName] ?? DEFAULT_MODELS[provider.id];

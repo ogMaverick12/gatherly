@@ -15,6 +15,7 @@ import { ChipGroup } from '../ChipGroup';
 import { RadioChips } from '../RadioChips';
 import { ReviewSummary } from '../ReviewSummary';
 
+// long-function: one view section, kept in one block so its reading order stays visible.
 /** Optional packs, the interface language and a free note, then the review. */
 export function ExtrasStep({
   form,

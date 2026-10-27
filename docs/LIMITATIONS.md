@@ -145,6 +145,11 @@ Treat a 92 as "this plan looks internally consistent", not "this plan is good".
 - **Coverage is measured, and the thresholds are enforced.** The current figures are in
   [`DELIVERY_OUTCOMES.md`](DELIVERY_OUTCOMES.md#verification-summary). The uncovered lines are
   concentrated in UI branches and in the fallback paths of the provider adapters.
+- **A small number of files are longer than the 200-line house rule.** `npm run stats` measures
+  them and fails if the count grows past what [`quality-allowance.json`](quality-allowance.json)
+  records: the three locale dictionaries (kept whole so they stay comparable) and two development
+  scripts. Every function over 40 lines carries a written reason; the undocumented exports are
+  mostly Zod schemas and label maps.
 - **The browser suite is the evidence for the plan.** The unit, component and end-to-end suites
   are counted in
   [`DELIVERY_OUTCOMES.md`](DELIVERY_OUTCOMES.md#verification-summary). There is no load test and

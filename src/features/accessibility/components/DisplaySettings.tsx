@@ -23,6 +23,7 @@ const THEMES: { value: ThemePreference; key: 'themeLight' | 'themeDark' | 'theme
  *
  * A disclosure rather than a modal, so it can be opened with a keyboard and
  * read in place. Every control is a real form control with a label.
+ * long-function: one disclosure: the markup order is the order of the settings, and a component per group would hide that order.
  */
 export function DisplaySettings() {
   const {

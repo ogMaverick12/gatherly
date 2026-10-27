@@ -9,6 +9,7 @@ function relativeLabel(offsetDays: number): string {
   return offsetDays < 0 ? `T-${Math.abs(offsetDays)}` : `T+${offsetDays}`;
 }
 
+// long-function: one view section, kept in one block so its reading order stays visible.
 export function TimelinePanel({
   view,
   onToggleMilestone,

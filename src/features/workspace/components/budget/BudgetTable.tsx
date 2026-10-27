@@ -11,6 +11,7 @@ import type { BudgetAllocation } from '@/features/budget/services';
  * The table shows the working - the base share, the share after priorities and
  * the amount - because a number the user cannot check is a number they cannot
  * argue with.
+ * long-function: one table: header, rows and footer are the same eight-column grid.
  */
 export function BudgetTable({ budget, plan }: { budget: BudgetAllocation; plan: Plan }) {
   const { dictionary } = useAccessibility();

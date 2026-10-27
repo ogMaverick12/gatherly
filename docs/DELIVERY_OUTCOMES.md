@@ -18,14 +18,32 @@ holds measured numbers; other documents link here.
 | `npm run lint`          | Clean. ESLint 9 flat config, `--max-warnings=0`, 0 errors, 0 warnings                                                                                                                                                                                                                 |
 | `npm run typecheck`     | Clean. `tsc --noEmit`, strict mode, no errors                                                                                                                                                                                                                                         |
 | `npm run format:check`  | Clean. Prettier                                                                                                                                                                                                                                                                       |
+| `npm run stats`         | Clean. The three shape lists are at or below the allowance in [`quality-allowance.json`](quality-allowance.json): 5 files over 200 lines, 53 functions over 40 lines (each with a stated reason), 165 exports without JSDoc                                                           |
 | `npm test`              | **51 files, 602 tests, 602 passed, 0 failed**                                                                                                                                                                                                                                         |
-| `npm run test:coverage` | **92.88%** statements, **80.25%** branches, **92.72%** functions, **94.67%** lines (thresholds 90 / 70 / 90 / 90, enforced)                                                                                                                                                           |
+| `npm run test:coverage` | **93.10%** statements, **80.04%** branches, **92.87%** functions, **94.86%** lines (thresholds 90 / 70 / 90 / 90, enforced)                                                                                                                                                           |
 | `npm run build`         | Succeeds. Routes: `/`, `/intake`, `/plan`, `/api/chat`, `/api/health`, `/api/ideas`, `/api/parse`. First Load JS: 103 kB shared, 162 kB for `/plan`                                                                                                                                   |
 | `npm run test:e2e`      | **14 passed** (3 journeys, 5 quality flows, 5 accessibility screens, 1 streamed-chat flow)                                                                                                                                                                                            |
 | `npm audit --omit=dev`  | **0 vulnerabilities**                                                                                                                                                                                                                                                                 |
 | `npm audit`             | **7 vulnerabilities**, all in the development toolchain (Tailwind's braces chain, the Next ESLint config's fast-glob chain). None ships; fixes are breaking major upgrades (Tailwind 4, eslint-config-next@14). Documented in [`../SECURITY.md`](../SECURITY.md#3-dependency-posture) |
 
-`node scripts/stats.mjs` prints these counts again, so they cannot drift.
+`npm run stats` prints these counts again, so they cannot drift.
+
+### Code shape
+
+`npm run stats` also measures the function and file shape rules from `AGENTS.md` and compares them
+with [`quality-allowance.json`](quality-allowance.json). It exits 1 when a count rises above the
+allowance, and it is the last step of `npm run check`. Measured on 2026-10-27:
+
+| List                                   | Count | Allowance | What stays                                                         |
+| -------------------------------------- | ----- | --------- | ------------------------------------------------------------------ |
+| Files over 200 lines                   | 5     | 5         | Three locale dictionaries and two development scripts              |
+| Functions over 40 lines                | 53    | 53        | Each carries a `long-function:` reason in the comment above it     |
+| Functions over 40 lines without reason | 0     | 0         | A new long function without a reason fails the gate                |
+| Exports without a JSDoc block          | 165   | 165       | Mostly schemas, label maps and components; services are documented |
+
+The full lists, file by file, are printed by `npm run stats` rather than copied here, so they cannot
+go stale. The allowance exists so a refactor cannot silently add to the lists; it is lowered, never
+raised, and the notes in the file say why each remaining entry is there.
 
 ### Tests per file
 
@@ -221,7 +239,7 @@ single-column on mobile and the panels stack.
 
 > _are explicitly selected by the user and never infer identity, religion, community, or region._
 
-**Built.** Eight packs in `src/lib/plan.ts`: mehendi-haldi, sangeet-evening, cocktail-hour,
+**Built.** Eight packs in `src/lib/plan/packs.ts`: mehendi-haldi, sangeet-evening, cocktail-hour,
 community-feast, potluck, street-food-style, carnival-procession and plant-based-feast. Each
 contributes checklist items and shifts a few percentage points of the budget.
 

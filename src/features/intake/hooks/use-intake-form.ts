@@ -36,6 +36,7 @@ export interface IntakeFormController {
  * Everything the intake form does except draw anything: the four steps, the
  * per-step validation gate, and the submit that stores the plan and moves to
  * the workspace.
+ * long-function: one controller: step gate, error list and draft are updated by the same transition.
  */
 export function useIntakeForm(): IntakeFormController {
   const router = useRouter();

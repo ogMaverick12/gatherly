@@ -9,6 +9,7 @@ import { RiskList } from './overview/RiskList';
 import { StatCard } from './overview/StatCard';
 import { TaskList } from './overview/TaskList';
 
+// long-function: one view section, kept in one block so its reading order stays visible.
 /** The overview tab: the six figures, then the risks, the tasks and catering. */
 export function OverviewPanel({
   view,

@@ -12,6 +12,7 @@ import { formatMinor } from '@/lib/money';
 
 const FEATURE_KEYS = ['budget', 'timeline', 'vendors', 'health', 'ideas', 'export'] as const;
 
+// long-function: one view section, kept in one block so its reading order stays visible.
 export function LandingContent() {
   const { dictionary } = useAccessibility();
   const t = dictionary;

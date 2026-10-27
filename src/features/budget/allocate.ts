@@ -20,6 +20,7 @@ import { budgetWarnings } from './warnings';
 /**
  * Spread the spendable budget across the categories, applying the priority
  * boost and the pack shifts before the money is divided.
+ * long-function: the weight, priority, pack and remainder steps share one working copy of the rows, so they run in one pass.
  */
 function allocateCategories(
   plan: Plan,

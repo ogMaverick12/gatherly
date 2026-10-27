@@ -12,6 +12,7 @@ import type { BudgetWarning, CategoryAllocation } from './types';
  * The warnings a budget raises: each one names what was measured and what the
  * user can do about it, built from the allocation so the numbers in them are
  * the numbers on screen.
+ * long-function: each warning is a short branch over the same allocation, and the list reads in the order a planner would check.
  */
 export function budgetWarnings(
   plan: Plan,

@@ -13,6 +13,7 @@ export interface RadioChipOption<T extends string> {
  *
  * Real radios inside a fieldset with a legend, so keyboard and screen-reader
  * behaviour is the platform's, not something this component re-implements.
+ * long-function: one fieldset: legend, radios and checked style are the same rule for every chip.
  */
 export function RadioChips<T extends string>({
   legend,

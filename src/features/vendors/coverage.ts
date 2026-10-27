@@ -1,4 +1,4 @@
-import type { BudgetCategoryId, Plan, VendorCategoryId, VendorStatus } from '@/lib/plan';
+import type { BudgetCategoryId, Plan, Vendor, VendorCategoryId, VendorStatus } from '@/lib/plan';
 import { VENDOR_CATEGORY_LABELS } from '@/lib/plan';
 import { VENDOR_CATEGORY_BUDGET_LINE, vendorChecklist } from './checklist';
 
@@ -23,44 +23,53 @@ export interface VendorCoverage {
   readonly nextAction: string | null;
 }
 
+/** The furthest a category has got: booked beats quoted beats contacted. */
+function statusOf(vendors: readonly Vendor[]): CategoryCoverage['status'] {
+  if (vendors.some((vendor) => vendor.status === 'booked')) return 'booked';
+  if (vendors.some((vendor) => vendor.status === 'quoted')) return 'quoted';
+  if (vendors.some((vendor) => vendor.status === 'contacted')) return 'contacted';
+  if (vendors.some((vendor) => vendor.status === 'to_contact')) return 'to_contact';
+  return 'not-started';
+}
+
+/** One vendor category: what it was given, what it has quoted and booked. */
+function categoryCoverage(
+  category: VendorCategoryId,
+  plan: Plan,
+  allocationByCategory: Readonly<Record<BudgetCategoryId, number>>,
+): CategoryCoverage {
+  const budgetLine = VENDOR_CATEGORY_BUDGET_LINE[category];
+  const allocatedMinor = allocationByCategory[budgetLine] ?? 0;
+  const vendors = plan.vendors.filter((vendor) => vendor.category === category);
+  const quotedMinor = vendors.reduce((sum, vendor) => sum + (vendor.quotedMinor ?? 0), 0);
+  const bookedMinor = vendors
+    .filter((vendor) => vendor.status === 'booked')
+    .reduce((sum, vendor) => sum + (vendor.quotedMinor ?? vendor.depositMinor ?? 0), 0);
+  const coveragePercent =
+    allocatedMinor > 0
+      ? Math.min(100, Math.round((bookedMinor / allocatedMinor) * 100))
+      : bookedMinor > 0
+        ? 100
+        : 0;
+  return {
+    category,
+    label: VENDOR_CATEGORY_LABELS[category],
+    allocatedMinor,
+    quotedMinor,
+    bookedMinor,
+    coveragePercent,
+    status: statusOf(vendors),
+    hasVendor: vendors.length > 0,
+  };
+}
+
 export function computeVendorCoverage(
   plan: Plan,
   allocationByCategory: Readonly<Record<BudgetCategoryId, number>>,
 ): VendorCoverage {
-  const categories: CategoryCoverage[] = vendorChecklist(plan.intake.eventType).map((category) => {
-    const budgetLine = VENDOR_CATEGORY_BUDGET_LINE[category];
-    const allocatedMinor = allocationByCategory[budgetLine] ?? 0;
-    const vendors = plan.vendors.filter((vendor) => vendor.category === category);
-    const quotedMinor = vendors.reduce((sum, vendor) => sum + (vendor.quotedMinor ?? 0), 0);
-    const bookedMinor = vendors
-      .filter((vendor) => vendor.status === 'booked')
-      .reduce((sum, vendor) => sum + (vendor.quotedMinor ?? vendor.depositMinor ?? 0), 0);
-    const status = vendors.some((vendor) => vendor.status === 'booked')
-      ? 'booked'
-      : vendors.some((vendor) => vendor.status === 'quoted')
-        ? 'quoted'
-        : vendors.some((vendor) => vendor.status === 'contacted')
-          ? 'contacted'
-          : vendors.some((vendor) => vendor.status === 'to_contact')
-            ? 'to_contact'
-            : 'not-started';
-    const coveragePercent =
-      allocatedMinor > 0
-        ? Math.min(100, Math.round((bookedMinor / allocatedMinor) * 100))
-        : bookedMinor > 0
-          ? 100
-          : 0;
-    return {
-      category,
-      label: VENDOR_CATEGORY_LABELS[category],
-      allocatedMinor,
-      quotedMinor,
-      bookedMinor,
-      coveragePercent,
-      status,
-      hasVendor: vendors.length > 0,
-    };
-  });
+  const categories = vendorChecklist(plan.intake.eventType).map((category) =>
+    categoryCoverage(category, plan, allocationByCategory),
+  );
 
   const allocatedMinor = categories.reduce((sum, item) => sum + item.allocatedMinor, 0);
   const bookedMinor = categories.reduce((sum, item) => sum + item.bookedMinor, 0);

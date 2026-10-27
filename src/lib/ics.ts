@@ -81,6 +81,7 @@ export interface CalendarOptions {
   readonly locale?: string;
 }
 
+// long-function: one pass over the inputs; splitting it would only pass the same state between more functions.
 export function buildCalendar(plan: Plan, options: CalendarOptions = {}): string {
   const now = options.now ?? new Date();
   const stamp = toStamp(now);

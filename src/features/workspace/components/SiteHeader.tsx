@@ -5,6 +5,7 @@ import { Wordmark } from './Wordmark';
 import { useAccessibility } from '@/features/accessibility/provider';
 import Link from 'next/link';
 
+// long-function: one view section, kept in one block so its reading order stays visible.
 export function SiteHeader() {
   const { dictionary, preferences, setLanguage } = useAccessibility();
 

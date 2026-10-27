@@ -94,6 +94,7 @@ export async function encodeShareFragment(plan: Plan): Promise<string> {
   return `${PLAIN_PREFIX}.${bytesToBase64Url(bytes)}`;
 }
 
+// long-function: one pass over the inputs; splitting it would only pass the same state between more functions.
 export async function decodeShareFragment(fragment: string): Promise<Plan | null> {
   const trimmed = fragment.trim().replace(/^#/, '');
   const separator = trimmed.indexOf('.');

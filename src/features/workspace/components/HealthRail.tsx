@@ -13,6 +13,7 @@ const BAND_LABEL: Record<HealthBand, string> = {
   at_risk: 'At risk',
 };
 
+// long-function: one view section, kept in one block so its reading order stays visible.
 export function HealthRail({ view }: { view: PlanView }) {
   const { dictionary } = useAccessibility();
   const { health, plan, budget, timeline } = view;

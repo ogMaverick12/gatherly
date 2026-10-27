@@ -8,6 +8,7 @@ import type { PlanView } from '@/lib/plan-view';
 import { OfflineBanner } from '@/features/accessibility/components/OfflineBanner';
 import { ExportBar } from './ExportBar';
 
+// long-function: one view section, kept in one block so its reading order stays visible.
 /** The plan's headline figures, its exports, and the way to start over. */
 export function WorkspaceHeader({
   view,

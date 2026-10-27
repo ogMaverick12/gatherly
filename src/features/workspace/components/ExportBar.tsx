@@ -12,6 +12,7 @@ import type { PlanView } from '@/lib/plan-view';
 const BUTTON_CLASS =
   'inline-flex min-h-[44px] items-center justify-center rounded-pill border border-line-strong px-4 py-2 text-sm font-medium text-ink transition-colors duration-200 hover:border-ink hover:bg-raised';
 
+// long-function: one view section, kept in one block so its reading order stays visible.
 export function ExportBar({ view }: { view: PlanView }) {
   const { dictionary } = useAccessibility();
   const t = dictionary;

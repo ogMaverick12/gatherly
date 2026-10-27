@@ -31,6 +31,7 @@ export function workspaceTabs(view: PlanView, t: Dictionary): TabDefinition<Work
  *
  * One list drives both, so a section can never be reachable in one layout and
  * missing in the other.
+ * long-function: one list drives both layouts, so a section can never be reachable in one and missing in the other.
  */
 export function WorkspaceTabs({
   tabs,

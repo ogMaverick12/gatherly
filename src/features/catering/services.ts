@@ -1,4 +1,4 @@
-import { DIETARY_LABELS, type DietaryNeed, type Plan } from '@/lib/plan';
+import { DIETARY_LABELS, type DietaryNeed, type Intake, type Plan } from '@/lib/plan';
 
 /**
  * Catering engine.
@@ -45,29 +45,23 @@ function drinksPerGuest(serviceHours: number): number {
   return 2;
 }
 
-export function computeCatering(plan: Plan): CateringEstimate {
-  const { intake } = plan;
-  const guests = intake.guests;
-  const bufferPlates = Math.ceil((guests * BUFFER_PERCENT) / 100);
-  const totalPlates = guests + bufferPlates;
-  const starters = Math.ceil(guests * 0.9);
-  const desserts = Math.ceil(guests * 0.9);
-  const serviceHours = SERVICE_HOURS[intake.eventType];
-  const drinks = Math.ceil(guests * drinksPerGuest(serviceHours));
-  const servers = Math.ceil(guests / PLATES_PER_SERVER) + 2;
-  const leadStaff = 1;
-
-  const caterer = plan.vendors.find((vendor) => vendor.category === 'caterer');
-  const catererHasNotes = (caterer?.notes.trim().length ?? 0) > 0;
-
-  const dietary: DietaryRequirement[] = intake.dietary.map((need) => ({
+/** One requirement per recorded need, confirmed only when a caterer replied. */
+function dietaryRequirements(
+  intake: Intake,
+  caterer: Plan['vendors'][number] | undefined,
+): DietaryRequirement[] {
+  const confirmed = Boolean(caterer) && (caterer?.notes.trim().length ?? 0) > 0;
+  return intake.dietary.map((need) => ({
     need,
     label: DIETARY_LABELS[need],
     action: `Ask the caterer in writing to cover ${DIETARY_LABELS[need].toLowerCase()} meals and to label the plates.`,
-    confirmed: Boolean(caterer) && catererHasNotes,
+    confirmed,
   }));
+}
 
-  const notes: string[] = [
+/** The lines that explain where the estimate can still move. */
+function cateringNotes(intake: Intake, bufferPlates: number): string[] {
+  const notes = [
     `${bufferPlates} extra plates (${BUFFER_PERCENT}%) cover the guests who always arrive late.`,
     'A plated meal needs one server for every 25 guests, plus two for the room.',
   ];
@@ -82,19 +76,28 @@ export function computeCatering(plan: Plan): CateringEstimate {
   if (intake.dietary.length === 0) {
     notes.push('No dietary needs were recorded. Ask anyway - people often forget to say.');
   }
+  return notes;
+}
+
+export function computeCatering(plan: Plan): CateringEstimate {
+  const { intake } = plan;
+  const guests = intake.guests;
+  const bufferPlates = Math.ceil((guests * BUFFER_PERCENT) / 100);
+  const serviceHours = SERVICE_HOURS[intake.eventType];
+  const caterer = plan.vendors.find((vendor) => vendor.category === 'caterer');
 
   return {
     guests,
     mainPlates: guests,
     bufferPlates,
-    totalPlates,
-    starters,
-    desserts,
-    drinks,
-    servers,
-    leadStaff,
+    totalPlates: guests + bufferPlates,
+    starters: Math.ceil(guests * 0.9),
+    desserts: Math.ceil(guests * 0.9),
+    drinks: Math.ceil(guests * drinksPerGuest(serviceHours)),
+    servers: Math.ceil(guests / PLATES_PER_SERVER) + 2,
+    leadStaff: 1,
     serviceHours,
-    dietary,
-    notes,
+    dietary: dietaryRequirements(intake, caterer),
+    notes: cateringNotes(intake, bufferPlates),
   };
 }

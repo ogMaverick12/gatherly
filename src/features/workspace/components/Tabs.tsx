@@ -13,6 +13,7 @@ export interface TabDefinition<T extends string> {
  *
  * Uses the ARIA tabs pattern: arrow keys move between tabs, Home and End
  * jump to the ends, and only the selected tab is in the page tab order.
+ * long-function: the ARIA key map and the elements it moves focus between stay in one block on purpose.
  */
 export function Tabs<T extends string>({
   tabs,

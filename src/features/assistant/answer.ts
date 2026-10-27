@@ -7,6 +7,7 @@ function money(minor: number, currency: PlanSnapshot['currency']): string {
   return formatMinor(minor, currency);
 }
 
+// long-function: one pass over the inputs; splitting it would only pass the same state between more functions.
 export function buildBasicAnswer(intent: AssistantIntent, snapshot: PlanSnapshot): string {
   const topCategories = snapshot.categories.slice(0, 3);
 

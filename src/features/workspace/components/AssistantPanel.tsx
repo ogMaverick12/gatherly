@@ -7,6 +7,7 @@ import { useAssistantChat } from '../hooks/use-assistant-chat';
 import { AssistantComposer } from './AssistantComposer';
 import { AssistantLog } from './AssistantLog';
 
+// long-function: one view section, kept in one block so its reading order stays visible.
 /** The assistant tab: the ground it answers from, the log, and the question box. */
 export function AssistantPanel({
   view,

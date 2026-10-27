@@ -10,6 +10,7 @@ import { MoneyStep } from './steps/MoneyStep';
 import { NeedsStep } from './steps/NeedsStep';
 import { ExtrasStep } from './steps/ExtrasStep';
 
+// long-function: one view section, kept in one block so its reading order stays visible.
 /** The four-step intake, one section per step, with a validation gate between. */
 export function IntakeForm() {
   const { dictionary: t } = useAccessibility();

@@ -13,6 +13,7 @@ import { VendorsPanel } from './VendorsPanel';
 import { WorkspaceHeader } from './WorkspaceHeader';
 import { WorkspaceTabs, workspaceTabs, type WorkspaceTabId } from './WorkspaceTabs';
 
+// long-function: one view section, kept in one block so its reading order stays visible.
 /** The workspace: one header, six panel sections and the health rail beside them. */
 export function PlanWorkspace() {
   const { dictionary } = useAccessibility();

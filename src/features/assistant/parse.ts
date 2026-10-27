@@ -46,6 +46,7 @@ function matchAll<T>(text: string, table: readonly { value: T; words: readonly s
   return found;
 }
 
+// long-function: one pass over the inputs; splitting it would only pass the same state between more functions.
 function parseEventDate(text: string): string | null {
   const iso = /(\d{4})-(\d{2})-(\d{2})/.exec(text);
   if (iso) {

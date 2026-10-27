@@ -38,6 +38,7 @@ export interface PlanView {
   readonly snapshot: PlanSnapshot;
 }
 
+// long-function: one pass over the inputs; splitting it would only pass the same state between more functions.
 export function computePlanView(plan: Plan, today: DateOnly = todayDateOnly(new Date())): PlanView {
   const budget = computeBudget(plan);
 

@@ -6,6 +6,7 @@ import type { PlanView } from '@/lib/plan-view';
 import type { Idea } from '@/lib/plan';
 import { renderSnapshotForModel } from '@/features/assistant/services';
 
+// long-function: one view section, kept in one block so its reading order stays visible.
 export function IdeasPanel({
   view,
   onApplyIdea,

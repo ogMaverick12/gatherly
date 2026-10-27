@@ -33,6 +33,7 @@ export interface ChatStreamOptions {
  *
  * @param options the selected provider, its request, the fallback answer
  * @returns the response body to hand to the client
+ * long-function: one stream: the encoder and the start() closure must share one parser and one cancelled flag.
  */
 export function chatEventStream(options: ChatStreamOptions): ReadableStream<Uint8Array> {
   const encoder = new TextEncoder();
@@ -49,6 +50,7 @@ export function chatEventStream(options: ChatStreamOptions): ReadableStream<Uint
     options.onComplete?.(providerError);
   };
 
+  // long-function: start() owns the read loop, the deadline and the close, and splitting it would put the cancelled flag out of reach.
   return new ReadableStream<Uint8Array>({
     async start(controller) {
       let closed = false;

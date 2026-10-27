@@ -13,6 +13,7 @@ export interface ChipOption<T extends string> {
  *
  * Real checkboxes inside a fieldset, so keyboard and screen-reader
  * behaviour is the platform's, not something we re-implemented.
+ * long-function: one fieldset: layout, checkbox and checked style are the same rule for every chip.
  */
 export function ChipGroup<T extends string>({
   legend,

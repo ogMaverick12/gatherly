@@ -90,6 +90,7 @@ export interface AccessibilityContextValue {
 
 const AccessibilityContext = createContext<AccessibilityContextValue | null>(null);
 
+// long-function: one view section, kept in one block so its reading order stays visible.
 export function AccessibilityProvider({
   children,
   initialLanguage,

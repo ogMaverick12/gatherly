@@ -11,6 +11,7 @@ import type { StreamedAnswer } from './assistant-stream';
  * The live bubble is `aria-live="off"` on purpose: announcing every chunk
  * would talk over the reader. The finished message lands in the polite log,
  * so completion is announced once, with the full answer.
+ * long-function: one log region: the polite and the assertive announcements must keep their DOM order.
  */
 export function AssistantLog({
   messages,

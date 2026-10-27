@@ -23,7 +23,7 @@ up.
 | GenAI-powered assistant | A question box that answers from your plan, streamed, with a badge that says whether a model wrote it; a deterministic Basic mode when no key is set               | `src/lib/ai/`, `src/app/api/chat/route.ts`, `src/features/assistant/services.ts`                         | `tests/ai.test.ts`, `tests/api/chat-stream.test.ts`, `tests/components/assistant-stream.test.tsx`, `tests/security/providers.test.ts`, `tests/api/routes.test.ts` |
 | Weddings                | Wedding benchmarks, wedding idea set, wedding ceremony flow in the run-of-show                                                                                     | `src/features/budget/services.ts`, `src/features/ideas/services.ts`, `src/features/timeline/services.ts` | `tests/budget.test.ts`, `tests/ideas.test.ts`, `tests/timeline.test.ts`                                                                                           |
 | Birthdays               | Birthday benchmarks, birthday idea set, birthday run-of-show                                                                                                       | `src/features/budget/services.ts`, `src/features/ideas/services.ts`, `src/features/timeline/services.ts` | `tests/budget.test.ts`, `tests/ideas.test.ts`, `tests/timeline.test.ts`                                                                                           |
-| Community events        | Community gathering as a first-class event type, with its own benchmarks, ideas and preparation steps                                                              | `src/lib/plan.ts`, `src/features/budget/services.ts`, `src/features/ideas/services.ts`                   | `tests/plan.test.ts`, `tests/ideas.test.ts`, `tests/budget.test.ts`                                                                                               |
+| Community events        | Community gathering as a first-class event type, with its own benchmarks, ideas and preparation steps                                                              | `src/lib/plan`, `src/features/budget/services.ts`, `src/features/ideas/services.ts`                      | `tests/plan.test.ts`, `tests/ideas.test.ts`, `tests/budget.test.ts`                                                                                               |
 | Budgets                 | Visible category maths in whole paise, an 8% contingency, per-guest figures, benchmark shares and what-if scenarios                                                | `src/features/budget/services.ts`, `src/lib/money.ts`                                                    | `tests/budget.test.ts`, `tests/money.test.ts`, `tests/property.test.ts`                                                                                           |
 | Timelines               | Milestones worked backwards from the event date, each with an owner, a date and a reason, plus a run-of-show                                                       | `src/features/timeline/services.ts`                                                                      | `tests/timeline.test.ts`, `tests/property.test.ts`                                                                                                                |
 | Vendor checklists       | A category checklist with statuses, quotes and deposits, and a coverage percentage against the plan                                                                | `src/features/vendors/services.ts`                                                                       | `tests/vendors.test.ts`, `tests/components/vendors.test.tsx`                                                                                                      |
@@ -44,19 +44,19 @@ birthday and a community gathering - so you can see the workspace in under a min
 
 ### Scripts
 
-| Script                   | What it does                                                      |
-| ------------------------ | ----------------------------------------------------------------- |
-| `npm run dev`            | Next.js dev server                                                |
-| `npm run build`          | Production build                                                  |
-| `npm start`              | Serve the production build                                        |
-| `npm run lint`           | ESLint 9, flat config, `--max-warnings=0`                         |
-| `npm run typecheck`      | `tsc --noEmit`, strict mode                                       |
-| `npm run format:check`   | Prettier, check only                                              |
-| `npm test`               | Vitest, the unit and component suites                             |
-| `npm run test:coverage`  | Vitest with the v8 coverage report and thresholds                 |
-| `npm run check`          | `lint` + `typecheck` + `format:check` + `test:coverage`, the gate |
-| `npm run test:e2e`       | Playwright journeys (`npm run e2e:install` first, once)           |
-| `node scripts/stats.mjs` | Prints the counts this README quotes, so they cannot drift        |
+| Script                  | What it does                                                      |
+| ----------------------- | ----------------------------------------------------------------- |
+| `npm run dev`           | Next.js dev server                                                |
+| `npm run build`         | Production build                                                  |
+| `npm start`             | Serve the production build                                        |
+| `npm run lint`          | ESLint 9, flat config, `--max-warnings=0`                         |
+| `npm run typecheck`     | `tsc --noEmit`, strict mode                                       |
+| `npm run format:check`  | Prettier, check only                                              |
+| `npm test`              | Vitest, the unit and component suites                             |
+| `npm run test:coverage` | Vitest with the v8 coverage report and thresholds                 |
+| `npm run check`         | `lint` + `typecheck` + `format:check` + `test:coverage` + `stats` |
+| `npm run test:e2e`      | Playwright journeys (`npm run e2e:install` first, once)           |
+| `npm run stats`         | Prints the counts this README quotes and the three quality lists  |
 
 ### Environment
 

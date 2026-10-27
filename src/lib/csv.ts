@@ -19,6 +19,7 @@ export function withBom(csv: string): string {
   return `﻿${csv}`;
 }
 
+// long-function: one pass over the inputs; splitting it would only pass the same state between more functions.
 export function budgetCsv(plan: Plan, budget: BudgetAllocation): string {
   const currency = plan.intake.currency;
   const rows: (string | number)[][] = [

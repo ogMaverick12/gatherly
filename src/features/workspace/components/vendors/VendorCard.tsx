@@ -18,6 +18,7 @@ import { FIELD_CLASS, VendorField } from './VendorField';
 import { VendorQuoteScore } from './VendorQuoteScore';
 import { useVendorDraft } from './use-vendor-draft';
 
+// long-function: one view section, kept in one block so its reading order stays visible.
 /** One vendor: what is known about them, and what to do next. */
 export function VendorCard({
   vendor,

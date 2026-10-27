@@ -51,6 +51,7 @@ export interface AssistantChat {
  * it while it is being written and stop it if it is not what they wanted. If
  * the route is unreachable the same deterministic rules answer locally, and
  * the notice says the mode rather than hiding it.
+ * long-function: one controller: the abort, the local fallback and the notice are the same state transition.
  */
 export function useAssistantChat(
   view: PlanView,

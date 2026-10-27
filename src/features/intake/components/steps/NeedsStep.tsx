@@ -13,6 +13,7 @@ import {
 import type { IntakeFormValues } from '../../schema';
 import { ChipGroup } from '../ChipGroup';
 
+// long-function: one view section, kept in one block so its reading order stays visible.
 /** What the household cares about, what guests need, and a free note. */
 export function NeedsStep({ form }: { form: UseFormReturn<IntakeFormValues> }) {
   const { dictionary: t } = useAccessibility();

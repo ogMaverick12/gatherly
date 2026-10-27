@@ -61,6 +61,7 @@ function mergeHeaders(response: Response, headers: Record<string, string>): void
   response.headers.set('Cache-Control', NO_STORE);
 }
 
+// long-function: one pass over the inputs; splitting it would only pass the same state between more functions.
 async function runRoute(
   request: Request,
   name: string,

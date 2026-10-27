@@ -13,6 +13,7 @@ import {
 import type { IntakeFormValues } from '../../schema';
 import { RadioChips } from '../RadioChips';
 
+// long-function: one view section, kept in one block so its reading order stays visible.
 /** Event type, date, head count, city tier and venue: what the event is. */
 export function BasicsStep({
   form,

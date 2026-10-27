@@ -44,6 +44,7 @@ export interface PlanSnapshot {
   readonly topRisks: readonly string[];
 }
 
+// long-function: one pass over the inputs; splitting it would only pass the same state between more functions.
 export function buildSnapshot(
   plan: Plan,
   budget: BudgetAllocation,
