@@ -56,7 +56,8 @@ function inventoryTables() {
     [
       ...fs
         .readFileSync(join(ROOT, 'README.md'), 'utf8')
-        .matchAll(/^\| `([^`]+)` \| [^|]+ \| (.*) \|$/gm),
+        .replace(/\r\n/g, '\n')
+        .matchAll(/^\|\s+`([^`]+)`\s+\|\s+[^|]+\s+\|\s+(.*?)\s+\|$/gm),
     ].map((m) => [m[1], m[2].trim()]),
   );
   const deps = [
@@ -88,14 +89,13 @@ export function writeInventory() {
     `# Inventory\n\n## File tree (three levels)\n\`\`\`text\n${tree.join('\n')}\n\`\`\`\n\n## 25 largest source files\n| File | Lines |\n| --- | --- |\n${largest.map((e) => `| \`${e.f}\` | ${e.n} |`).join('\n')}\n\n## Test declarations per file\nCounted from source declarations of \`it\`/\`test\`; parameterized declarations count once.\n| File | Declarations |\n| --- | --- |\n${tests.join('\n')}\n\n## Dependencies and README reasons\n| Package | Scope | README reason |\n| --- | --- | --- |\n${deps.join('\n')}\n\n## API routes and runtime settings\n| Route | Declared settings |\n| --- | --- |\n${routes.join('\n')}\n`,
   );
 }
-
 function grep(args) {
   const r = spawnSync('git', args, { cwd: ROOT, encoding: 'utf8', maxBuffer: MAX });
   return r.status === 2
     ? `SEARCH ERROR: ${(r.stderr ?? '').trim() || 'git grep failed'}`
     : (r.stdout ?? '').trim() || 'none';
 }
-function block(title, pattern, paths = CODE, keep = () => true) {
+function block(title, pattern, paths = CODE, keep = (f) => !f.startsWith('scripts/audit-bundle')) {
   const args = ['grep', '-n', '-I', '-E', pattern, '--', ...paths];
   const output =
     grep(args)

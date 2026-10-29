@@ -93,7 +93,7 @@ function main() {
     results.push(name === 'live-smoke' ? skip(name, command) : run(name, command));
   if (existsSync(join(AUDIT, 'lighthouse')))
     cpSync(join(AUDIT, 'lighthouse'), join(OUT, 'lighthouse'), { recursive: true });
-  sh('git checkout -- public/sw.js');
+  sh('git -c core.autocrlf=false checkout -- public/sw.js');
   writeInventory();
   writeChecks();
   const hits = scanSecrets();
