@@ -86,6 +86,6 @@ export function createSamplePlan(template: SamplePlanTemplate, now: Date): Plan 
 }
 
 /** Parse untrusted JSON (localStorage, share links) into a plan. */
-export function parsePlan(input: unknown): z.SafeParseReturnType<unknown, Plan> {
+export function parsePlan(input: unknown): z.ZodSafeParseResult<Plan> {
   return PlanSchema.safeParse(input);
 }

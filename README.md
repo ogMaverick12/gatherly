@@ -214,15 +214,15 @@ Every measured number lives in one place:
 [`docs/DELIVERY_OUTCOMES.md`](docs/DELIVERY_OUTCOMES.md). Run
 `node scripts/stats.mjs` to print the current counts, and `npm run check` to prove them.
 
-| Check                   | What it proves                                                      |
-| ----------------------- | ------------------------------------------------------------------- |
-| `npm run lint`          | Clean, 0 warnings (`--max-warnings=0`)                              |
-| `npm run typecheck`     | Clean, strict TypeScript                                            |
-| `npm run format:check`  | Clean, Prettier                                                     |
-| `npm run test:coverage` | The unit and component suites pass and the coverage thresholds hold |
-| `npm run build`         | `/`, `/intake`, `/plan` and the API routes compile                  |
-| `npm run test:e2e`      | The Playwright journeys pass, including the accessibility sweeps    |
-| `npm audit --omit=dev`  | No known vulnerabilities in the shipped dependencies                |
+| Check                   | What it proves                                                          |
+| ----------------------- | ----------------------------------------------------------------------- |
+| `npm run lint`          | Clean, 0 warnings (`--max-warnings=0`)                                  |
+| `npm run typecheck`     | Clean, strict TypeScript                                                |
+| `npm run format:check`  | Clean, Prettier                                                         |
+| `npm run test:coverage` | The unit and component suites pass and the coverage thresholds hold     |
+| `npm run build`         | `/`, `/intake`, `/plan` and the API routes compile                      |
+| `npm run test:e2e`      | The Playwright journeys pass, including the accessibility sweeps        |
+| `npm audit --omit=dev`  | Run npm audit --omit=dev. Last result: 0 vulnerabilities on 2026-10-29. |
 
 Coverage thresholds are enforced in `vitest.config.mts` (90 / 70 / 90 / 90), so a regression below
 those numbers fails the test run rather than being reported after the fact.

@@ -31,7 +31,7 @@ export interface RouteContext {
   deferLog(): void;
 }
 
-interface RouteOptions<TSchema extends z.ZodTypeAny> {
+interface RouteOptions<TSchema extends z.ZodType> {
   /** Used for the rate limit bucket and the log line. */
   readonly name: string;
   readonly schema: TSchema;
@@ -127,7 +127,7 @@ async function runRoute(
  * @param options the route name, its body schema and its handler
  * @returns the POST handler Next.js calls
  */
-export function createRoute<TSchema extends z.ZodTypeAny>(
+export function createRoute<TSchema extends z.ZodType>(
   options: RouteOptions<TSchema>,
 ): (request: Request) => Promise<Response> {
   return (request) =>

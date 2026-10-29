@@ -154,8 +154,8 @@ Treat a 92 as "this plan looks internally consistent", not "this plan is good".
   are counted in
   [`DELIVERY_OUTCOMES.md`](DELIVERY_OUTCOMES.md#verification-summary). There is no load test and
   no cross-browser matrix beyond Chromium.
-- **Known advisories remain in the development toolchain** (Vitest, Tailwind and the Next ESLint
-  config). None of them ships. See [`../SECURITY.md`](../SECURITY.md#3-dependency-posture).
+- **Dependency audit.** Run `npm audit --omit=dev`. Last result: 0 vulnerabilities on 2026-10-29.
+  See [`../SECURITY.md`](../SECURITY.md#3-dependency-posture).
 
 ---
 

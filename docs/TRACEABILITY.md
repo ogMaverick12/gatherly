@@ -135,24 +135,22 @@ Recorded honestly rather than quietly:
    coverage improved, and the statement and line figures moved down slightly because the newly
    added UI and route code is not fully exercised by unit tests. The thresholds in
    `vitest.config.mts` (90 / 70 / 90 / 90) are met.
-3. **`npm audit --omit=dev --audit-level=high` now reports nothing at all.** The brief predicted
-   a clean production audit; the current state is `0 vulnerabilities` for production dependencies,
-   after the PostCSS override described in [`../SECURITY.md`](../SECURITY.md#3-dependency-posture)
-   removed the last two.
+3. **The production dependency audit is clean.** Run `npm audit --omit=dev`. Last result:
+   0 vulnerabilities on 2026-10-29. The brief's earlier prediction is now the measured result.
 
 ---
 
 ## 6. Manual verification
 
-| Check                       | How                                                    | Result                                                             |
-| --------------------------- | ------------------------------------------------------ | ------------------------------------------------------------------ |
-| Landing to a working plan   | `npm run dev`, open `/`, click a sample plan           | Pass                                                               |
-| Persistence across a reload | Complete a milestone, reload `/plan`                   | Pass - the milestone is still ticked                               |
-| Keyboard-only navigation    | Tab to the tab strip, use the arrow keys               | Pass - the tabs move focus                                         |
-| Offline                     | Load the plan, switch the network off, reload          | Pass - the plan renders, the engines still calculate               |
-| Exports                     | CSV download, calendar file, print preview, share link | Pass                                                               |
-| Contrast                    | `tests/accessibility/contrast.test.ts`                 | Pass - 19 contrast checks across the light, dark and calm palettes |
-| Production build            | `npm run build`                                        | Pass                                                               |
-| Dependency audit            | `npm audit --omit=dev`                                 | Pass - 0 vulnerabilities                                           |
+| Check                       | How                                                    | Result                                                                  |
+| --------------------------- | ------------------------------------------------------ | ----------------------------------------------------------------------- |
+| Landing to a working plan   | `npm run dev`, open `/`, click a sample plan           | Pass                                                                    |
+| Persistence across a reload | Complete a milestone, reload `/plan`                   | Pass - the milestone is still ticked                                    |
+| Keyboard-only navigation    | Tab to the tab strip, use the arrow keys               | Pass - the tabs move focus                                              |
+| Offline                     | Load the plan, switch the network off, reload          | Pass - the plan renders, the engines still calculate                    |
+| Exports                     | CSV download, calendar file, print preview, share link | Pass                                                                    |
+| Contrast                    | `tests/accessibility/contrast.test.ts`                 | Pass - 19 contrast checks across the light, dark and calm palettes      |
+| Production build            | `npm run build`                                        | Pass                                                                    |
+| Dependency audit            | `npm audit --omit=dev`                                 | Run npm audit --omit=dev. Last result: 0 vulnerabilities on 2026-10-29. |
 
 The end-to-end journey is automated in `tests/e2e/journey.spec.ts` and runs with `npm run e2e`.

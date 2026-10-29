@@ -13,18 +13,17 @@ was built and how it was verified.
 Every number below was measured in this working tree, in this order. This is the one file that
 holds measured numbers; other documents link here.
 
-| Command                 | Result                                                                                                                                                                                                                                                                                |
-| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `npm run lint`          | Clean. ESLint 9 flat config, `--max-warnings=0`, 0 errors, 0 warnings                                                                                                                                                                                                                 |
-| `npm run typecheck`     | Clean. `tsc --noEmit`, strict mode, no errors                                                                                                                                                                                                                                         |
-| `npm run format:check`  | Clean. Prettier                                                                                                                                                                                                                                                                       |
-| `npm run stats`         | Clean. The three shape lists are at or below the allowance in [`quality-allowance.json`](quality-allowance.json): 5 files over 200 lines, 53 functions over 40 lines (each with a stated reason), 165 exports without JSDoc                                                           |
-| `npm test`              | **51 files, 602 tests, 602 passed, 0 failed**                                                                                                                                                                                                                                         |
-| `npm run test:coverage` | **93.10%** statements, **80.04%** branches, **92.87%** functions, **94.86%** lines (thresholds 90 / 70 / 90 / 90, enforced)                                                                                                                                                           |
-| `npm run build`         | Succeeds. Routes: `/`, `/intake`, `/plan`, `/api/chat`, `/api/health`, `/api/ideas`, `/api/parse`. First Load JS: 103 kB shared, 162 kB for `/plan`                                                                                                                                   |
-| `npm run test:e2e`      | **14 passed** (3 journeys, 5 quality flows, 5 accessibility screens, 1 streamed-chat flow)                                                                                                                                                                                            |
-| `npm audit --omit=dev`  | **0 vulnerabilities**                                                                                                                                                                                                                                                                 |
-| `npm audit`             | **7 vulnerabilities**, all in the development toolchain (Tailwind's braces chain, the Next ESLint config's fast-glob chain). None ships; fixes are breaking major upgrades (Tailwind 4, eslint-config-next@14). Documented in [`../SECURITY.md`](../SECURITY.md#3-dependency-posture) |
+| Command                 | Result                                                                                                                                                                                                                      |
+| ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `npm run lint`          | Clean. ESLint 9 flat config, `--max-warnings=0`, 0 errors, 0 warnings                                                                                                                                                       |
+| `npm run typecheck`     | Clean. `tsc --noEmit`, strict mode, no errors                                                                                                                                                                               |
+| `npm run format:check`  | Clean. Prettier                                                                                                                                                                                                             |
+| `npm run stats`         | Clean. The three shape lists are at or below the allowance in [`quality-allowance.json`](quality-allowance.json): 5 files over 200 lines, 53 functions over 40 lines (each with a stated reason), 165 exports without JSDoc |
+| `npm test`              | **51 files, 602 tests, 602 passed, 0 failed**                                                                                                                                                                               |
+| `npm run test:coverage` | **93.10%** statements, **80.04%** branches, **92.87%** functions, **94.86%** lines (thresholds 90 / 70 / 90 / 90, enforced)                                                                                                 |
+| `npm run build`         | Succeeds. Routes: `/`, `/intake`, `/plan`, `/api/chat`, `/api/health`, `/api/ideas`, `/api/parse`. First Load JS: 103 kB shared, 162 kB for `/plan`                                                                         |
+| `npm run test:e2e`      | **14 passed** (3 journeys, 5 quality flows, 5 accessibility screens, 1 streamed-chat flow)                                                                                                                                  |
+| `npm audit --omit=dev`  | Run npm audit --omit=dev. Last result: 0 vulnerabilities on 2026-10-29.                                                                                                                                                     |
 
 `npm run stats` prints these counts again, so they cannot drift.
 
@@ -411,11 +410,7 @@ Restated here so nothing is buried:
    `UPSTASH_REDIS_REST_TOKEN` in production. The live mode is observable: `GET /api/health`
    reports `rateLimit: 'shared' | 'per-instance'`, and a production start without the variables
    logs one warning naming them.
-2. **Advisories remain in the dev toolchain** (Tailwind's braces chain, the Next ESLint config's
-   fast-glob chain). None ships; vitest's critical advisory was closed by upgrading to Vitest 5,
-   and two more were closed with package overrides. The current count is in the
-   [verification summary](#verification-summary). Listed in
-   [`SECURITY.md`](../SECURITY.md#3-dependency-posture).
+2. **Dependency audit.** Run `npm audit --omit=dev`. Last result: 0 vulnerabilities on 2026-10-29.
 3. **No load test and no cross-browser matrix** beyond Chromium.
 4. **Coverage is not 100%.** The current figures are in the
    [verification summary](#verification-summary). The gaps are in UI branches and in provider

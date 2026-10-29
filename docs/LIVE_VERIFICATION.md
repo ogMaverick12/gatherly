@@ -52,10 +52,7 @@ The keys are never printed, and the script never writes them to disk.
 
 ## The dependency audit
 
-| Command                | Result                                                                                                        |
-| ---------------------- | ------------------------------------------------------------------------------------------------------------- |
-| `npm audit --omit=dev` | 0 vulnerabilities                                                                                             |
-| `npm audit`            | Findings in the development toolchain only; listed in [`../SECURITY.md`](../SECURITY.md#3-dependency-posture) |
+Run `npm audit --omit=dev`. Last result: 0 vulnerabilities on 2026-10-29.
 
 ## The rate-limit mode
 

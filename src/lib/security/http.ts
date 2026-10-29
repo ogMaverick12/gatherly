@@ -106,7 +106,7 @@ async function readBodyWithLimit(request: Request, maxBytes: number): Promise<st
  * @param maxBytes the body size cap
  * @returns the validated body
  */
-export async function readJsonBody<TSchema extends z.ZodTypeAny>(
+export async function readJsonBody<TSchema extends z.ZodType>(
   request: Request,
   schema: TSchema,
   maxBytes = MAX_BODY_BYTES,

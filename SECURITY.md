@@ -197,32 +197,10 @@ nonce-only with `strict-dynamic`, so no inline or external script can run.
 
 ## 3. Dependency posture
 
-```bash
-npm audit --omit=dev   # 0 vulnerabilities
-npm audit              # 7 high, all in the development toolchain
-```
+Run `npm audit --omit=dev`. Last result: 0 vulnerabilities on 2026-10-29.
 
-**Production dependencies are clean** — `npm audit --omit=dev` reports zero findings.
-
-The remaining seven findings are all in build- and lint-time tools only. None ships to the browser,
-none handles user data at runtime, and none is reachable from a request:
-
-| Package                                                           | Severity | Why it is not remediated                                                                                                                                                                                                                                  |
-| ----------------------------------------------------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `tailwindcss` (+ `braces`, `chokidar`, `fast-glob`, `micromatch`) | high     | `braces` flags every published version (`*`), so there is no patched release to upgrade to. The only remediation is Tailwind 4, which replaces the config format, the PostCSS plugin and the colour pipeline. That is the optional G8 branch, not merged. |
-| `eslint-config-next` / `@next/eslint-plugin-next`                 | high     | The advisory is fixed in `eslint-config-next@14.2.35`, which is a _downgrade_ relative to the Next 15 line and would misconfigure the lint rules. Lint-time only.                                                                                         |
-
-**Findings closed in this revision.** `vitest` / `tinypool` (critical) is gone — the suite moved to Vitest 5. `postcss-selector-parser` (moderate) is pinned to `^7.1.6` by an override, and the `@typescript-eslint` transitive chain is pinned to `^8.72.0` by two overrides, both recorded in `package.json`'s `overrides` block with a one-line reason each. `npm audit fix --force` was never used.
-
-**One production finding was remediated earlier.** `next@15.5.28` pins `postcss@8.4.31`, affected by four PostCSS advisories. The `package.json` `overrides` block hoists it to the patched `8.5.31`:
-
-```json
-"overrides": {
-  "postcss": "$postcss"
-}
-```
-
-The build, the type check and the whole test suite pass with this override in place.
+`npm audit fix --force` was not used. The lockfile is the evidence; run the command above in this
+working tree to confirm the current result.
 
 ---
 

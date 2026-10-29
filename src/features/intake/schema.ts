@@ -30,7 +30,7 @@ export const IntakeFormSchema = z
     eventDate: z.string(),
     dateNotSet: z.boolean(),
     guests: z
-      .number({ invalid_type_error: 'Enter a number of guests.' })
+      .number({ error: 'Enter a number of guests.' })
       .int()
       .min(1, 'At least one guest.')
       .max(5000, 'That is more than 5000 guests - is that right?'),
@@ -39,7 +39,7 @@ export const IntakeFormSchema = z
     venueType: z.enum(VENUE_TYPES),
     currency: z.enum(CURRENCIES),
     budget: z
-      .number({ invalid_type_error: 'Enter a budget.' })
+      .number({ error: 'Enter a budget.' })
       .min(0, 'A budget of zero is allowed, but the plan will be thin.')
       .max(100_000_000, 'That is more than the app can plan for.'),
     priorities: z.array(z.enum(PRIORITIES)).max(4),
