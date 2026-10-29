@@ -5,7 +5,7 @@
  * Edits go through the pure helpers in plan-updates so the panels stay presentational.
  */
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { computePlanView, type PlanView } from '@/lib/plan-view';
 import { hydratePlan, usePlan, usePlanActions } from '@/lib/plan-store';
 import type { ChatMessage, Idea, Plan, Vendor, VendorCategoryId } from '@/lib/plan';
@@ -42,15 +42,20 @@ export interface PlanWorkspaceController {
  * The Panel components do not know how a plan is stored: every change here is
  * handed to a pure helper in `plan-updates.ts`, so the rules stay in one place
  * and the panels stay presentational.
+ *
+ * The stored plan is hydrated in a layout effect so it is applied before paint,
+ * then a local tick forces the external store snapshot to be read again.
  */
+// long-function: one controller, kept together so every plan edit follows the same path.
 export function usePlanWorkspace(): PlanWorkspaceController {
   const plan = usePlan();
   const { update, replace, clear } = usePlanActions();
   const [activeTab, setActiveTab] = useState('overview');
+  const [, setHydrated] = useState(false);
   const seeded = useRef<string | null>(null);
-
-  useEffect(() => {
+  useLayoutEffect(() => {
     hydratePlan();
+    setHydrated(true);
   }, []);
 
   const view = useMemo<PlanView | null>(() => (plan ? computePlanView(plan) : null), [plan]);

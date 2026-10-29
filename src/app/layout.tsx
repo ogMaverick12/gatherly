@@ -89,6 +89,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html
       lang="en"
+      data-text-size="standard"
+      data-calm="false"
+      data-motion="on"
       className={`${display.variable} ${sans.variable} ${devanagari.variable} ${bengali.variable}`}
       suppressHydrationWarning
     >

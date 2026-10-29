@@ -26,6 +26,11 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
+  // These pages are dynamic because the CSP nonce is per request. Next would
+  // otherwise stream metadata after the shell, where Lighthouse cannot see it,
+  // so block metadata for every user agent and keep it in <head>.
+  htmlLimitedBots: /.*/,
+
   // The repository sits inside a larger workspace; pin the tracing root so
   // Next.js does not pick up an unrelated lockfile further up.
   outputFileTracingRoot: path.join(process.cwd()),

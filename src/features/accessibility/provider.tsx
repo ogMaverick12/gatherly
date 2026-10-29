@@ -84,11 +84,20 @@ export function AccessibilityProvider({
 
   useEffect(() => {
     const root = document.documentElement;
-    root.dataset['theme'] = resolvedTheme;
-    root.dataset['textSize'] = preferences.textSize;
-    root.dataset['calm'] = preferences.calmMode ? 'true' : 'false';
-    root.dataset['motion'] = preferences.reducedMotion ? 'off' : 'on';
-    root.lang = LANGUAGE_TAGS[preferences.language];
+    // Do not write an attribute the server already rendered. Redundant root
+    // writes invalidate style after paint for no visual change.
+    if (root.dataset['theme'] !== resolvedTheme) root.dataset['theme'] = resolvedTheme;
+    if (root.dataset['textSize'] !== preferences.textSize) {
+      root.dataset['textSize'] = preferences.textSize;
+    }
+    if (root.dataset['calm'] !== String(preferences.calmMode)) {
+      root.dataset['calm'] = preferences.calmMode ? 'true' : 'false';
+    }
+    if (root.dataset['motion'] !== (preferences.reducedMotion ? 'off' : 'on')) {
+      root.dataset['motion'] = preferences.reducedMotion ? 'off' : 'on';
+    }
+    const languageTag = LANGUAGE_TAGS[preferences.language];
+    if (root.lang !== languageTag) root.lang = languageTag;
   }, [preferences, resolvedTheme]);
 
   useEffect(() => {
