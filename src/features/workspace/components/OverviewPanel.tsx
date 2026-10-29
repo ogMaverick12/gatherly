@@ -1,5 +1,10 @@
 'use client';
 
+/**
+ * The overview tab: six headline figures followed by risks, tasks and catering.
+ * The panel only arranges the sections; every number arrives already computed.
+ */
+
 import { useAccessibility } from '@/features/accessibility/provider';
 import { formatDateOnly } from '@/lib/dates';
 import { formatMinor } from '@/lib/money';

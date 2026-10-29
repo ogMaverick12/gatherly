@@ -1,5 +1,10 @@
 'use client';
 
+/**
+ * The workspace header with the plan's headline figures and export controls.
+ * Clearing the plan is confirmed first and is the only destructive action here.
+ */
+
 import { useAccessibility } from '@/features/accessibility/provider';
 import { formatDateOnly } from '@/lib/dates';
 import { formatMinor } from '@/lib/money';

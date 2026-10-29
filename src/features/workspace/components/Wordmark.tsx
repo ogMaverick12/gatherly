@@ -1,3 +1,9 @@
+/**
+ * The Gatherly wordmark and its four-point celebration mark.
+ * Both draw from the current colour, so they inherit the surrounding text colour.
+ */
+
+/** Render the Gatherly name beside the celebration mark. */
 export function Wordmark({ className = '' }: { className?: string }) {
   return (
     <span className={`inline-flex items-center gap-2 ${className}`}>

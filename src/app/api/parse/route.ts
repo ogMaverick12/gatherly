@@ -6,7 +6,9 @@ import { PARSE_SYSTEM_PROMPT } from '@/lib/ai/prompts';
 import { jsonResponse } from '@/lib/security/http';
 import { createRoute } from '@/lib/security/route';
 import { parseFreeText } from '@/features/assistant/parse';
+/** Node.js runtime: the provider adapters rely on Node APIs. */
 export const runtime = 'nodejs';
+/** Parse each request fresh; the result is never cached. */
 export const dynamic = 'force-dynamic';
 
 const BASIC_SUFFIX = 'so the deterministic parse is shown instead.';

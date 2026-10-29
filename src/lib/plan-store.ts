@@ -88,16 +88,32 @@ export function hydratePlan(): Plan | null {
   return currentPlan;
 }
 
+/**
+ * The current plan, or null before a plan is created or hydrated.
+ *
+ * @returns the in-memory plan, without touching storage
+ */
 export function getPlan(): Plan | null {
   return currentPlan;
 }
 
+/**
+ * Replace the current plan and persist it, or clear storage with null.
+ *
+ * @param plan the plan to store, or null to clear it
+ */
 export function setPlan(plan: Plan | null): void {
   currentPlan = plan;
   writeStoredPlan(plan);
   emit();
 }
 
+/**
+ * Apply an updater to the current plan and persist the result.
+ * Does nothing when no plan is loaded.
+ *
+ * @param updater pure function from the current plan to the next one
+ */
 export function updatePlan(updater: (plan: Plan) => Plan): void {
   if (!currentPlan) return;
   const next = updater(currentPlan);
@@ -106,10 +122,18 @@ export function updatePlan(updater: (plan: Plan) => Plan): void {
   emit();
 }
 
+/**
+ * Remove the plan from memory and from local storage.
+ */
 export function clearPlan(): void {
   setPlan(null);
 }
 
+/**
+ * Subscribe a component to the plan store.
+ *
+ * @returns the current plan, or null when there is none
+ */
 export function usePlan(): Plan | null {
   return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 }

@@ -6,7 +6,9 @@ import { IDEAS_SYSTEM_PROMPT } from '@/lib/ai/prompts';
 import { jsonResponse } from '@/lib/security/http';
 import { createRoute } from '@/lib/security/route';
 import { generateIdeas, providerIdeas } from '@/features/ideas/services';
+/** Node.js runtime: the provider adapters rely on Node APIs. */
 export const runtime = 'nodejs';
+/** Generate ideas per request; results are never cached. */
 export const dynamic = 'force-dynamic';
 
 const BASIC_SUFFIX = 'so the deterministic ideas are shown instead.';

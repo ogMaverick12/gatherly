@@ -1,5 +1,10 @@
 'use client';
 
+/**
+ * The intake form shell: step progress, the active step and the navigation buttons.
+ * Validation and submission live in the intake hook; this file only draws the wizard.
+ */
+
 import Link from 'next/link';
 import { useAccessibility } from '@/features/accessibility/provider';
 import { INTAKE_STEPS } from '../schema';

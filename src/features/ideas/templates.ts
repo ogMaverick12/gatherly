@@ -1,3 +1,10 @@
+/**
+ * The idea-template catalogue.
+ *
+ * Four groups are concatenated into one list; the scorer filters by event type
+ * and ranks the rest, so order here is only a stable tie-breaker.
+ */
+
 import { BIRTHDAY_IDEAS } from './templates/birthday';
 import { COMMUNITY_IDEAS } from './templates/community';
 import { GENERIC_IDEAS } from './templates/generic';

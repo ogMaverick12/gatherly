@@ -1,3 +1,10 @@
+/**
+ * The idea-template shape.
+ *
+ * A template carries fixed words plus two closures that tune and score them
+ * against the user's context, so no template needs to know about any other.
+ */
+
 import type { EventType } from '@/lib/plan';
 import type { IdeaContext } from '../context';
 

@@ -1,5 +1,10 @@
 'use client';
 
+/**
+ * The plan's export and import controls, plus the shared-link prompt.
+ * Every file is built in the browser and every import is validated first.
+ */
+
 import { useRef, useState } from 'react';
 import { useAccessibility } from '@/features/accessibility/provider';
 import { copyToClipboard, downloadFile } from '@/lib/download';
@@ -12,6 +17,10 @@ import type { PlanView } from '@/lib/plan-view';
 const BUTTON_CLASS =
   'inline-flex min-h-[44px] items-center justify-center rounded-pill border border-line-strong px-4 py-2 text-sm font-medium text-ink transition-colors duration-200 hover:border-ink hover:bg-raised';
 
+/**
+ * Offer printing, calendar, CSV, JSON, share and import actions for the plan.
+ * Copy and import feedback is announced through a polite status region.
+ */
 // long-function: one view section, kept in one block so its reading order stays visible.
 export function ExportBar({ view }: { view: PlanView }) {
   const { dictionary } = useAccessibility();

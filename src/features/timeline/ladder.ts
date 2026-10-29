@@ -65,6 +65,14 @@ function pullStepsForward(milestones: TimelineMilestone[], today: DateOnly): Tim
   });
 }
 
+/**
+ * Builds the milestone ladder for the plan, working back from the event date.
+ * @param plan the plan whose intake, vendor state and event type select the steps
+ * @param today the date the plan is being viewed, ISO `YYYY-MM-DD`; steps already past are pulled forward
+ * @returns the selected milestones in ladder order, with dates where the event date is set
+ * @example
+ * buildMilestoneLadder(plan, '2026-10-29').find((m) => m.offsetDays === 0)?.date; // event date
+ */
 export function buildMilestoneLadder(plan: Plan, today: DateOnly): TimelineMilestone[] {
   const { intake } = plan;
   const eventDate = intake.eventDate;

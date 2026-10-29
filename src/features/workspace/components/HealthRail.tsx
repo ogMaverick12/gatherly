@@ -1,5 +1,10 @@
 'use client';
 
+/**
+ * The health rail beside the workspace: score, band, next action and key figures.
+ * The formula is disclosed in place so the score can be checked, not just trusted.
+ */
+
 import { useAccessibility } from '@/features/accessibility/provider';
 import { CelebrationDot, HealthRing } from './HealthRing';
 import type { PlanView } from '@/lib/plan-view';
@@ -13,6 +18,10 @@ const BAND_LABEL: Record<HealthBand, string> = {
   at_risk: 'At risk',
 };
 
+/**
+ * Show the plan's health score with its band, next action and headline figures.
+ * The details element lists every weighted part behind the score.
+ */
 // long-function: one view section, kept in one block so its reading order stays visible.
 export function HealthRail({ view }: { view: PlanView }) {
   const { dictionary } = useAccessibility();

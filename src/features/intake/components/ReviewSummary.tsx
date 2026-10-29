@@ -1,5 +1,10 @@
 'use client';
 
+/**
+ * The review card shown at the end of intake.
+ * It restates the answers in the order they were asked, using the same labels.
+ */
+
 import { useAccessibility } from '@/features/accessibility/provider';
 import { CITY_TIER_LABELS, EVENT_TYPE_LABELS, PRIORITY_LABELS, type Currency } from '@/lib/plan';
 import { formatMinorPlain } from '@/lib/money';

@@ -1,3 +1,9 @@
+/**
+ * Birthday idea templates.
+ *
+ * Every entry matches birthdays only; shared advice lives in the generic file.
+ */
+
 import type { IdeaTemplate } from './template';
 
 /** Ideas that only make sense for a birthday. */

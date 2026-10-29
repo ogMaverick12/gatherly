@@ -1,5 +1,10 @@
 'use client';
 
+/**
+ * The timeline tab: the milestone ladder and the run-of-show table.
+ * Both sections read their dates and labels from the computed plan view.
+ */
+
 import { useAccessibility } from '@/features/accessibility/provider';
 import type { PlanView } from '@/lib/plan-view';
 import { formatDateOnly, todayDateOnly } from '@/lib/dates';
@@ -9,6 +14,10 @@ function relativeLabel(offsetDays: number): string {
   return offsetDays < 0 ? `T-${Math.abs(offsetDays)}` : `T+${offsetDays}`;
 }
 
+/**
+ * Show dated milestones, their deadlines and the run of show.
+ * Ticking a milestone reports the id upward; this component never edits the plan.
+ */
 // long-function: one view section, kept in one block so its reading order stays visible.
 export function TimelinePanel({
   view,

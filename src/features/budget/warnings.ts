@@ -1,3 +1,10 @@
+/**
+ * Budget warnings.
+ *
+ * Each warning names what was measured and what to do about it, using the
+ * same allocation the tab shows so the numbers cannot disagree.
+ */
+
 import type { Plan } from '@/lib/plan';
 import { formatMinorPlain, sumMinor } from '@/lib/money';
 import {

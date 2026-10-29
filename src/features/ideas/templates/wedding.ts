@@ -1,3 +1,9 @@
+/**
+ * Wedding idea templates.
+ *
+ * Every entry matches weddings only; shared advice lives in the generic file.
+ */
+
 import type { IdeaTemplate } from './template';
 
 /** Ideas that only make sense for a wedding. */

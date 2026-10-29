@@ -20,6 +20,7 @@ export interface LadderItem {
   readonly skipUnderGuests?: number;
 }
 
+/** One entry per step, ordered from the furthest ahead (180 days before) to the event day. */
 export const LADDER: readonly LadderItem[] = [
   {
     id: 'venue-shortlist',

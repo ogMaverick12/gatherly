@@ -18,6 +18,9 @@ export const PACK_IDS = [
   'carnival-procession',
   'plant-based-feast',
 ] as const;
+/**
+ * The pack id enum, derived from `PACK_IDS`.
+ */
 export const PackIdSchema = z.enum(PACK_IDS);
 export type PackId = z.infer<typeof PackIdSchema>;
 
@@ -31,6 +34,9 @@ export interface PackDefinition {
   readonly budgetShift: Readonly<Partial<Record<BudgetCategoryId, number>>>;
 }
 
+/**
+ * The full definition of every optional pack, keyed by id.
+ */
 export const PACKS: Record<PackId, PackDefinition> = {
   'mehendi-haldi': {
     id: 'mehendi-haldi',
@@ -122,5 +128,8 @@ export const PACKS: Record<PackId, PackDefinition> = {
   },
 };
 
+/**
+ * The sentence shown wherever packs are offered or listed.
+ */
 export const PACK_DISCLAIMER =
   'Packs are optional starting points. Confirm the details with family, elders, officiants or local organisers before you rely on them.';

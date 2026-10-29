@@ -81,6 +81,13 @@ export interface CalendarOptions {
   readonly locale?: string;
 }
 
+/**
+ * Build an iCalendar document for the event and its dated milestones.
+ *
+ * @param plan the plan to export
+ * @param options the clock used for DTSTAMP and the locale for descriptions
+ * @returns RFC 5545 text with folded lines and CRLF endings
+ */
 // long-function: one pass over the inputs; splitting it would only pass the same state between more functions.
 export function buildCalendar(plan: Plan, options: CalendarOptions = {}): string {
   const now = options.now ?? new Date();

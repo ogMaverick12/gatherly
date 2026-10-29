@@ -1,5 +1,10 @@
 'use client';
 
+/**
+ * The budget warnings section.
+ * Severity is written in words and borders as well as colour, and each warning explains itself.
+ */
+
 import { useAccessibility } from '@/features/accessibility/provider';
 import type { BudgetWarning } from '@/features/budget/services';
 

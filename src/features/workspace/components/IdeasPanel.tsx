@@ -1,11 +1,20 @@
 'use client';
 
+/**
+ * The ideas tab: generated suggestions the user can apply one at a time.
+ * Requests go to the ideas route, and the badge always names the answer's mode.
+ */
+
 import { useState } from 'react';
 import { useAccessibility } from '@/features/accessibility/provider';
 import type { PlanView } from '@/lib/plan-view';
 import type { Idea } from '@/lib/plan';
 import { renderSnapshotForModel } from '@/features/assistant/services';
 
+/**
+ * Show plan ideas with their rationale and tags, and apply one as a task.
+ * Generating replaces the list; applying only adds a task and leaves the rest alone.
+ */
 // long-function: one view section, kept in one block so its reading order stays visible.
 export function IdeasPanel({
   view,

@@ -1,5 +1,10 @@
 'use client';
 
+/**
+ * A multi-select chip group built from real checkboxes in a fieldset.
+ * It supports a maximum selection and announces the limit in text.
+ */
+
 import { useId } from 'react';
 
 export interface ChipOption<T extends string> {

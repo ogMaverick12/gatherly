@@ -1,5 +1,10 @@
 'use client';
 
+/**
+ * The landing page: hero, sample plans, feature list and the inclusion note.
+ * All figures come from a sample plan computed in the browser, not from a server.
+ */
+
 import Link from 'next/link';
 import { useMemo } from 'react';
 import { useAccessibility } from '@/features/accessibility/provider';
@@ -12,6 +17,10 @@ import { formatMinor } from '@/lib/money';
 
 const FEATURE_KEYS = ['budget', 'timeline', 'vendors', 'health', 'ideas', 'export'] as const;
 
+/**
+ * Render the marketing page with a live sample plan preview.
+ * Copy comes from the dictionary, so the page follows the selected language.
+ */
 // long-function: one view section, kept in one block so its reading order stays visible.
 export function LandingContent() {
   const { dictionary } = useAccessibility();

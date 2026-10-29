@@ -1,3 +1,10 @@
+/**
+ * The community gathering run of show.
+ *
+ * Times are clock labels rather than dates; the timeline service returns them
+ * in order and leaves duration arithmetic to the caller.
+ */
+
 import type { RunOfShowTemplate } from './template';
 
 /** The community gathering, hour by hour. */

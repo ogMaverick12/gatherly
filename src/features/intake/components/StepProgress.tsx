@@ -1,5 +1,10 @@
 'use client';
 
+/**
+ * The ordered progress list for the four intake steps.
+ * The current step is marked with aria-current, not only with colour.
+ */
+
 import { useAccessibility } from '@/features/accessibility/provider';
 import { INTAKE_STEPS, type IntakeStep } from '../schema';
 

@@ -1,3 +1,7 @@
+/**
+ * The streaming chat response: `mode`, text `delta` frames and a final `done`.
+ * Basic mode and provider failures fall back to the deterministic answer.
+ */
 import { providerErrorNotice } from './notices';
 import type { GenerationMode, GenerationRequest, Provider, ProviderErrorKind } from './provider';
 import { sendBasic, providerAttempt, type Write } from './chat-attempt';

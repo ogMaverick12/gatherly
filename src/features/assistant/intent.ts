@@ -64,6 +64,11 @@ const INTENT_KEYWORDS: Record<AssistantIntent, readonly string[]> = {
   general: [],
 };
 
+/**
+ * Picks the subject the user is most likely asking about.
+ * @param text the user's message, in any case or language the keywords cover
+ * @returns the best-scoring intent, or `general` when no keyword matches
+ */
 export function classifyIntent(text: string): AssistantIntent {
   const normalised = text.toLowerCase();
   let best: AssistantIntent = 'general';

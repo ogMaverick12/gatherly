@@ -1,3 +1,9 @@
+/**
+ * The deterministic assistant answers.
+ *
+ * Every answer is built from the plan snapshot alone, so Basic mode needs no model.
+ */
+
 import { formatMinor, sharePercent } from '@/lib/money';
 import type { AssistantIntent } from './intent';
 import type { PlanSnapshot } from './snapshot';
@@ -7,6 +13,12 @@ function money(minor: number, currency: PlanSnapshot['currency']): string {
   return formatMinor(minor, currency);
 }
 
+/**
+ * Writes the plain-language answer for one intent from the plan snapshot.
+ * @param intent the subject the user asked about
+ * @param snapshot the numbers already computed for the plan
+ * @returns a short answer in English with the user's own figures
+ */
 // long-function: one pass over the inputs; splitting it would only pass the same state between more functions.
 export function buildBasicAnswer(intent: AssistantIntent, snapshot: PlanSnapshot): string {
   const topCategories = snapshot.categories.slice(0, 3);

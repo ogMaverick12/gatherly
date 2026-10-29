@@ -1,5 +1,10 @@
 'use client';
 
+/**
+ * A small, accessible tab strip built on the ARIA tabs pattern.
+ * It is generic over the tab id and reports selection upward; it holds no plan state.
+ */
+
 import { useCallback, useRef, type KeyboardEvent } from 'react';
 
 export interface TabDefinition<T extends string> {

@@ -1,5 +1,10 @@
 'use client';
 
+/**
+ * A banner shown while the browser is offline.
+ * It explains that the plan still works and only the AI routes are affected.
+ */
+
 import { useEffect, useState } from 'react';
 import { useAccessibility } from '../provider';
 

@@ -1,3 +1,10 @@
+/**
+ * Shared idea templates.
+ *
+ * These apply to every event type and carry the advice that is not specific to
+ * a wedding, a birthday or a community gathering.
+ */
+
 import { DIETARY_LABELS } from '@/lib/plan';
 import { formatMinor } from '@/lib/money';
 import type { IdeaTemplate } from './template';

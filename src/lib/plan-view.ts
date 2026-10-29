@@ -1,3 +1,7 @@
+/**
+ * A single derived view of a plan: budget, timeline, health, risks and ideas.
+ * The engines are pure, so the result can be memoised on the plan and date.
+ */
 import type { BudgetCategoryId, Plan } from './plan';
 import { todayDateOnly, type DateOnly } from './dates';
 import { computeBudget, computeScenarios, type BudgetScenario } from '@/features/budget/services';
@@ -18,9 +22,8 @@ import { generateIdeas, type IdeaContext } from '@/features/ideas/services';
 import { buildSnapshot, type PlanSnapshot } from '@/features/assistant/services';
 
 /**
- * One pass over a plan that produces every derived value the workspace
- * needs. The engines are pure, so this is safe to memoise on the plan
- * object: the result only changes when the plan changes.
+ * Every derived value the workspace needs for one plan.
+ * The result only changes when the plan or the reference date changes.
  */
 export interface PlanView {
   readonly plan: Plan;
@@ -38,6 +41,13 @@ export interface PlanView {
   readonly snapshot: PlanSnapshot;
 }
 
+/**
+ * Compute every derived value for a plan in one pass.
+ *
+ * @param plan the plan to read
+ * @param today the calendar date used for overdue and countdown checks (ISO date YYYY-MM-DD)
+ * @returns the budget, timeline, health, risks, ideas and snapshot for the plan
+ */
 // long-function: one pass over the inputs; splitting it would only pass the same state between more functions.
 export function computePlanView(plan: Plan, today: DateOnly = todayDateOnly(new Date())): PlanView {
   const budget = computeBudget(plan);

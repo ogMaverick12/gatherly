@@ -1,3 +1,10 @@
+/**
+ * The event-day run of show.
+ *
+ * Each event type has its own ordered template; this module picks the right
+ * one and returns plain steps the timeline panel and exports can render.
+ */
+
 import type { EventType, Plan } from '@/lib/plan';
 import { BIRTHDAY_RUN_OF_SHOW } from './run-of-show/birthday';
 import { COMMUNITY_RUN_OF_SHOW } from './run-of-show/community';
@@ -20,7 +27,11 @@ const RUN_OF_SHOW: Record<EventType, readonly RunOfShowTemplate[]> = {
   community: COMMUNITY_RUN_OF_SHOW,
 };
 
-/** The event-day schedule for the plan's event type, in order. */
+/**
+ * Returns the event-day schedule for the plan's event type.
+ * @param plan the plan whose event type selects the template
+ * @returns the steps in clock order, each with a start `HH:MM` and duration in minutes
+ */
 export function buildRunOfShow(plan: Plan): RunOfShowStep[] {
   const template = RUN_OF_SHOW[plan.intake.eventType];
   return template.map((step) => ({

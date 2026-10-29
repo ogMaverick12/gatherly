@@ -44,6 +44,17 @@ export interface PlanSnapshot {
   readonly topRisks: readonly string[];
 }
 
+/**
+ * Collects the numbers the other engines produced into one read-only object.
+ * @param plan the stored plan, for intake, tasks and vendors
+ * @param budget the allocation, in integer minor units (paise)
+ * @param coverage the vendor coverage percentages
+ * @param timeline the ladder summary with its counts and next step
+ * @param health the plan health report
+ * @param catering the plate and drink estimate
+ * @param risks the risk register, most serious first
+ * @returns the snapshot the assistant and overview read from
+ */
 // long-function: one pass over the inputs; splitting it would only pass the same state between more functions.
 export function buildSnapshot(
   plan: Plan,

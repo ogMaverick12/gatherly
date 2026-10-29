@@ -109,6 +109,12 @@ export function warnWhenRateLimitIsPerInstance(): void {
 
 let limiter: RateLimiter | null = null;
 
+/**
+ * The process-wide limiter, built from the environment on first use.
+ * Uses Upstash when configured and the in-memory bucket otherwise.
+ *
+ * @returns the shared limiter instance
+ */
 export function getRateLimiter(): RateLimiter {
   if (limiter) return limiter;
 

@@ -1,3 +1,9 @@
+/**
+ * Community idea templates.
+ *
+ * Every entry matches community gatherings only; shared advice lives in the generic file.
+ */
+
 import type { IdeaTemplate } from './template';
 
 /** Ideas that only make sense for a community gathering. */

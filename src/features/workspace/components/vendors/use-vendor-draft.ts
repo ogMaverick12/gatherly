@@ -1,5 +1,10 @@
 'use client';
 
+/**
+ * Local draft state for the editable fields on a vendor card.
+ * Values are committed on blur, so a half-typed quote never reaches the stored plan.
+ */
+
 import { useEffect, useState } from 'react';
 import { fromMajorUnits, toMajorUnits } from '@/lib/money';
 import type { Currency, Vendor } from '@/lib/plan';

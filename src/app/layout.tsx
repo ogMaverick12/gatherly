@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next';
+import { headers } from 'next/headers';
 import {
   Fraunces,
   Noto_Sans_Bengali,
@@ -38,6 +39,14 @@ const bengali = Noto_Sans_Bengali({
   variable: '--font-bengali',
 });
 
+// Runs before paint so a stored dark theme never flashes light; the nonce above
+// is what lets this one inline script through the policy.
+const THEME_SCRIPT =
+  "(function(){try{var p=JSON.parse(localStorage.getItem('gatherly:prefs:v1')||'null');" +
+  "var t=p&&p.theme;var d=t==='dark'||(t!=='light'&&window.matchMedia('(prefers-color-scheme: dark)').matches);" +
+  "document.documentElement.dataset.theme=d?'dark':'light';}catch(e){}})();";
+
+/** App-wide metadata: title template, description, manifest and icons. */
 export const metadata: Metadata = {
   metadataBase: new URL('https://gatherly.example'),
   title: {
@@ -59,6 +68,7 @@ export const metadata: Metadata = {
   },
 };
 
+/** Mobile viewport and theme colours for light and dark browser chrome. */
 export const viewport: Viewport = {
   themeColor: [
     { media: '(prefers-color-scheme: light)', color: '#FBF6EE' },
@@ -68,13 +78,23 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+/**
+ * App shell: fonts, skip link, header, footer and accessibility provider.
+ *
+ * @param props.children The page rendered inside the main landmark.
+ */
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const nonce = (await headers()).get('x-nonce') ?? undefined;
+
   return (
     <html
       lang="en"
       className={`${display.variable} ${sans.variable} ${devanagari.variable} ${bengali.variable}`}
       suppressHydrationWarning
     >
+      <head>
+        <script nonce={nonce} dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
+      </head>
       <body className="min-h-screen bg-paper text-ink antialiased">
         <AccessibilityProvider>
           <a

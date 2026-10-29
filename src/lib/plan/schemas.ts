@@ -19,16 +19,28 @@ import { PackIdSchema } from './packs';
 
 const DATE_ONLY_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 
+/**
+ * A calendar date string in `YYYY-MM-DD` form.
+ */
 export const DateOnlySchema = z
   .string()
   .regex(DATE_ONLY_PATTERN, 'Expected a calendar date as YYYY-MM-DD');
 
+/**
+ * An ISO-8601 timestamp string, as stored in plan metadata.
+ */
 export const IsoDateTimeSchema = z
   .string()
   .refine((value) => !Number.isNaN(Date.parse(value)), 'Expected an ISO-8601 timestamp');
 
+/**
+ * Up to four priorities, in the order the household chose them.
+ */
 export const PriorityListSchema = z.array(PrioritySchema).max(4);
 
+/**
+ * Everything the intake asks for, before any plan is built.
+ */
 export const IntakeSchema = z
   .object({
     eventType: EventTypeSchema,
@@ -51,6 +63,9 @@ export const IntakeSchema = z
 
 export type Intake = z.infer<typeof IntakeSchema>;
 
+/**
+ * One checklist task in a plan.
+ */
 export const PlanTaskSchema = z
   .object({
     id: z.string().min(1).max(80),
@@ -62,6 +77,9 @@ export const PlanTaskSchema = z
 
 export type PlanTask = z.infer<typeof PlanTaskSchema>;
 
+/**
+ * One vendor row, including its quote and payment state.
+ */
 export const VendorSchema = z
   .object({
     id: z.string().min(1).max(80),
@@ -78,6 +96,9 @@ export const VendorSchema = z
 
 export type Vendor = z.infer<typeof VendorSchema>;
 
+/**
+ * One dated planning milestone, relative to the event.
+ */
 export const MilestoneSchema = z
   .object({
     id: z.string().min(1).max(80),
@@ -92,6 +113,9 @@ export const MilestoneSchema = z
 
 export type Milestone = z.infer<typeof MilestoneSchema>;
 
+/**
+ * One stored idea, with its rationale, cost impact and source.
+ */
 export const IdeaSchema = z
   .object({
     id: z.string().min(1).max(80),
@@ -106,6 +130,9 @@ export const IdeaSchema = z
 
 export type Idea = z.infer<typeof IdeaSchema>;
 
+/**
+ * One chat message, from either the user or the assistant.
+ */
 export const ChatMessageSchema = z
   .object({
     id: z.string().min(1).max(80),
@@ -118,6 +145,9 @@ export const ChatMessageSchema = z
 
 export type ChatMessage = z.infer<typeof ChatMessageSchema>;
 
+/**
+ * Display and motion preferences stored with a plan.
+ */
 export const PlanSettingsSchema = z
   .object({
     theme: z.enum(['light', 'dark', 'system']),
@@ -129,8 +159,14 @@ export const PlanSettingsSchema = z
 
 export type PlanSettings = z.infer<typeof PlanSettingsSchema>;
 
+/**
+ * The plan document version written by this build.
+ */
 export const PLAN_VERSION = 1 as const;
 
+/**
+ * The full plan document, and the only shape the store accepts.
+ */
 export const PlanSchema = z
   .object({
     version: z.literal(PLAN_VERSION),

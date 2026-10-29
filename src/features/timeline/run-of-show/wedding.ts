@@ -1,3 +1,10 @@
+/**
+ * The wedding run of show.
+ *
+ * Times are clock labels rather than dates; the timeline service returns them
+ * in order and leaves duration arithmetic to the caller.
+ */
+
 import type { RunOfShowTemplate } from './template';
 
 /** The wedding day, hour by hour. */

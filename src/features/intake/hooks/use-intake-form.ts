@@ -1,5 +1,10 @@
 'use client';
 
+/**
+ * The intake wizard controller.
+ * It owns the step gate, the form values and the submit that stores the plan.
+ */
+
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm, type UseFormReturn } from 'react-hook-form';

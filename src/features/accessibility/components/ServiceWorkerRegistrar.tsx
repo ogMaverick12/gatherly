@@ -1,5 +1,10 @@
 'use client';
 
+/**
+ * Registers the service worker after the page has loaded.
+ * Failure is ignored: the app works without the offline cache.
+ */
+
 import { useEffect } from 'react';
 
 /**

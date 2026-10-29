@@ -1,5 +1,10 @@
 'use client';
 
+/**
+ * A single-choice chip group built from real radios in a fieldset.
+ * The legend and help text are wired to the group for screen readers.
+ */
+
 import { useId } from 'react';
 
 export interface RadioChipOption<T extends string> {

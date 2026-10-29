@@ -8,6 +8,7 @@ import type { CityTier, Currency, DietaryNeed, EventType, Priority } from '@/lib
  * value in their plan.
  */
 
+/** Words that select an event type, checked in table order. */
 export const EVENT_TYPE_KEYWORDS: readonly { value: EventType; words: readonly string[] }[] = [
   { value: 'wedding', words: ['wedding', 'marriage', 'shaadi', 'baraat', 'sangeet', 'mehendi'] },
   { value: 'birthday', words: ['birthday', 'birth day', 'bday', 'anniversary', 'cake'] },
@@ -17,6 +18,7 @@ export const EVENT_TYPE_KEYWORDS: readonly { value: EventType; words: readonly s
   },
 ];
 
+/** Words and city names that suggest a cost tier. */
 export const TIER_KEYWORDS: readonly { value: CityTier; words: readonly string[] }[] = [
   {
     value: 'tier1',
@@ -50,6 +52,7 @@ export const TIER_KEYWORDS: readonly { value: CityTier; words: readonly string[]
   { value: 'tier3', words: ['tier 3', 'tier-3', 'tier three', 'small town', 'village'] },
 ];
 
+/** Currency names and symbols, used to read an amount typed after them. */
 export const CURRENCY_KEYWORDS: readonly { value: Currency; words: readonly string[] }[] = [
   { value: 'INR', words: ['₹', 'inr', 'rupee', 'rupees'] },
   { value: 'USD', words: ['$', 'usd', 'dollar', 'dollars'] },
@@ -73,6 +76,7 @@ export const CURRENCY_KEYWORDS: readonly { value: Currency; words: readonly stri
   { value: 'JPY', words: ['jpy', '¥', 'yen'] },
 ];
 
+/** Words that point at one of the ten planning priorities. */
 export const PRIORITY_WORDS: readonly { value: Priority; words: readonly string[] }[] = [
   {
     value: 'photography',
@@ -101,6 +105,7 @@ export const PRIORITY_WORDS: readonly { value: Priority; words: readonly string[
   { value: 'simplicity', words: ['simple', 'simplicity', 'easy', 'relaxed', 'informal'] },
 ];
 
+/** Words for each recorded dietary need. */
 export const DIETARY_WORDS: readonly { value: DietaryNeed; words: readonly string[] }[] = [
   { value: 'vegan', words: ['vegan'] },
   { value: 'vegetarian', words: ['vegetarian', 'veg '] },
@@ -114,6 +119,7 @@ export const DIETARY_WORDS: readonly { value: DietaryNeed; words: readonly strin
   { value: 'diabetic', words: ['diabetic', 'diabetes', 'low sugar', 'low-sugar'] },
 ];
 
+/** Words that map to an access need from the published list. */
 export const ACCESS_WORDS: readonly { value: string; words: readonly string[] }[] = [
   { value: 'wheelchair', words: ['wheelchair', 'wheel chair'] },
   { value: 'step-free', words: ['step free', 'step-free', 'no steps', 'wheelchair access'] },
@@ -125,6 +131,7 @@ export const ACCESS_WORDS: readonly { value: string; words: readonly string[] }[
   { value: 'service-animal', words: ['service animal', 'guide dog', 'assistance dog'] },
 ];
 
+/** Month names and abbreviations, with their 1-based month number. */
 export const MONTHS: readonly { name: string; index: number }[] = [
   { name: 'january', index: 1 },
   { name: 'february', index: 2 },

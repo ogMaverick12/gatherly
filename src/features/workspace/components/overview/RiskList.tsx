@@ -1,5 +1,10 @@
 'use client';
 
+/**
+ * The risk register for the current plan.
+ * Severity is repeated in text and dot colour, and every risk carries a mitigation.
+ */
+
 import { useAccessibility } from '@/features/accessibility/provider';
 import type { Risk } from '@/features/risks/services';
 

@@ -102,7 +102,15 @@ function deposit(vendor: Vendor): ScoreComponent {
   return { ...base, earned, detail: `The deposit is ${Math.round(share * 100)}% of the quote.` };
 }
 
-/** Score a vendor's quote out of 100, with the working behind each part. */
+/**
+ * Scores a vendor's quote out of 100, with the working behind each part.
+ * @param vendor the vendor record, including quote, deposit, due date and status
+ * @param allocationMinor the amount budgeted for this category, integer minor units (paise)
+ * @param eventDate the event date, ISO `YYYY-MM-DD`, or null when it is not set
+ * @returns the total 0-100 and the four scored components
+ * @example
+ * scoreQuote(vendor, 250_000, '2026-12-01').score; // 0-100
+ */
 export function scoreQuote(
   vendor: Vendor,
   allocationMinor: number,

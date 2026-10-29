@@ -1,5 +1,10 @@
 'use client';
 
+/**
+ * The question box for the plan assistant.
+ * It renders the input, send and stop controls; the chat hook owns their state.
+ */
+
 import { useAccessibility } from '@/features/accessibility/provider';
 
 // long-function: one view section, kept in one block so its reading order stays visible.

@@ -1,3 +1,7 @@
+/**
+ * The Google Gemini adapter, using the official Gen AI SDK.
+ * The API key stays server-side and each request is bounded by a timeout.
+ */
 import { ApiError, GoogleGenAI, ThinkingLevel, type GenerateContentConfig } from '@google/genai';
 import { isRetryableKind, isTimeout, kindFromStatus } from './errors';
 import {

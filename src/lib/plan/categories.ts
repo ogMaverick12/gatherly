@@ -21,9 +21,15 @@ export const BUDGET_CATEGORIES = [
   'accommodation',
   'gifts',
 ] as const;
+/**
+ * The budget category enum, derived from `BUDGET_CATEGORIES`.
+ */
 export const BudgetCategorySchema = z.enum(BUDGET_CATEGORIES);
 export type BudgetCategoryId = z.infer<typeof BudgetCategorySchema>;
 
+/**
+ * Human-readable labels for each budget category.
+ */
 export const BUDGET_CATEGORY_LABELS: Record<BudgetCategoryId, string> = {
   venue: 'Venue & rentals',
   catering: 'Food & drink',
@@ -39,6 +45,9 @@ export const BUDGET_CATEGORY_LABELS: Record<BudgetCategoryId, string> = {
   gifts: 'Gifts & favours',
 };
 
+/**
+ * The vendor categories a plan can track, in display order.
+ */
 export const VENDOR_CATEGORIES = [
   'venue',
   'caterer',
@@ -52,9 +61,15 @@ export const VENDOR_CATEGORIES = [
   'accommodation',
   'gifts',
 ] as const;
+/**
+ * The vendor category enum, derived from `VENDOR_CATEGORIES`.
+ */
 export const VendorCategorySchema = z.enum(VENDOR_CATEGORIES);
 export type VendorCategoryId = z.infer<typeof VendorCategorySchema>;
 
+/**
+ * Human-readable labels for each vendor category.
+ */
 export const VENDOR_CATEGORY_LABELS: Record<VendorCategoryId, string> = {
   venue: 'Venue',
   caterer: 'Caterer',
@@ -69,10 +84,19 @@ export const VENDOR_CATEGORY_LABELS: Record<VendorCategoryId, string> = {
   gifts: 'Gifts & favours',
 };
 
+/**
+ * The stages a vendor moves through, from first contact to booked or passed.
+ */
 export const VENDOR_STATUSES = ['to_contact', 'contacted', 'quoted', 'booked', 'declined'] as const;
+/**
+ * The vendor status enum, derived from `VENDOR_STATUSES`.
+ */
 export const VendorStatusSchema = z.enum(VENDOR_STATUSES);
 export type VendorStatus = z.infer<typeof VendorStatusSchema>;
 
+/**
+ * Human-readable labels for each vendor status.
+ */
 export const VENDOR_STATUS_LABELS: Record<VendorStatus, string> = {
   to_contact: 'To contact',
   contacted: 'Contacted',
@@ -81,6 +105,9 @@ export const VENDOR_STATUS_LABELS: Record<VendorStatus, string> = {
   declined: 'Passed',
 };
 
+/**
+ * The areas a checklist task can belong to.
+ */
 export const TASK_AREAS = [
   'budget',
   'timeline',
@@ -92,5 +119,8 @@ export const TASK_AREAS = [
   'logistics',
   'general',
 ] as const;
+/**
+ * The task area enum, derived from `TASK_AREAS`.
+ */
 export const TaskAreaSchema = z.enum(TASK_AREAS);
 export type TaskArea = z.infer<typeof TaskAreaSchema>;

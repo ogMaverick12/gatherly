@@ -1,3 +1,10 @@
+/**
+ * Vendor coverage.
+ *
+ * Compares what each checklist category was allocated with what has actually
+ * been quoted and booked, in integer minor units throughout.
+ */
+
 import type { BudgetCategoryId, Plan, Vendor, VendorCategoryId, VendorStatus } from '@/lib/plan';
 import { VENDOR_CATEGORY_LABELS } from '@/lib/plan';
 import { VENDOR_CATEGORY_BUDGET_LINE, vendorChecklist } from './checklist';
@@ -63,6 +70,14 @@ function categoryCoverage(
   };
 }
 
+/**
+ * Builds coverage rows for every checklist category and the overall percentage.
+ * @param plan the stored plan whose event type, vendors and quotes are read
+ * @param allocationByCategory the budgeted amount per category, integer minor units (paise)
+ * @returns booked and quoted totals in paise, with each category's coverage percent 0-100
+ * @example
+ * computeVendorCoverage(plan, allocation).overallPercent; // percent 0-100
+ */
 export function computeVendorCoverage(
   plan: Plan,
   allocationByCategory: Readonly<Record<BudgetCategoryId, number>>,

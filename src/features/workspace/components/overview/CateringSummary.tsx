@@ -1,5 +1,10 @@
 'use client';
 
+/**
+ * The catering estimate: plates, drinks, staff and dietary follow-ups.
+ * The figures are estimates, and the caveat stays with them.
+ */
+
 import { useAccessibility } from '@/features/accessibility/provider';
 import type { CateringEstimate } from '@/features/catering/services';
 import { CelebrationDot } from '../HealthRing';

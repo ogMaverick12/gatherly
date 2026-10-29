@@ -1,3 +1,10 @@
+/**
+ * Timeline merging and summarising.
+ *
+ * Stored dates win over regenerated ones, so a fixed schedule becomes overdue
+ * rather than sliding forward every time the plan is opened.
+ */
+
 import { type Milestone } from '@/lib/plan';
 import { diffDays, type DateOnly } from '@/lib/dates';
 import type { TimelineMilestone } from './ladder';
@@ -34,6 +41,14 @@ export interface TimelineSummary {
   readonly daysToEvent: number | null;
 }
 
+/**
+ * Summarises progress and finds the next milestone.
+ * @param milestones the merged ladder, with stored dates already applied
+ * @param today the date the summary is for, ISO `YYYY-MM-DD`
+ * @returns counts, the next undone milestone and whole days to the event (negative after it)
+ * @example
+ * summariseTimeline(milestones, '2026-10-29').daysToEvent; // e.g. 120, or null with no date
+ */
 export function summariseTimeline(
   milestones: readonly TimelineMilestone[],
   today: DateOnly,

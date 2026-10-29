@@ -8,35 +8,62 @@ import { z } from 'zod';
  */
 
 export const EVENT_TYPES = ['wedding', 'birthday', 'community'] as const;
+/**
+ * The event type enum, derived from `EVENT_TYPES`.
+ */
 export const EventTypeSchema = z.enum(EVENT_TYPES);
 export type EventType = z.infer<typeof EventTypeSchema>;
 
+/**
+ * Human-readable labels for each event type.
+ */
 export const EVENT_TYPE_LABELS: Record<EventType, string> = {
   wedding: 'Wedding',
   birthday: 'Birthday',
   community: 'Community gathering',
 };
 
+/**
+ * The city tiers used to judge typical budget shares.
+ */
 export const CITY_TIERS = ['tier1', 'tier2', 'tier3'] as const;
+/**
+ * The city tier enum, derived from `CITY_TIERS`.
+ */
 export const CityTierSchema = z.enum(CITY_TIERS);
 export type CityTier = z.infer<typeof CityTierSchema>;
 
+/**
+ * Human-readable labels for each city tier.
+ */
 export const CITY_TIER_LABELS: Record<CityTier, string> = {
   tier1: 'Tier 1 city (major metro)',
   tier2: 'Tier 2 city (regional centre)',
   tier3: 'Tier 3 city (smaller town)',
 };
 
+/**
+ * The languages the interface is translated into.
+ */
 export const LANGUAGES = ['en', 'hi', 'bn'] as const;
+/**
+ * The language enum, derived from `LANGUAGES`.
+ */
 export const LanguageSchema = z.enum(LANGUAGES);
 export type Language = z.infer<typeof LanguageSchema>;
 
+/**
+ * The name of each language, written in that language.
+ */
 export const LANGUAGE_LABELS: Record<Language, string> = {
   en: 'English',
   hi: 'हिन्दी',
   bn: 'বাংলা',
 };
 
+/**
+ * The priorities a household can choose to shift the budget towards.
+ */
 export const PRIORITIES = [
   'photography',
   'food',
@@ -49,9 +76,15 @@ export const PRIORITIES = [
   'formality',
   'simplicity',
 ] as const;
+/**
+ * The priority enum, derived from `PRIORITIES`.
+ */
 export const PrioritySchema = z.enum(PRIORITIES);
 export type Priority = z.infer<typeof PrioritySchema>;
 
+/**
+ * Human-readable labels for each priority.
+ */
 export const PRIORITY_LABELS: Record<Priority, string> = {
   photography: 'Photography & film',
   food: 'Food & drink',
@@ -65,6 +98,9 @@ export const PRIORITY_LABELS: Record<Priority, string> = {
   simplicity: 'Simplicity & ease',
 };
 
+/**
+ * The dietary needs a plan can record for the caterer.
+ */
 export const DIETARY_NEEDS = [
   'vegan',
   'vegetarian',
@@ -77,9 +113,15 @@ export const DIETARY_NEEDS = [
   'low-sodium',
   'diabetic',
 ] as const;
+/**
+ * The dietary need enum, derived from `DIETARY_NEEDS`.
+ */
 export const DietaryNeedSchema = z.enum(DIETARY_NEEDS);
 export type DietaryNeed = z.infer<typeof DietaryNeedSchema>;
 
+/**
+ * Human-readable labels for each dietary need.
+ */
 export const DIETARY_LABELS: Record<DietaryNeed, string> = {
   vegan: 'Vegan',
   vegetarian: 'Vegetarian',
@@ -93,6 +135,9 @@ export const DIETARY_LABELS: Record<DietaryNeed, string> = {
   diabetic: 'Diabetic friendly',
 };
 
+/**
+ * The access needs a plan can record and turn into tasks.
+ */
 export const ACCESS_NEEDS = [
   'wheelchair',
   'step-free',
@@ -103,9 +148,15 @@ export const ACCESS_NEEDS = [
   'rest-area',
   'service-animal',
 ] as const;
+/**
+ * The access need enum, derived from `ACCESS_NEEDS`.
+ */
 export const AccessNeedSchema = z.enum(ACCESS_NEEDS);
 export type AccessNeed = z.infer<typeof AccessNeedSchema>;
 
+/**
+ * Human-readable labels for each access need.
+ */
 export const ACCESS_LABELS: Record<AccessNeed, string> = {
   wheelchair: 'Wheelchair access',
   'step-free': 'Step-free routes',
@@ -117,10 +168,19 @@ export const ACCESS_LABELS: Record<AccessNeed, string> = {
   'service-animal': 'Service animals welcome',
 };
 
+/**
+ * The venue settings a plan can choose between.
+ */
 export const VENUE_TYPES = ['indoor', 'outdoor', 'mixed', 'unset'] as const;
+/**
+ * The venue type enum, derived from `VENUE_TYPES`.
+ */
 export const VenueTypeSchema = z.enum(VENUE_TYPES);
 export type VenueType = z.infer<typeof VenueTypeSchema>;
 
+/**
+ * Human-readable labels for each venue type.
+ */
 export const VENUE_TYPE_LABELS: Record<VenueType, string> = {
   indoor: 'Indoor',
   outdoor: 'Outdoor',

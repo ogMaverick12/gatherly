@@ -1,5 +1,10 @@
 'use client';
 
+/**
+ * The assistant conversation controller.
+ * It streams answers, falls back to a Basic answer offline and exposes stop.
+ */
+
 import { useRef, useState } from 'react';
 import { useAccessibility } from '@/features/accessibility/provider';
 import {

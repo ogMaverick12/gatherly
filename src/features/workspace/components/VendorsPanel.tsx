@@ -1,5 +1,10 @@
 'use client';
 
+/**
+ * The vendors tab: coverage, the per-category checklist and the add form.
+ * Updates are passed straight through to the workspace controller.
+ */
+
 import type { Vendor, VendorCategoryId } from '@/lib/plan';
 import type { PlanView } from '@/lib/plan-view';
 import { AddVendorForm } from './vendors/AddVendorForm';

@@ -20,6 +20,10 @@ import { isValidDateOnly } from '@/lib/dates';
  * event date can be left unset. Both are converted when the plan is built.
  */
 
+/**
+ * The intake form schema, validated as the user moves through the steps.
+ * Budgets are entered in major units; dates must be ISO `YYYY-MM-DD` unless "not set".
+ */
 export const IntakeFormSchema = z
   .object({
     eventType: z.enum(EVENT_TYPES),
@@ -68,10 +72,14 @@ export const IntakeFormSchema = z
 
 export type IntakeFormValues = z.infer<typeof IntakeFormSchema>;
 
+/** The four form steps, in the order they are shown. */
 export const INTAKE_STEPS = ['basics', 'money', 'needs', 'extras'] as const;
 
 export type IntakeStep = (typeof INTAKE_STEPS)[number];
 
+/**
+ * Which fields each step validates, so the next button can gate on that step alone.
+ */
 export const STEP_FIELDS: Record<IntakeStep, (keyof IntakeFormValues)[]> = {
   basics: [
     'eventType',
@@ -87,6 +95,7 @@ export const STEP_FIELDS: Record<IntakeStep, (keyof IntakeFormValues)[]> = {
   extras: ['packs', 'language', 'notes'],
 };
 
+/** The starting values for a new form, chosen to be plausible rather than empty. */
 export const DEFAULT_INTAKE_VALUES: IntakeFormValues = {
   eventType: 'wedding',
   eventDate: '',

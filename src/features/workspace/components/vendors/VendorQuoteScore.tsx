@@ -1,5 +1,10 @@
 'use client';
 
+/**
+ * The quote score disclosure on a vendor card.
+ * Opening it shows every component, the points earned and the reason.
+ */
+
 import { useAccessibility } from '@/features/accessibility/provider';
 import type { QuoteAssessment } from '@/features/vendors/services';
 

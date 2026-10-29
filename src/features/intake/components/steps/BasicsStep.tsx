@@ -1,5 +1,10 @@
 'use client';
 
+/**
+ * The first intake step: event type, date, guests, city tier and venue.
+ * Fields register with the shared form so validation stays in the schema.
+ */
+
 import { Controller, type UseFormReturn } from 'react-hook-form';
 import { useAccessibility } from '@/features/accessibility/provider';
 import {

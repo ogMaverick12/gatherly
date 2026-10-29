@@ -1,5 +1,10 @@
 'use client';
 
+/**
+ * The conversation transcript, including an answer that is still arriving.
+ * The live bubble stays silent to readers, and the finished message is announced once.
+ */
+
 import type { RefObject } from 'react';
 import type { Dictionary } from '@/lib/i18n';
 import type { ChatMessage } from '@/lib/plan';

@@ -1,5 +1,10 @@
 'use client';
 
+/**
+ * The workspace controller: reads the stored plan and exposes every edit.
+ * Edits go through the pure helpers in plan-updates so the panels stay presentational.
+ */
+
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { computePlanView, type PlanView } from '@/lib/plan-view';
 import { hydratePlan, usePlan, usePlanActions } from '@/lib/plan-store';

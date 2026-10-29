@@ -1,3 +1,7 @@
+/**
+ * The OpenRouter adapter over the chat-completions HTTP API.
+ * The API key stays server-side; each request is bounded by a timeout.
+ */
 import { isRetryableKind, isTimeout, kindFromStatus } from './errors';
 import {
   ProviderError,

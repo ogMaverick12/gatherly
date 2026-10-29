@@ -1,6 +1,12 @@
+/**
+ * The site footer.
+ * It repeats the privacy promise and links to the two ways into the product.
+ */
+
 import Link from 'next/link';
 import { Wordmark } from './Wordmark';
 
+/** Close every page with the privacy note and links to intake and the plan. */
 export function SiteFooter() {
   return (
     <footer className="no-print mt-16 border-t border-line bg-paper-raised">

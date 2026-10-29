@@ -1,3 +1,10 @@
+/**
+ * The free-text intake parser.
+ *
+ * It matches only the published keyword tables and returns null for anything
+ * it did not read, so an unrecognised phrase never becomes a plan value.
+ */
+
 import type { ParsedFields } from '@/lib/api-schema';
 import { isValidDateOnly } from '@/lib/dates';
 import { fromMajorUnits } from '@/lib/money';
@@ -132,6 +139,12 @@ function parseBudget(text: string): { currency: Currency; amountMinor: number } 
   return null;
 }
 
+/**
+ * Reads what it can from a sentence typed by the user.
+ * @param input the raw sentence; dates may be ISO, `DD/MM/YYYY` or month-name forms
+ * @returns whichever fields were recognised: an ISO date `YYYY-MM-DD`, a whole guest count,
+ * budget in integer minor units (paise, cents) and up to four priorities
+ */
 export function parseFreeText(input: string): ParsedFields {
   const text = input.toLowerCase();
 

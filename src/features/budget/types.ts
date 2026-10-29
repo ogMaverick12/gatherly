@@ -1,3 +1,10 @@
+/**
+ * Budget result types.
+ *
+ * Every amount here is an integer in minor units (paise); formatting happens
+ * only in the money helper.
+ */
+
 import type { BudgetCategoryId } from '@/lib/plan';
 
 /** The numbers the budget UI renders, one row per category. */

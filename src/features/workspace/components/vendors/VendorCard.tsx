@@ -1,5 +1,10 @@
 'use client';
 
+/**
+ * One vendor card: the fields, the quote score and the contact link.
+ * Edits stay local until a field loses focus, then are reported as a patch.
+ */
+
 import { useAccessibility } from '@/features/accessibility/provider';
 import {
   buildWhatsAppLink,

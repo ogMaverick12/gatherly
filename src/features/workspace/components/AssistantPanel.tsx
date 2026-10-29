@@ -1,5 +1,10 @@
 'use client';
 
+/**
+ * The assistant tab, wiring the conversation hook to the log and composer.
+ * The Basic-mode notice stays visible whenever the provider route is unavailable.
+ */
+
 import { useAccessibility } from '@/features/accessibility/provider';
 import type { ChatMessage } from '@/lib/plan';
 import type { PlanView } from '@/lib/plan-view';

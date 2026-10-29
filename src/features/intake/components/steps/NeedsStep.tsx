@@ -1,5 +1,10 @@
 'use client';
 
+/**
+ * The third intake step: priorities, dietary needs, access needs and a culture note.
+ * Dietary and access options are needs the user selects, never assumptions.
+ */
+
 import { Controller, type UseFormReturn } from 'react-hook-form';
 import { useAccessibility } from '@/features/accessibility/provider';
 import {

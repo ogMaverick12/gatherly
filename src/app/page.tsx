@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { LandingContent } from '@/features/workspace/components/LandingContent';
 
+/** Browser-tab metadata for the landing page. */
 export const metadata: Metadata = {
   title: 'Gatherly - a calm event-planning companion',
   description:
@@ -13,6 +14,7 @@ export const metadata: Metadata = {
  */
 export const dynamic = 'force-dynamic';
 
+/** Render the marketing landing page. */
 export default function LandingPage() {
   return <LandingContent />;
 }

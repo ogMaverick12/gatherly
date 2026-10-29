@@ -1,3 +1,7 @@
+/**
+ * The deterministic provider used when no model is configured or a call fails.
+ * It streams the answer the route already computed, a sentence at a time.
+ */
 import type { GenerationRequest, GenerationResult, Provider } from './provider';
 
 /**

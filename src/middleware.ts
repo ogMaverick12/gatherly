@@ -29,6 +29,12 @@ function buildPolicy(nonce: string): string {
   ].join('; ');
 }
 
+/**
+ * Attach a fresh nonce-based CSP to a document request.
+ *
+ * @param request Incoming document request; API and static paths are excluded by the matcher.
+ * @returns The next response with the nonce shared through `x-nonce` and the policy set.
+ */
 export function middleware(request: NextRequest): NextResponse {
   const nonce = Buffer.from(crypto.randomUUID()).toString('base64');
   const policy = buildPolicy(nonce);
@@ -45,6 +51,7 @@ export function middleware(request: NextRequest): NextResponse {
   return response;
 }
 
+/** Run on documents only: API, static assets and the service worker keep their own headers. */
 export const config = {
   matcher: [
     {

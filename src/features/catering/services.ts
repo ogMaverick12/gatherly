@@ -8,7 +8,9 @@ import { DIETARY_LABELS, type DietaryNeed, type Intake, type Plan } from '@/lib/
  * engine stops at quantities and lets the budget tab do the money.
  */
 
+/** Extra plates added for late arrivals, percent 0-100. */
 export const BUFFER_PERCENT = 8;
+/** How many guests one server can plate for. */
 export const PLATES_PER_SERVER = 25;
 
 export interface DietaryRequirement {
@@ -79,6 +81,11 @@ function cateringNotes(intake: Intake, bufferPlates: number): string[] {
   return notes;
 }
 
+/**
+ * Works out the plate, drink and staffing quantities for a plan.
+ * @param plan the plan whose guest count, event type, venue and dietary needs are read
+ * @returns whole-number quantities (plates, drinks, servers) and the notes that explain them
+ */
 export function computeCatering(plan: Plan): CateringEstimate {
   const { intake } = plan;
   const guests = intake.guests;

@@ -32,6 +32,12 @@ export function taskId(title: string): string {
     .slice(0, 30)}`;
 }
 
+/**
+ * Flips the done flag on one task.
+ * @param plan the current plan
+ * @param id the task id to toggle
+ * @returns a new plan with the task flipped; unknown ids are ignored
+ */
 export function withTaskToggled(plan: Plan, id: string): Plan {
   return {
     ...plan,
@@ -39,6 +45,12 @@ export function withTaskToggled(plan: Plan, id: string): Plan {
   };
 }
 
+/**
+ * Flips one milestone and re-stores the whole ladder.
+ * @param plan the current plan
+ * @param id the milestone id to toggle
+ * @returns a new plan whose milestones come from the recomputed plan view
+ */
 export function withMilestoneToggled(plan: Plan, id: string): Plan {
   const merged = computePlanView(plan).milestones.map((milestone) => ({
     id: milestone.id,
@@ -52,6 +64,13 @@ export function withMilestoneToggled(plan: Plan, id: string): Plan {
   return { ...plan, milestones: merged };
 }
 
+/**
+ * Applies a partial change to one vendor.
+ * @param plan the current plan
+ * @param id the vendor id to update
+ * @param patch the fields to overwrite; fields not named keep their values
+ * @returns a new plan with the vendor patched; an unknown id leaves vendors unchanged
+ */
 export function withVendorUpdated(plan: Plan, id: string, patch: Partial<Vendor>): Plan {
   return {
     ...plan,
@@ -59,6 +78,13 @@ export function withVendorUpdated(plan: Plan, id: string, patch: Partial<Vendor>
   };
 }
 
+/**
+ * Appends a new, uncontacted vendor to the plan.
+ * @param plan the current plan
+ * @param category the vendor category to add
+ * @param name the vendor's name; may be empty while it is still a placeholder
+ * @returns a new plan with the vendor added at the end of the list
+ */
 export function withVendorAdded(plan: Plan, category: Vendor['category'], name: string): Plan {
   return {
     ...plan,
@@ -100,6 +126,12 @@ export function withIdeaApplied(plan: Plan, idea: Idea): Plan {
   };
 }
 
+/**
+ * Replaces the stored ideas, used when a new set is generated.
+ * @param plan the current plan
+ * @param ideas the ideas to keep, in display order
+ * @returns a new plan with the ideas copied into it
+ */
 export function withIdeasStored(plan: Plan, ideas: readonly Idea[]): Plan {
   return { ...plan, ideas: [...ideas] };
 }

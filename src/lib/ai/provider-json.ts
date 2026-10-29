@@ -1,3 +1,7 @@
+/**
+ * Ask a provider for JSON and validate the answer with a Zod schema.
+ * Every failure becomes a kind, so callers can fall back without throwing.
+ */
 import type { z } from 'zod';
 import { kindOfFailure } from './errors';
 import { extractJson } from './json';

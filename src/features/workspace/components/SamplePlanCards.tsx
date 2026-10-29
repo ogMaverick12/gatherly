@@ -1,5 +1,10 @@
 'use client';
 
+/**
+ * One-click sample plans on the landing page.
+ * Opening one stores a real, editable plan in this browser and opens the workspace.
+ */
+
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useAccessibility } from '@/features/accessibility/provider';

@@ -1,5 +1,10 @@
 'use client';
 
+/**
+ * The budget tab: the allocation table, warnings and what-if scenarios.
+ * Each section is its own component; this file only sets the reading order.
+ */
+
 import { useAccessibility } from '@/features/accessibility/provider';
 import type { PlanView } from '@/lib/plan-view';
 import { BudgetTable } from './budget/BudgetTable';

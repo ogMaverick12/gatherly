@@ -11,6 +11,11 @@ import type { HealthBand, HealthInputs, HealthPart, HealthReport } from './types
 
 export type { HealthBand, HealthInputs, HealthPart, HealthReport } from './types';
 
+/**
+ * Scores the plan out of 100 and picks the first thing worth doing.
+ * @param inputs the plan plus the budget, vendor and timeline results already computed for it
+ * @returns a score 0-100, its band, the five weighted parts and their formula
+ */
 export function computeHealth(inputs: HealthInputs): HealthReport {
   const parts: HealthPart[] = [
     budgetPart(inputs.budget),

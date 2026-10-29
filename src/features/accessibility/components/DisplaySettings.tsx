@@ -1,5 +1,10 @@
 'use client';
 
+/**
+ * Display and access settings in a disclosure.
+ * Text size, theme, calm mode, motion and speech live here.
+ */
+
 import { useId, useState } from 'react';
 import { useAccessibility, type TextSize, type ThemePreference } from '../provider';
 

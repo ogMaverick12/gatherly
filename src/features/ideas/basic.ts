@@ -1,3 +1,10 @@
+/**
+ * The Basic-mode ideas engine.
+ *
+ * It scores the built-in templates against the plan's own numbers and returns
+ * the best twelve, with no model call and no network.
+ */
+
 import type { ProviderIdea } from '@/lib/api-schema';
 import { formatMinor } from '@/lib/money';
 import type { CityTier, Idea } from '@/lib/plan';
@@ -28,6 +35,11 @@ export function providerIdeas(ideas: readonly ProviderIdea[]): Idea[] {
   }));
 }
 
+/**
+ * Picks the templates that suit this plan and ranks them by relevance.
+ * @param context the plan facts the templates quote and score against
+ * @returns up to twelve ideas, best first, each marked as Basic-mode output
+ */
 export function generateIdeas(context: IdeaContext): Idea[] {
   const applicable = TEMPLATES.filter(
     (template) => template.eventTypes === 'all' || template.eventTypes.includes(context.eventType),

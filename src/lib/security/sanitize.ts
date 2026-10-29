@@ -11,12 +11,27 @@ const CONTROL_CHARACTERS = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g;
 const ZERO_WIDTH = /[\u200B-\u200F\u202A-\u202E\u2060-\u2064\uFEFF]/g;
 const LINE_BREAKS = /\r\n|\r|\n/g;
 
+/**
+ * The default cap on user text, in characters, before it reaches a model.
+ */
 export const MAX_USER_TEXT = 2000;
 
+/**
+ * Replace control characters with spaces and drop zero-width characters.
+ *
+ * @param value raw user text
+ * @returns the text with control and invisible characters removed
+ */
 export function stripControlCharacters(value: string): string {
   return value.replace(CONTROL_CHARACTERS, ' ').replace(ZERO_WIDTH, '');
 }
 
+/**
+ * Collapse runs of spaces and tabs, normalise line endings and trim.
+ *
+ * @param value text that may contain irregular whitespace
+ * @returns the cleaned, single-spaced text
+ */
 export function normaliseWhitespace(value: string): string {
   return value
     .replace(LINE_BREAKS, '\n')

@@ -30,6 +30,9 @@ export interface SamplePlanTemplate {
   readonly vendors: readonly SampleVendor[];
 }
 
+/**
+ * The three one-click sample plans shown on the landing page.
+ */
 export const SAMPLE_PLAN_TEMPLATES: readonly SamplePlanTemplate[] = [
   {
     id: 'wedding',

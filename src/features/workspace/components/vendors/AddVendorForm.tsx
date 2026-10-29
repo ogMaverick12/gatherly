@@ -1,5 +1,10 @@
 'use client';
 
+/**
+ * The manual add-vendor form at the bottom of the vendors tab.
+ * It only reports the chosen category and trimmed name; the workspace owns the write.
+ */
+
 import { useState } from 'react';
 import { useAccessibility } from '@/features/accessibility/provider';
 import { VENDOR_CATEGORY_LABELS, type VendorCategoryId } from '@/lib/plan';

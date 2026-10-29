@@ -6,6 +6,7 @@ import type { BudgetCategoryId, EventType, Priority } from '@/lib/plan';
  * benchmarks it is compared against, and the thresholds that raise a warning.
  */
 
+/** Starting share of the budget per category, in percentage points, before any adjustment. */
 export const BASE_WEIGHTS: Record<EventType, Record<BudgetCategoryId, number>> = {
   wedding: {
     venue: 26,
@@ -115,11 +116,14 @@ export const PRIORITY_CATEGORY_MAP: Record<Priority, readonly BudgetCategoryId[]
   simplicity: ['entertainment', 'stationery'],
 };
 
+/** The boost applied to a prioritised category's weight (15%). */
 export const PRIORITY_MULTIPLIER = 1.15;
+/** The share of the total held back as contingency, percent 0-100. */
 export const CONTINGENCY_PERCENT = 8;
 
-/** Share thresholds that produce a warning. Published so they can be argued with. */
+/** Share of spendable budget above which food raises a warning, percent 0-100. */
 export const CATERING_HEAVY_PERCENT = 35;
+/** Share of budget below which an indoor venue is worth checking, percent 0-100. */
 export const VENUE_LIGHT_PERCENT = 20;
 
 /** Categories that scale with the guest count rather than being a flat cost. */
@@ -133,6 +137,12 @@ export const PER_GUEST_CATEGORIES: ReadonlySet<BudgetCategoryId> = new Set([
   'gifts',
 ]);
 
+/**
+ * Benchmark shares for an event type, nudged for very large or very small guest counts.
+ * @param eventType the event type whose published shares are the base
+ * @param guests whole number of guests; 200 or more, or under 50, shifts a few points
+ * @returns percent 0-100 per category, for comparison only
+ */
 export function benchmarkSharesFor(
   eventType: EventType,
   guests: number,

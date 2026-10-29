@@ -1,5 +1,10 @@
 'use client';
 
+/**
+ * The what-if scenario cards.
+ * Every card shows its total and the difference from the current plan.
+ */
+
 import { useAccessibility } from '@/features/accessibility/provider';
 import type { BudgetScenario } from '@/features/budget/services';
 import { formatMinor } from '@/lib/money';

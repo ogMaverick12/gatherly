@@ -1,5 +1,10 @@
 'use client';
 
+/**
+ * The budget allocation table.
+ * Each row shows the base share, the adjusted share and the amount so the maths can be checked.
+ */
+
 import { useAccessibility } from '@/features/accessibility/provider';
 import { formatMinor } from '@/lib/money';
 import type { Plan } from '@/lib/plan';

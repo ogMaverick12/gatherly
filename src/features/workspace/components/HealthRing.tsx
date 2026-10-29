@@ -1,3 +1,8 @@
+/**
+ * The circular health score and the small celebration status dot.
+ * Both draw with design tokens, and the ring states its score in words.
+ */
+
 import type { HealthBand } from '@/features/health/services';
 
 const BAND_COLOR: Record<HealthBand, string> = {
@@ -6,6 +11,10 @@ const BAND_COLOR: Record<HealthBand, string> = {
   at_risk: 'var(--color-rose)',
 };
 
+/**
+ * Draw the plan health score as a ring with the number in the middle.
+ * The band only colours the arc; the label and value carry the meaning.
+ */
 // long-function: one view section, kept in one block so its reading order stays visible.
 export function HealthRing({
   score,

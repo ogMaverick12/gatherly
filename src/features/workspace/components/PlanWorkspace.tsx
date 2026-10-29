@@ -1,5 +1,10 @@
 'use client';
 
+/**
+ * The workspace shell: header, tab strip, the active panel and the health rail.
+ * Tabs come from one list, so the wide and narrow layouts always match.
+ */
+
 import { useAccessibility } from '@/features/accessibility/provider';
 import { usePlanWorkspace } from '../hooks/use-plan-workspace';
 import { AssistantPanel } from './AssistantPanel';

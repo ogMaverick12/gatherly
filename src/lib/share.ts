@@ -84,6 +84,12 @@ export function toSharePayload(plan: Plan): SharePayload {
   };
 }
 
+/**
+ * Encode a plan into a URL fragment, compressing it when that is smaller.
+ *
+ * @param plan the plan to share
+ * @returns the fragment body (no leading `#`), safe for a URL
+ */
 export async function encodeShareFragment(plan: Plan): Promise<string> {
   const json = JSON.stringify(toSharePayload(plan));
   const bytes = new TextEncoder().encode(json);
@@ -94,6 +100,12 @@ export async function encodeShareFragment(plan: Plan): Promise<string> {
   return `${PLAIN_PREFIX}.${bytesToBase64Url(bytes)}`;
 }
 
+/**
+ * Decode a share fragment back into a validated plan.
+ *
+ * @param fragment the fragment body, with or without a leading `#`
+ * @returns the restored plan, or null when the fragment is invalid or outdated
+ */
 // long-function: one pass over the inputs; splitting it would only pass the same state between more functions.
 export async function decodeShareFragment(fragment: string): Promise<Plan | null> {
   const trimmed = fragment.trim().replace(/^#/, '');
@@ -153,6 +165,13 @@ export async function decodeShareFragment(fragment: string): Promise<Plan | null
   return parsed.success ? parsed.data : null;
 }
 
+/**
+ * Build the full share URL for an encoded fragment.
+ *
+ * @param origin the site origin, with or without a trailing slash
+ * @param fragment the encoded fragment body
+ * @returns the absolute plan URL with the fragment attached
+ */
 export function buildShareUrl(origin: string, fragment: string): string {
   return `${origin.replace(/\/$/, '')}/plan#${fragment}`;
 }

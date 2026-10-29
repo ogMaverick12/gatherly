@@ -1,5 +1,10 @@
 'use client';
 
+/**
+ * The empty state shown when this browser has no plan.
+ * It offers the intake wizard and the prompt for a plan shared through a link.
+ */
+
 import { useAccessibility } from '@/features/accessibility/provider';
 import type { Plan } from '@/lib/plan';
 import { SharedPlanPrompt } from './ExportBar';

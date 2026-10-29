@@ -19,6 +19,13 @@ export function withBom(csv: string): string {
   return `﻿${csv}`;
 }
 
+/**
+ * Render a plan's budget allocation as a spreadsheet-ready CSV.
+ *
+ * @param plan the plan whose currency and guest count label the columns
+ * @param budget the computed allocation, in integer minor units (paise)
+ * @returns CSV text with a header, one row per category and totals
+ */
 // long-function: one pass over the inputs; splitting it would only pass the same state between more functions.
 export function budgetCsv(plan: Plan, budget: BudgetAllocation): string {
   const currency = plan.intake.currency;
@@ -69,6 +76,12 @@ export function budgetCsv(plan: Plan, budget: BudgetAllocation): string {
   return toCsv(rows);
 }
 
+/**
+ * Render the plan's milestones as a spreadsheet-ready CSV.
+ *
+ * @param plan the plan holding the milestones
+ * @returns CSV text with title, date, offset, done flag and rationale
+ */
 export function milestonesCsv(plan: Plan): string {
   const rows: (string | number)[][] = [
     ['Milestone', 'Date', 'Days before the event', 'Done', 'Why it matters'],
@@ -85,6 +98,12 @@ export function milestonesCsv(plan: Plan): string {
   return toCsv(rows);
 }
 
+/**
+ * Render the plan's vendors as a spreadsheet-ready CSV.
+ *
+ * @param plan the plan holding the vendors
+ * @returns CSV text with category, name, status, quote and payment details
+ */
 export function vendorsCsv(plan: Plan): string {
   const rows: (string | number)[][] = [
     ['Category', 'Name', 'Status', 'Quote (minor units)', 'Payment due', 'Notes'],

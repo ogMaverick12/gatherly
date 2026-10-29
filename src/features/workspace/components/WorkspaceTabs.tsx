@@ -1,5 +1,10 @@
 'use client';
 
+/**
+ * The workspace tab list and its two presentations.
+ * One definition drives the wide tab strip and the phone bottom bar.
+ */
+
 import type { Dictionary } from '@/lib/i18n';
 import type { PlanView } from '@/lib/plan-view';
 import { Tabs, type TabDefinition } from './Tabs';

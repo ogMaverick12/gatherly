@@ -1,5 +1,10 @@
 'use client';
 
+/**
+ * The vendor checklist, grouped by the categories the event needs.
+ * A category with no vendor shows an add button instead of an empty list.
+ */
+
 import { useAccessibility } from '@/features/accessibility/provider';
 import type { Vendor, VendorCategoryId } from '@/lib/plan';
 import type { PlanView } from '@/lib/plan-view';

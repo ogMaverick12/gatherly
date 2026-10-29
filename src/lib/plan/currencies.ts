@@ -30,6 +30,9 @@ export const CURRENCIES = [
   'LKR',
   'JPY',
 ] as const;
+/**
+ * The currency enum, derived from `CURRENCIES`.
+ */
 export const CurrencySchema = z.enum(CURRENCIES);
 export type Currency = z.infer<typeof CurrencySchema>;
 
@@ -40,6 +43,9 @@ export interface CurrencyMeta {
   readonly label: string;
 }
 
+/**
+ * Decimal places, symbol and label for every supported currency.
+ */
 export const CURRENCY_META: Record<Currency, CurrencyMeta> = {
   INR: { code: 'INR', minorUnits: 2, symbol: '₹', label: 'Indian rupee' },
   USD: { code: 'USD', minorUnits: 2, symbol: '$', label: 'US dollar' },

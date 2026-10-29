@@ -1,3 +1,7 @@
+/**
+ * Classifying provider failures into the small set of kinds routes act on.
+ * Adapters carry only the kind forward, never the provider's own message.
+ */
 import { ProviderError, type ProviderErrorKind } from './provider';
 
 /** The failure kinds worth trying again: a transient condition, not our bug. */

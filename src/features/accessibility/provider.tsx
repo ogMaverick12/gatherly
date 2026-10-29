@@ -9,70 +9,24 @@ import {
   useState,
   type ReactNode,
 } from 'react';
-import { z } from 'zod';
-import type { Language } from '@/lib/plan';
 import { getDictionary, LANGUAGE_TAGS, type Dictionary } from '@/lib/i18n';
+import type { Language } from '@/lib/plan';
+import {
+  DEFAULT_PREFERENCES,
+  readStoredPreferences,
+  writeStoredPreferences,
+  type AccessibilityPreferences,
+  type TextSize,
+  type ThemePreference,
+} from './preferences';
+
+export { DEFAULT_PREFERENCES, writeStoredPreferences } from './preferences';
+export type { AccessibilityPreferences, TextSize, ThemePreference } from './preferences';
 
 /**
- * Accessibility and display preferences.
- *
- * Everything the user can change about how the app looks, reads and moves
- * lives here. The values are stored on the device, validated on read (local
- * storage is untrusted), and applied to the document element so CSS can
- * react to them without React re-rendering the whole tree.
+ * Accessibility context: preferences, dictionary, speech and document mirroring.
+ * Storage rules live in preferences.ts so this file stays about React.
  */
-
-export type ThemePreference = 'light' | 'dark' | 'system';
-export type TextSize = 'standard' | 'large' | 'xlarge';
-
-export interface AccessibilityPreferences {
-  readonly language: Language;
-  readonly theme: ThemePreference;
-  readonly textSize: TextSize;
-  readonly calmMode: boolean;
-  readonly reducedMotion: boolean;
-}
-
-const STORAGE_KEY = 'gatherly:prefs:v1';
-
-const PreferencesSchema = z
-  .object({
-    language: z.enum(['en', 'hi', 'bn']),
-    theme: z.enum(['light', 'dark', 'system']),
-    textSize: z.enum(['standard', 'large', 'xlarge']),
-    calmMode: z.boolean(),
-    reducedMotion: z.boolean(),
-  })
-  .strict();
-
-export const DEFAULT_PREFERENCES: AccessibilityPreferences = {
-  language: 'en',
-  theme: 'system',
-  textSize: 'standard',
-  calmMode: false,
-  reducedMotion: false,
-};
-
-function readStoredPreferences(): AccessibilityPreferences {
-  if (typeof window === 'undefined') return DEFAULT_PREFERENCES;
-  try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) return DEFAULT_PREFERENCES;
-    const parsed = PreferencesSchema.safeParse(JSON.parse(raw));
-    return parsed.success ? parsed.data : DEFAULT_PREFERENCES;
-  } catch {
-    return DEFAULT_PREFERENCES;
-  }
-}
-
-export function writeStoredPreferences(preferences: AccessibilityPreferences): void {
-  if (typeof window === 'undefined') return;
-  try {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(preferences));
-  } catch {
-    // Storage can be unavailable (private mode, quota). The app still works.
-  }
-}
 
 export interface AccessibilityContextValue {
   readonly preferences: AccessibilityPreferences;
@@ -90,6 +44,11 @@ export interface AccessibilityContextValue {
 
 const AccessibilityContext = createContext<AccessibilityContextValue | null>(null);
 
+/**
+ * Supplies preferences, the dictionary and speech, mirroring choices onto the root element.
+ * @param props children plus an optional language resolved on the server
+ * @returns the provider element wrapping the children
+ */
 // long-function: one view section, kept in one block so its reading order stays visible.
 export function AccessibilityProvider({
   children,
@@ -98,19 +57,24 @@ export function AccessibilityProvider({
   children: ReactNode;
   initialLanguage?: Language;
 }) {
-  const [preferences, setPreferences] = useState<AccessibilityPreferences>(() => {
-    const stored = readStoredPreferences();
-    return initialLanguage ? { ...stored, language: initialLanguage } : stored;
-  });
+  // Start from server-safe defaults and apply storage after hydration: reading
+  // it during the first render would make the markup disagree with the server.
+  const [preferences, setPreferences] = useState<AccessibilityPreferences>(DEFAULT_PREFERENCES);
+  const [ready, setReady] = useState(false);
   const [speaking, setSpeaking] = useState(false);
+  const [speechSupported, setSpeechSupported] = useState(false);
 
-  const speechSupported = useMemo(
-    () =>
-      typeof window !== 'undefined' &&
-      'speechSynthesis' in window &&
-      typeof window.SpeechSynthesisUtterance === 'function',
-    [],
-  );
+  useEffect(() => {
+    const stored = readStoredPreferences();
+    setPreferences(initialLanguage ? { ...stored, language: initialLanguage } : stored);
+    setReady(true);
+  }, [initialLanguage]);
+
+  useEffect(() => {
+    setSpeechSupported(
+      'speechSynthesis' in window && typeof window.SpeechSynthesisUtterance === 'function',
+    );
+  }, []);
 
   const resolvedTheme = useMemo<'light' | 'dark'>(() => {
     if (preferences.theme !== 'system') return preferences.theme;
@@ -128,8 +92,9 @@ export function AccessibilityProvider({
   }, [preferences, resolvedTheme]);
 
   useEffect(() => {
+    if (!ready) return;
     writeStoredPreferences(preferences);
-  }, [preferences]);
+  }, [preferences, ready]);
 
   const update = useCallback((patch: Partial<AccessibilityPreferences>) => {
     setPreferences((current) => ({ ...current, ...patch }));
@@ -180,6 +145,11 @@ export function AccessibilityProvider({
   return <AccessibilityContext.Provider value={value}>{children}</AccessibilityContext.Provider>;
 }
 
+/**
+ * Reads the shared accessibility context.
+ * @returns the current preferences, dictionary and setters
+ * @throws when called outside an AccessibilityProvider
+ */
 export function useAccessibility(): AccessibilityContextValue {
   const context = useContext(AccessibilityContext);
   if (!context) {

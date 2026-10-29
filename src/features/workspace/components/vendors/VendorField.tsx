@@ -1,5 +1,10 @@
 'use client';
 
+/**
+ * The shared label-and-control wrapper for vendor fields.
+ * The field style is exported here so every control in the card stays identical.
+ */
+
 import type { ReactNode } from 'react';
 
 /** The input styling every vendor field shares. */

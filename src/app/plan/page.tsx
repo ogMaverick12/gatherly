@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { PlanWorkspace } from '@/features/workspace/components/PlanWorkspace';
 
+/** Browser-tab metadata for the plan workspace. */
 export const metadata: Metadata = {
   title: 'Your plan',
   description:
@@ -10,6 +11,7 @@ export const metadata: Metadata = {
 /** Rendered per request so the CSP nonce applies. See app/page.tsx. */
 export const dynamic = 'force-dynamic';
 
+/** Render the client-side plan workspace. */
 export default function PlanPage() {
   return <PlanWorkspace />;
 }

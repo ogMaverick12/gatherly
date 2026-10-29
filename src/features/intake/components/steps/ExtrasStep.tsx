@@ -1,5 +1,10 @@
 'use client';
 
+/**
+ * The last intake step: optional packs, interface language, a note and the review.
+ * Packs are opt-in and carry the disclaimer that they are a starting point to confirm.
+ */
+
 import { Controller, type UseFormReturn } from 'react-hook-form';
 import { useAccessibility } from '@/features/accessibility/provider';
 import {

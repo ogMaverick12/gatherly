@@ -1,5 +1,12 @@
+/**
+ * Hindi label set, typed against the English dictionary.
+ * Every key must exist here or the locale-parity test fails.
+ */
 import type { Dictionary } from './en';
 
+/**
+ * The Hindi dictionary, complete for every key in `en`.
+ */
 export const hi: Dictionary = {
   common: {
     appName: 'Gatherly',

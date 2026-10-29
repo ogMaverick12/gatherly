@@ -1,3 +1,10 @@
+/**
+ * The budget allocator.
+ *
+ * It reserves the contingency, applies weights, priorities and pack shifts,
+ * then divides the spendable money down to the last minor unit.
+ */
+
 import {
   BUDGET_CATEGORIES,
   BUDGET_CATEGORY_LABELS,
@@ -89,7 +96,13 @@ function allocateCategories(
   return { categories, packShifts, weightTotal };
 }
 
-/** The full allocation: the contingency, the category amounts and the warnings. */
+/**
+ * The full allocation: the contingency, the category amounts and the warnings.
+ * @param plan the plan whose intake drives the split
+ * @returns amounts in integer minor units (paise), with the working kept for display
+ * @example
+ * computeBudget(plan).contingencyMinor; // 8% of plan.intake.budgetMinor
+ */
 export function computeBudget(plan: Plan): BudgetAllocation {
   const { intake } = plan;
   const totalMinor = intake.budgetMinor;

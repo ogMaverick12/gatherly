@@ -5,7 +5,9 @@ import { CHAT_SYSTEM_PROMPT } from '@/lib/ai/prompts';
 import { createRoute } from '@/lib/security/route';
 import { buildBasicAnswer, classifyIntent } from '@/features/assistant/services';
 
+/** Node.js runtime: the provider adapters rely on Node APIs. */
 export const runtime = 'nodejs';
+/** Answer every request; a chat reply must never be cached. */
 export const dynamic = 'force-dynamic';
 
 /**

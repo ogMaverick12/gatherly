@@ -1,7 +1,13 @@
 'use client';
 
+/**
+ * The heading above the intake wizard.
+ * The title and subtitle come from the active dictionary.
+ */
+
 import { useAccessibility } from '@/features/accessibility/provider';
 
+/** Render the intake page title and subtitle. */
 export function IntakeHeading() {
   const { dictionary } = useAccessibility();
   return (

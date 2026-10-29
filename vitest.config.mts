@@ -39,16 +39,16 @@ export default defineConfig({
       // logic, so they are held to a higher bar than the whole project.
       thresholds: {
         'src/lib/**': {
-          statements: 90,
-          branches: 70,
-          functions: 90,
-          lines: 90,
+          statements: 92,
+          branches: 85,
+          functions: 92,
+          lines: 92,
         },
         'src/features/**/services.ts': {
-          statements: 90,
-          branches: 70,
-          functions: 90,
-          lines: 90,
+          statements: 92,
+          branches: 85,
+          functions: 92,
+          lines: 92,
         },
         'src/**': {
           statements: 80,

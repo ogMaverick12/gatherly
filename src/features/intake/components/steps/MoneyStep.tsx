@@ -1,5 +1,10 @@
 'use client';
 
+/**
+ * The second intake step: currency, budget and the per-guest figure.
+ * The per-guest line updates as the budget or guest count changes.
+ */
+
 import { type UseFormReturn } from 'react-hook-form';
 import { useAccessibility } from '@/features/accessibility/provider';
 import { CURRENCIES, CURRENCY_META, type Currency } from '@/lib/plan';

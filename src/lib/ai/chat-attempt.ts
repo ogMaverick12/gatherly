@@ -1,3 +1,7 @@
+/**
+ * The mechanics of one streamed provider attempt: first chunk, retry, fallback.
+ * Kept apart from the route stream so each decision is testable on its own.
+ */
 import { splitSentences } from './basic';
 import { isRetryableKind, kindOfFailure } from './errors';
 import { providerErrorNotice } from './notices';

@@ -1,3 +1,7 @@
+/**
+ * The AI entry point: provider selection and the public re-exports.
+ * Routes call `selectProvider` and never construct an adapter themselves.
+ */
 import { readConfig } from './config';
 import { BasicProvider } from './basic';
 import { GeminiProvider } from './gemini';
@@ -67,6 +71,12 @@ export function selectProvider(): ProviderSelection {
   };
 }
 
+/**
+ * The provider id of a selection, for logging and the mode badge.
+ *
+ * @param selection the provider chosen for this request
+ * @returns the provider's stable id
+ */
 export function providerIdFor(selection: ProviderSelection): ProviderId {
   return selection.provider.id;
 }

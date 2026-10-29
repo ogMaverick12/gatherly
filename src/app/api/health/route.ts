@@ -3,7 +3,9 @@ import { jsonResponse } from '@/lib/security/http';
 import { rateLimitMode } from '@/lib/security/rate-limit';
 import { createGetRoute } from '@/lib/security/route';
 
+/** Node.js runtime: the rate-limit mode reads server-only env vars. */
 export const runtime = 'nodejs';
+/** Report fresh state on every call, never a cached snapshot. */
 export const dynamic = 'force-dynamic';
 
 /**

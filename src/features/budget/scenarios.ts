@@ -1,3 +1,10 @@
+/**
+ * Budget scenarios.
+ *
+ * Each scenario re-costs the same plan with one assumption changed, so the
+ * user can compare the shape of the spend rather than a single total.
+ */
+
 import type { Plan, Priority } from '@/lib/plan';
 import { computeBudget } from './allocate';
 import type { BudgetScenario, ScenarioKind } from './types';
@@ -6,6 +13,13 @@ function scenarioPlan(plan: Plan, patch: Partial<Plan['intake']>): Plan {
   return { ...plan, intake: { ...plan.intake, ...patch } };
 }
 
+/**
+ * Re-costs the plan under guest, budget, venue and priority changes.
+ * @param plan the stored plan, used as the baseline for every comparison
+ * @returns between four and seven scenarios, each with amounts in integer minor units (paise)
+ * @example
+ * computeScenarios(plan).find((s) => s.kind === 'guests-up')?.deltaVsBaseMinor; // paise
+ */
 // long-function: one pass over the inputs; splitting it would only pass the same state between more functions.
 export function computeScenarios(plan: Plan): BudgetScenario[] {
   const base = computeBudget(plan);

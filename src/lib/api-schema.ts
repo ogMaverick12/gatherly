@@ -27,6 +27,9 @@ export const PlanSummarySchema = z
 // Annotated with the domain type so a validated body can be handed to the
 // assistant's services without a cast: the schema is the only place the two
 // shapes are allowed to meet.
+/**
+ * The plan snapshot the client may send: numbers only, strictly shaped.
+ */
 export const SnapshotSchema: z.ZodType<PlanSnapshot> = z
   .object({
     eventType: EventTypeSchema,
@@ -68,6 +71,9 @@ export const SnapshotSchema: z.ZodType<PlanSnapshot> = z
 
 export type ApiSnapshot = z.infer<typeof SnapshotSchema>;
 
+/**
+ * Request body for the chat route: message, summary and snapshot.
+ */
 export const ChatRequestSchema = z
   .object({
     message: z.string().min(1).max(2000),
@@ -76,6 +82,9 @@ export const ChatRequestSchema = z
   })
   .strict();
 
+/**
+ * Request body for the ideas route: summary plus the context ideas depend on.
+ */
 export const IdeasRequestSchema = z
   .object({
     planSummary: PlanSummarySchema,
@@ -95,12 +104,18 @@ export const IdeasRequestSchema = z
   })
   .strict();
 
+/**
+ * Request body for the free-text parser: one short piece of text.
+ */
 export const ParseRequestSchema = z
   .object({
     text: z.string().min(1).max(2000),
   })
   .strict();
 
+/**
+ * One idea as a provider must return it, before it becomes a stored idea.
+ */
 export const ProviderIdeaSchema = z
   .object({
     title: z.string().min(1).max(160),
@@ -110,6 +125,9 @@ export const ProviderIdeaSchema = z
   })
   .strict();
 
+/**
+ * The provider's idea list, capped at the number the UI can show.
+ */
 export const ProviderIdeasSchema = z
   .object({
     ideas: z.array(ProviderIdeaSchema).max(8),
@@ -118,6 +136,9 @@ export const ProviderIdeasSchema = z
 
 export type ProviderIdea = z.infer<typeof ProviderIdeaSchema>;
 
+/**
+ * Fields the parser may extract; every field is optional or nullable.
+ */
 export const ParsedFieldsSchema = z
   .object({
     eventType: EventTypeSchema.nullable(),

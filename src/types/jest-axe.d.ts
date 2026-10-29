@@ -14,6 +14,13 @@ declare module 'jest-axe' {
     readonly inapplicable: readonly unknown[];
   }
 
+  /**
+   * Run the axe accessibility analyser against an element, elements or selector.
+   *
+   * @param element Element(s) or CSS selector to scan.
+   * @param options Optional axe rules and context.
+   * @returns Every violation, pass and incomplete check axe produced.
+   */
   export function axe(
     element: Element | Element[] | string,
     options?: Record<string, unknown>,

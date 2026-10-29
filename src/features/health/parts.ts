@@ -10,6 +10,11 @@ function clamp(value: number): number {
   return Math.max(0, Math.min(100, Math.round(value)));
 }
 
+/**
+ * Scores the budget shape from its warnings, out of 100, weighted 25.
+ * @param budget the allocation whose warnings are counted
+ * @returns the weighted part with the reason and next actions
+ */
 function budgetPart(budget: BudgetAllocation): HealthPart {
   const weight = 25;
   let score = 100;
@@ -43,6 +48,11 @@ function budgetPart(budget: BudgetAllocation): HealthPart {
   };
 }
 
+/**
+ * Scores timeline progress and overdue penalties, out of 100, weighted 25.
+ * @param timeline the merged ladder summary
+ * @returns the weighted part with its next actions
+ */
 function timelinePart(timeline: TimelineSummary): HealthPart {
   const weight = 25;
   const progress = timeline.total > 0 ? (timeline.done / timeline.total) * 100 : 0;
@@ -70,6 +80,11 @@ function timelinePart(timeline: TimelineSummary): HealthPart {
   };
 }
 
+/**
+ * Scores the share of the vendor budget that is booked, out of 100, weighted 25.
+ * @param coverage the per-category vendor coverage
+ * @returns the weighted part with the next vendor to chase
+ */
 function vendorPart(coverage: VendorCoverage): HealthPart {
   const weight = 25;
   const nextActions: string[] = [];
@@ -89,6 +104,11 @@ function vendorPart(coverage: VendorCoverage): HealthPart {
   };
 }
 
+/**
+ * Scores the share of the user's own tasks done, out of 100, weighted 15.
+ * @param plan the stored plan whose tasks are counted
+ * @returns the weighted part with the next open task
+ */
 function taskPart(plan: Plan): HealthPart {
   const weight = 15;
   const total = plan.tasks.length;
@@ -115,6 +135,11 @@ interface GuestCheck {
   readonly passed: boolean;
 }
 
+/**
+ * Scores whether recorded guest needs have a task or a caterer behind them, out of 100, weighted 10.
+ * @param plan the stored plan whose vendors, tasks and needs are checked
+ * @returns the weighted part listing the checks still open
+ */
 // long-function: one pass over the inputs; splitting it would only pass the same state between more functions.
 function guestPart(plan: Plan): HealthPart {
   const weight = 10;

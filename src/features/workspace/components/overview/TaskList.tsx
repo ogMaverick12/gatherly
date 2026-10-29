@@ -1,5 +1,10 @@
 'use client';
 
+/**
+ * The task checklist on the overview tab.
+ * Ticking a task reports its id upward; the workspace hook updates the plan and health score.
+ */
+
 import { useAccessibility } from '@/features/accessibility/provider';
 import type { PlanTask } from '@/lib/plan';
 
