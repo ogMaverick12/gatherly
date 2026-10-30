@@ -37,67 +37,79 @@ export interface IntakeFormController {
   onSubmit(event?: React.BaseSyntheticEvent): Promise<void>;
 }
 
-/**
- * Everything the intake form does except draw anything: the four steps, the
- * per-step validation gate, and the submit that stores the plan and moves to
- * the workspace.
- * long-function: one controller: step gate, error list and draft are updated by the same transition.
- */
-export function useIntakeForm(): IntakeFormController {
-  const router = useRouter();
-  const { setLanguage } = useAccessibility();
+/** Convert validated form values into the stored intake shape. */
+function toIntake(formValues: IntakeFormValues): Intake {
+  return {
+    eventType: formValues.eventType,
+    eventDate: formValues.dateNotSet ? null : formValues.eventDate,
+    guests: formValues.guests,
+    cityTier: formValues.cityTier,
+    currency: formValues.currency,
+    budgetMinor: fromMajorUnits(formValues.budget, formValues.currency),
+    priorities: formValues.priorities,
+    cultureNote: formValues.cultureNote,
+    dietary: formValues.dietary,
+    access: formValues.access,
+    language: formValues.language,
+    packs: formValues.packs,
+    venueType: formValues.venueType,
+    guestCountIsEstimate: formValues.guestCountIsEstimate,
+    notes: formValues.notes,
+  };
+}
+
+/** Own the current step and the validated next/back transitions. */
+function useStepNavigation(form: UseFormReturn<IntakeFormValues>) {
   const [stepIndex, setStepIndex] = useState(0);
   const step: IntakeStep = INTAKE_STEPS[stepIndex] ?? 'basics';
-
-  const form = useForm<IntakeFormValues>({
-    resolver: zodResolver(IntakeFormSchema),
-    defaultValues: DEFAULT_INTAKE_VALUES,
-    mode: 'onBlur',
-  });
-
-  const { trigger, handleSubmit, watch } = form;
-  const values = watch();
-  const currency: Currency = values.currency ?? 'INR';
-  const guests = Number(values.guests) || 0;
-  const budget = Number(values.budget) || 0;
-  const perGuest = guests > 0 ? budget / guests : 0;
-
   const goNext = async () => {
-    const valid = await trigger(STEP_FIELDS[step], { shouldFocus: true });
+    const valid = await form.trigger(STEP_FIELDS[step], { shouldFocus: true });
     if (!valid) return;
     setStepIndex((index) => Math.min(index + 1, INTAKE_STEPS.length - 1));
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
-
   const goBack = () => {
     setStepIndex((index) => Math.max(index - 1, 0));
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
+  return { step, stepIndex, goNext, goBack };
+}
 
-  const onSubmit = handleSubmit((formValues) => {
-    const intake: Intake = {
-      eventType: formValues.eventType,
-      eventDate: formValues.dateNotSet ? null : formValues.eventDate,
-      guests: formValues.guests,
-      cityTier: formValues.cityTier,
-      currency: formValues.currency,
-      budgetMinor: fromMajorUnits(formValues.budget, formValues.currency),
-      priorities: formValues.priorities,
-      cultureNote: formValues.cultureNote,
-      dietary: formValues.dietary,
-      access: formValues.access,
-      language: formValues.language,
-      packs: formValues.packs,
-      venueType: formValues.venueType,
-      guestCountIsEstimate: formValues.guestCountIsEstimate,
-      notes: formValues.notes,
-    };
+/** Build the submit handler that stores the plan and moves to the workspace. */
+function useIntakeSubmit(
+  form: UseFormReturn<IntakeFormValues>,
+  router: ReturnType<typeof useRouter>,
+  setLanguage: (language: Intake['language']) => void,
+) {
+  return form.handleSubmit((formValues) => {
+    const intake = toIntake(formValues);
     const plan = createPlan(intake, new Date());
     setPlan(plan);
     setLanguage(intake.language);
     router.push('/plan');
   });
+}
 
+/**
+ * Everything the intake form does except draw anything: the four steps, the
+ * per-step validation gate, and the submit that stores the plan and moves to
+ * the workspace.
+ */
+export function useIntakeForm(): IntakeFormController {
+  const router = useRouter();
+  const { setLanguage } = useAccessibility();
+  const form = useForm<IntakeFormValues>({
+    resolver: zodResolver(IntakeFormSchema),
+    defaultValues: DEFAULT_INTAKE_VALUES,
+    mode: 'onBlur',
+  });
+  const values = form.watch();
+  const currency: Currency = values.currency ?? 'INR';
+  const guests = Number(values.guests) || 0;
+  const budget = Number(values.budget) || 0;
+  const perGuest = guests > 0 ? budget / guests : 0;
+  const { step, stepIndex, goNext, goBack } = useStepNavigation(form);
+  const onSubmit = useIntakeSubmit(form, router, setLanguage);
   return {
     form,
     values,

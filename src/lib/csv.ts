@@ -19,42 +19,41 @@ export function withBom(csv: string): string {
   return `﻿${csv}`;
 }
 
-/**
- * Render a plan's budget allocation as a spreadsheet-ready CSV.
- *
- * @param plan the plan whose currency and guest count label the columns
- * @param budget the computed allocation, in integer minor units (paise)
- * @returns CSV text with a header, one row per category and totals
- */
-// long-function: one pass over the inputs; splitting it would only pass the same state between more functions.
-export function budgetCsv(plan: Plan, budget: BudgetAllocation): string {
-  const currency = plan.intake.currency;
-  const rows: (string | number)[][] = [
-    [
-      'Category',
-      'Planned (minor units)',
-      `Planned (${currency})`,
-      'Share of spendable %',
-      'Benchmark share %',
-      'Difference (points)',
-      'Per guest (minor units)',
-    ],
+/** The budget CSV header row. */
+function budgetHeader(currency: Plan['intake']['currency']): (string | number)[] {
+  return [
+    'Category',
+    'Planned (minor units)',
+    `Planned (${currency})`,
+    'Share of spendable %',
+    'Benchmark share %',
+    'Difference (points)',
+    'Per guest (minor units)',
   ];
+}
 
-  for (const category of budget.categories) {
-    rows.push([
-      category.label,
-      category.amountMinor,
-      formatMinorPlain(category.amountMinor, currency),
-      category.sharePercent,
-      category.benchmarkSharePercent,
-      category.varianceFromBenchmark,
-      category.perGuestMinor ?? '',
-    ]);
-  }
+/** One category row, with the formatted and per-guest amounts. */
+function budgetCategoryRow(
+  category: BudgetAllocation['categories'][number],
+  currency: Plan['intake']['currency'],
+): (string | number)[] {
+  return [
+    category.label,
+    category.amountMinor,
+    formatMinorPlain(category.amountMinor, currency),
+    category.sharePercent,
+    category.benchmarkSharePercent,
+    category.varianceFromBenchmark,
+    category.perGuestMinor ?? '',
+  ];
+}
 
-  rows.push([]);
-  rows.push([
+/** The contingency row. */
+function budgetContingencyRow(
+  budget: BudgetAllocation,
+  currency: Plan['intake']['currency'],
+): (string | number)[] {
+  return [
     'Contingency',
     budget.contingencyMinor,
     formatMinor(budget.contingencyMinor, currency),
@@ -62,8 +61,16 @@ export function budgetCsv(plan: Plan, budget: BudgetAllocation): string {
     '',
     '',
     '',
-  ]);
-  rows.push([
+  ];
+}
+
+/** The total row, including the per-guest total when there are guests. */
+function budgetTotalRow(
+  plan: Plan,
+  budget: BudgetAllocation,
+  currency: Plan['intake']['currency'],
+): (string | number)[] {
+  return [
     'Total',
     budget.totalMinor,
     formatMinor(budget.totalMinor, currency),
@@ -71,8 +78,25 @@ export function budgetCsv(plan: Plan, budget: BudgetAllocation): string {
     '',
     '',
     plan.intake.guests > 0 ? Math.round(budget.totalMinor / plan.intake.guests) : '',
-  ]);
+  ];
+}
 
+/**
+ * Render a plan's budget allocation as a spreadsheet-ready CSV.
+ *
+ * @param plan the plan whose currency and guest count label the columns
+ * @param budget the computed allocation, in integer minor units (paise)
+ * @returns CSV text with a header, one row per category and totals
+ */
+export function budgetCsv(plan: Plan, budget: BudgetAllocation): string {
+  const currency = plan.intake.currency;
+  const rows = [
+    budgetHeader(currency),
+    ...budget.categories.map((category) => budgetCategoryRow(category, currency)),
+    [],
+    budgetContingencyRow(budget, currency),
+    budgetTotalRow(plan, budget, currency),
+  ];
   return toCsv(rows);
 }
 

@@ -100,47 +100,43 @@ export async function encodeShareFragment(plan: Plan): Promise<string> {
   return `${PLAIN_PREFIX}.${bytesToBase64Url(bytes)}`;
 }
 
-/**
- * Decode a share fragment back into a validated plan.
- *
- * @param fragment the fragment body, with or without a leading `#`
- * @returns the restored plan, or null when the fragment is invalid or outdated
- */
-// long-function: one pass over the inputs; splitting it would only pass the same state between more functions.
-export async function decodeShareFragment(fragment: string): Promise<Plan | null> {
+/** Split a fragment into its prefix and body, or null when it has no separator. */
+function splitShareFragment(fragment: string): { prefix: string; body: string } | null {
   const trimmed = fragment.trim().replace(/^#/, '');
   const separator = trimmed.indexOf('.');
   if (separator < 0) return null;
-  const prefix = trimmed.slice(0, separator);
   const body = trimmed.slice(separator + 1);
   if (!body) return null;
+  return { prefix: trimmed.slice(0, separator), body };
+}
 
+/** Decode base64url and inflate a compressed fragment when required. */
+async function decodeFragmentBytes(prefix: string, body: string): Promise<Uint8Array | null> {
   let bytes: Uint8Array;
   try {
     bytes = base64UrlToBytes(body);
   } catch {
     return null;
   }
+  if (prefix === COMPRESSED_PREFIX) return inflate(bytes);
+  return prefix === PLAIN_PREFIX ? bytes : null;
+}
 
-  if (prefix === COMPRESSED_PREFIX) {
-    const inflated = await inflate(bytes);
-    if (!inflated) return null;
-    bytes = inflated;
-  } else if (prefix !== PLAIN_PREFIX) {
-    return null;
-  }
-
+/** Parse and version-check the JSON payload inside a fragment. */
+function readSharePayload(bytes: Uint8Array): Partial<SharePayload> | null {
   let json: unknown;
   try {
     json = JSON.parse(new TextDecoder().decode(bytes));
   } catch {
     return null;
   }
-
   if (!json || typeof json !== 'object') return null;
   const payload = json as Partial<SharePayload>;
-  if (payload.v !== 1) return null;
+  return payload.v === 1 ? payload : null;
+}
 
+/** Build and validate a plan from a payload, filling the fields a share omits. */
+function restoreSharedPlan(payload: Partial<SharePayload>): Plan | null {
   const now = new Date();
   const candidate = {
     version: 1,
@@ -160,9 +156,23 @@ export async function decodeShareFragment(fragment: string): Promise<Plan | null
       reducedMotion: false,
     },
   };
-
   const parsed = PlanSchema.safeParse(candidate);
   return parsed.success ? parsed.data : null;
+}
+
+/**
+ * Decode a share fragment back into a validated plan.
+ *
+ * @param fragment the fragment body, with or without a leading `#`
+ * @returns the restored plan, or null when the fragment is invalid or outdated
+ */
+export async function decodeShareFragment(fragment: string): Promise<Plan | null> {
+  const parts = splitShareFragment(fragment);
+  if (!parts) return null;
+  const bytes = await decodeFragmentBytes(parts.prefix, parts.body);
+  if (!bytes) return null;
+  const payload = readSharePayload(bytes);
+  return payload ? restoreSharedPlan(payload) : null;
 }
 
 /**

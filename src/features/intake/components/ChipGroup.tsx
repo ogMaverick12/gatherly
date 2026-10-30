@@ -13,12 +13,42 @@ export interface ChipOption<T extends string> {
   readonly hint?: string;
 }
 
+/** One checkbox rendered as a chip label. */
+function ChipLabel<T extends string>({
+  option,
+  checked,
+  muted,
+  onToggle,
+}: {
+  option: ChipOption<T>;
+  checked: boolean;
+  muted: boolean;
+  onToggle: (value: T) => void;
+}) {
+  return (
+    <label
+      className={`inline-flex min-h-[44px] cursor-pointer items-center gap-2 rounded-pill border px-4 py-2 text-sm transition-colors duration-200 ${
+        checked
+          ? 'border-teal bg-teal text-paper'
+          : 'border-line-strong bg-raised text-ink hover:border-teal'
+      } ${muted ? 'opacity-50' : ''}`}
+    >
+      <input
+        type="checkbox"
+        checked={checked}
+        onChange={() => onToggle(option.value)}
+        className="sr-only"
+      />
+      <span>{option.label}</span>
+    </label>
+  );
+}
+
 /**
  * A group of checkboxes styled as chips.
  *
  * Real checkboxes inside a fieldset, so keyboard and screen-reader
  * behaviour is the platform's, not something we re-implemented.
- * long-function: one fieldset: layout, checkbox and checked style are the same rule for every chip.
  */
 export function ChipGroup<T extends string>({
   legend,
@@ -70,22 +100,13 @@ export function ChipGroup<T extends string>({
         {options.map((option) => {
           const checked = value.includes(option.value);
           return (
-            <label
+            <ChipLabel
               key={option.value}
-              className={`inline-flex min-h-[44px] cursor-pointer items-center gap-2 rounded-pill border px-4 py-2 text-sm transition-colors duration-200 ${
-                checked
-                  ? 'border-teal bg-teal text-paper'
-                  : 'border-line-strong bg-raised text-ink hover:border-teal'
-              } ${atLimit && !checked ? 'opacity-50' : ''}`}
-            >
-              <input
-                type="checkbox"
-                checked={checked}
-                onChange={() => toggle(option.value)}
-                className="sr-only"
-              />
-              <span>{option.label}</span>
-            </label>
+              option={option}
+              checked={checked}
+              muted={atLimit && !checked}
+              onToggle={toggle}
+            />
           );
         })}
       </div>

@@ -55,26 +55,25 @@ export interface PlanSnapshot {
  * @param risks the risk register, most serious first
  * @returns the snapshot the assistant and overview read from
  */
-// long-function: one pass over the inputs; splitting it would only pass the same state between more functions.
-export function buildSnapshot(
+/** The intake fields copied straight from the plan. */
+function planFields(
   plan: Plan,
-  budget: BudgetAllocation,
-  coverage: VendorCoverage,
-  timeline: TimelineSummary,
-  health: HealthReport,
-  catering: CateringEstimate,
-  risks: readonly Risk[],
-): PlanSnapshot {
-  const outstanding = plan.vendors
-    .filter((vendor) => vendor.status !== 'booked' && vendor.status !== 'declined')
-    .map((vendor) => vendor.name || vendor.category);
-
+): Pick<PlanSnapshot, 'eventType' | 'eventDate' | 'guests' | 'cityTier' | 'currency'> {
   return {
     eventType: plan.intake.eventType,
     eventDate: plan.intake.eventDate,
     guests: plan.intake.guests,
     cityTier: plan.intake.cityTier,
     currency: plan.intake.currency,
+  };
+}
+
+/** The money fields and the non-zero category rows. */
+function budgetFields(
+  plan: Plan,
+  budget: BudgetAllocation,
+): Pick<PlanSnapshot, 'budgetMinor' | 'contingencyMinor' | 'perGuestMinor' | 'categories'> {
+  return {
     budgetMinor: budget.totalMinor,
     contingencyMinor: budget.contingencyMinor,
     perGuestMinor: plan.intake.guests > 0 ? Math.round(budget.totalMinor / plan.intake.guests) : 0,
@@ -85,20 +84,96 @@ export function buildSnapshot(
         amountMinor: category.amountMinor,
         sharePercent: category.sharePercent,
       })),
-    healthScore: health.score,
-    healthBand: health.band,
+  };
+}
+
+/** The health score and band. */
+function healthFields(health: HealthReport): Pick<PlanSnapshot, 'healthScore' | 'healthBand'> {
+  return { healthScore: health.score, healthBand: health.band };
+}
+
+/** The next milestone and completion counts. */
+function timelineFields(
+  timeline: TimelineSummary,
+): Pick<
+  PlanSnapshot,
+  'nextMilestone' | 'nextMilestoneDate' | 'overdueCount' | 'milestonesDone' | 'milestonesTotal'
+> {
+  return {
     nextMilestone: timeline.nextUp?.title ?? null,
     nextMilestoneDate: timeline.nextUp?.date ?? null,
     overdueCount: timeline.overdue,
     milestonesDone: timeline.done,
     milestonesTotal: timeline.total,
+  };
+}
+
+/** The vendor coverage percentage and the first six outstanding names. */
+function vendorFields(
+  plan: Plan,
+  coverage: VendorCoverage,
+): Pick<PlanSnapshot, 'vendorCoveragePercent' | 'outstandingVendors'> {
+  const outstanding = plan.vendors
+    .filter((vendor) => vendor.status !== 'booked' && vendor.status !== 'declined')
+    .map((vendor) => vendor.name || vendor.category);
+  return {
     vendorCoveragePercent: coverage.overallPercent,
     outstandingVendors: outstanding.slice(0, 6),
+  };
+}
+
+/** The plate, drink and dietary figures. */
+function cateringFields(
+  catering: CateringEstimate,
+): Pick<PlanSnapshot, 'plates' | 'drinks' | 'dietary'> {
+  return {
     plates: catering.totalPlates,
     drinks: catering.drinks,
     dietary: catering.dietary.map((need) => need.label),
+  };
+}
+
+/** The task completion counts. */
+function taskFields(plan: Plan): Pick<PlanSnapshot, 'tasksDone' | 'tasksTotal'> {
+  return {
     tasksDone: plan.tasks.filter((task) => task.done).length,
     tasksTotal: plan.tasks.length,
-    topRisks: risks.slice(0, 3).map((risk) => risk.title),
+  };
+}
+
+/** The first three risk titles. */
+function riskFields(risks: readonly Risk[]): Pick<PlanSnapshot, 'topRisks'> {
+  return { topRisks: risks.slice(0, 3).map((risk) => risk.title) };
+}
+
+/**
+ * Collects the numbers the other engines produced into one read-only object.
+ * @param plan the stored plan, for intake, tasks and vendors
+ * @param budget the allocation, in integer minor units (paise)
+ * @param coverage the vendor coverage percentages
+ * @param timeline the ladder summary with its counts and next step
+ * @param health the plan health report
+ * @param catering the plate and drink estimate
+ * @param risks the risk register, most serious first
+ * @returns the snapshot the assistant and overview read from
+ */
+export function buildSnapshot(
+  plan: Plan,
+  budget: BudgetAllocation,
+  coverage: VendorCoverage,
+  timeline: TimelineSummary,
+  health: HealthReport,
+  catering: CateringEstimate,
+  risks: readonly Risk[],
+): PlanSnapshot {
+  return {
+    ...planFields(plan),
+    ...budgetFields(plan, budget),
+    ...healthFields(health),
+    ...timelineFields(timeline),
+    ...vendorFields(plan, coverage),
+    ...cateringFields(catering),
+    ...taskFields(plan),
+    ...riskFields(risks),
   };
 }

@@ -53,50 +53,55 @@ function matchAll<T>(text: string, table: readonly { value: T; words: readonly s
   return found;
 }
 
-// long-function: one pass over the inputs; splitting it would only pass the same state between more functions.
-function parseEventDate(text: string): string | null {
+/** Read an ISO `YYYY-MM-DD` date. */
+function parseIsoDate(text: string): string | null {
   const iso = /(\d{4})-(\d{2})-(\d{2})/.exec(text);
-  if (iso) {
-    const candidate = `${iso[1]}-${iso[2]}-${iso[3]}`;
-    if (isValidDateOnly(candidate)) return candidate;
-  }
+  if (!iso) return null;
+  const candidate = `${iso[1]}-${iso[2]}-${iso[3]}`;
+  return isValidDateOnly(candidate) ? candidate : null;
+}
 
+/** Read a `DD/MM/YYYY` date. */
+function parseSlashDate(text: string): string | null {
   const slash = /(\d{1,2})\/(\d{1,2})\/(\d{4})/.exec(text);
-  if (slash) {
-    const day = slash[1]?.padStart(2, '0');
-    const month = slash[2]?.padStart(2, '0');
-    const year = slash[3];
-    if (day && month && year) {
-      const candidate = `${year}-${month}-${day}`;
-      if (isValidDateOnly(candidate)) return candidate;
-    }
-  }
+  if (!slash) return null;
+  const day = slash[1]?.padStart(2, '0');
+  const month = slash[2]?.padStart(2, '0');
+  const year = slash[3];
+  if (!day || !month || !year) return null;
+  const candidate = `${year}-${month}-${day}`;
+  return isValidDateOnly(candidate) ? candidate : null;
+}
 
+/** Read a `DD Month YYYY` date. */
+function parseDayMonth(text: string): string | null {
   const dayMonth = /(\d{1,2})\s+([a-z]+)\s+(\d{4})/i.exec(text);
-  if (dayMonth) {
-    const day = dayMonth[1]?.padStart(2, '0');
-    const monthName = (dayMonth[2] ?? '').toLowerCase();
-    const year = dayMonth[3];
-    const month = MONTHS.find((entry) => entry.name === monthName)?.index;
-    if (day && month && year) {
-      const candidate = `${year}-${String(month).padStart(2, '0')}-${day}`;
-      if (isValidDateOnly(candidate)) return candidate;
-    }
-  }
+  if (!dayMonth) return null;
+  const day = dayMonth[1]?.padStart(2, '0');
+  const monthName = (dayMonth[2] ?? '').toLowerCase();
+  const year = dayMonth[3];
+  const month = MONTHS.find((entry) => entry.name === monthName)?.index;
+  if (!day || !month || !year) return null;
+  const candidate = `${year}-${String(month).padStart(2, '0')}-${day}`;
+  return isValidDateOnly(candidate) ? candidate : null;
+}
 
+/** Read a `Month DD, YYYY` date. */
+function parseMonthDay(text: string): string | null {
   const monthDay = /([a-z]+)\s+(\d{1,2}),?\s+(\d{4})/i.exec(text);
-  if (monthDay) {
-    const monthName = (monthDay[1] ?? '').toLowerCase();
-    const day = monthDay[2]?.padStart(2, '0');
-    const year = monthDay[3];
-    const month = MONTHS.find((entry) => entry.name === monthName)?.index;
-    if (day && month && year) {
-      const candidate = `${year}-${String(month).padStart(2, '0')}-${day}`;
-      if (isValidDateOnly(candidate)) return candidate;
-    }
-  }
+  if (!monthDay) return null;
+  const monthName = (monthDay[1] ?? '').toLowerCase();
+  const day = monthDay[2]?.padStart(2, '0');
+  const year = monthDay[3];
+  const month = MONTHS.find((entry) => entry.name === monthName)?.index;
+  if (!day || !month || !year) return null;
+  const candidate = `${year}-${String(month).padStart(2, '0')}-${day}`;
+  return isValidDateOnly(candidate) ? candidate : null;
+}
 
-  return null;
+/** Read the first valid date in any of the supported formats. */
+function parseEventDate(text: string): string | null {
+  return parseIsoDate(text) ?? parseSlashDate(text) ?? parseDayMonth(text) ?? parseMonthDay(text);
 }
 
 function parseGuests(text: string): number | null {

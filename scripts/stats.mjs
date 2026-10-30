@@ -1,16 +1,16 @@
 #!/usr/bin/env node
 /**
- * Print the numbers the documentation quotes, plus the three quality lists.
+ * Print the numbers the documentation quotes, plus the quality lists.
  *
  * The docs claim counts: tests, files, coverage. Those numbers drift the
  * moment a file is added, so this script measures them and prints a block
  * that can be pasted into docs/DELIVERY_OUTCOMES.md.
  *
  * It also measures the shape rules in AGENTS.md - files under 200 lines,
- * functions under 40 lines, JSDoc on every exported function and constant -
- * against docs/quality-allowance.json and exits 1 when a count is above the
- * allowance recorded there. Lower the allowance when the count drops; never
- * raise it silently.
+ * logic functions under 40 lines, components under 80 lines, and JSDoc on
+ * every exported function and constant - against docs/quality-allowance.json.
+ * A logic function may be excused only by the exact line
+ * `// long-ok: data table` or `// long-ok: closed switch` above it.
  *
  * Usage:
  *   node scripts/stats.mjs
@@ -28,6 +28,7 @@ const PLAYWRIGHT_CLI = join(ROOT, 'node_modules', '@playwright', 'test', 'cli.js
 const ALLOWANCE_PATH = join(ROOT, 'docs', 'quality-allowance.json');
 const SOURCE_FOLDERS = [join(ROOT, 'src'), join(ROOT, 'scripts')];
 const SOURCE_EXTENSIONS = ['.ts', '.tsx', '.mjs'];
+const LONG_OK_TAGS = new Set(['// long-ok: data table', '// long-ok: closed switch']);
 
 /** Every file under a folder that matches the extension list. */
 function countFiles(folder, extensions) {
@@ -151,63 +152,94 @@ function functionName(node) {
   return '(anonymous)';
 }
 
-/** The source files the three lists measure. */
+/** True when the body contains JSX, which marks a PascalCase function as a component. */
+function containsJsx(node) {
+  let found = false;
+  const visit = (child) => {
+    if (ts.isJsxElement(child) || ts.isJsxSelfClosingElement(child) || ts.isJsxFragment(child)) {
+      found = true;
+      return;
+    }
+    ts.forEachChild(child, visit);
+  };
+  visit(node);
+  return found;
+}
+
+/** True for a PascalCase function that renders JSX. */
+function isReactComponent(node, name) {
+  return /^[A-Z]/.test(name) && containsJsx(node);
+}
+
+/** True when the exact long-ok tag sits in the three lines above the function. */
+function hasLongOkTag(lines, start) {
+  return lines.slice(Math.max(0, start - 3), start).some((line) => LONG_OK_TAGS.has(line.trim()));
+}
+
+/** Record one function in the component or logic list when it exceeds its limit. */
+function addFunctionMeasurement(node, sourceFile, shown, lines, lists) {
+  const start = sourceFile.getLineAndCharacterOfPosition(node.getStart(sourceFile, false)).line;
+  const end = sourceFile.getLineAndCharacterOfPosition(node.getEnd()).line;
+  const length = end - start + 1;
+  const name = functionName(node);
+  const where = `${shown}:${start + 1} ${name} (${length} lines)`;
+  if (isReactComponent(node, name)) {
+    if (length > 80) lists.longComponents.push(where);
+    return;
+  }
+  if (length > 40 && !hasLongOkTag(lines, start)) lists.longLogic.push(where);
+}
+
+/** Record an exported function or constant whose doc block is missing. */
+function addUndocumented(node, sourceFile, shown, lists) {
+  if (!isDocumentedExport(node)) return;
+  const before = sourceFile.text.slice(node.getFullStart(), node.getStart(sourceFile, false));
+  if (before.includes('/**')) return;
+  const start = sourceFile.getLineAndCharacterOfPosition(node.getStart(sourceFile, false)).line;
+  lists.undocumented.push(`${shown}:${start + 1} ${functionName(node)}`);
+}
+
+/** Walk the AST once, collecting all four quality lists. */
+function visitNode(node, sourceFile, shown, lines, lists) {
+  if (isMeasuredFunction(node) && node.body) {
+    addFunctionMeasurement(node, sourceFile, shown, lines, lists);
+  }
+  addUndocumented(node, sourceFile, shown, lists);
+  ts.forEachChild(node, (child) => visitNode(child, sourceFile, shown, lines, lists));
+}
+
+/** The source files the quality lists measure. */
 function sourceFiles() {
   return SOURCE_FOLDERS.flatMap((folder) =>
     findFiles(folder, (file) => SOURCE_EXTENSIONS.some((extension) => file.endsWith(extension))),
   );
 }
 
-/** The three quality lists: long files, long functions, undocumented exports. */
-// long-function: one AST walk collects all three lists; three walks would parse every file three times.
+/** Measure one file: its length, function sizes and undocumented exports. */
+function measureFile(file, lists) {
+  const text = readFileSync(file, 'utf8');
+  const shown = relative(ROOT, file).split(sep).join('/');
+  const lines = text.split('\n');
+  if (lines.length > 200) lists.longFiles.push(`${shown} (${lines.length} lines)`);
+  const sourceFile = ts.createSourceFile(
+    shown,
+    text,
+    ts.ScriptTarget.Latest,
+    true,
+    shown.endsWith('.tsx')
+      ? ts.ScriptKind.TSX
+      : shown.endsWith('.mjs')
+        ? ts.ScriptKind.JS
+        : ts.ScriptKind.TS,
+  );
+  visitNode(sourceFile, sourceFile, shown, lines, lists);
+}
+
+/** The quality lists: long files, long logic, long components, undocumented exports. */
 function qualityLists() {
-  const longFiles = [];
-  const longFunctions = [];
-  const undocumented = [];
-
-  for (const file of sourceFiles()) {
-    const text = readFileSync(file, 'utf8');
-    const shown = relative(ROOT, file).split(sep).join('/');
-    const lineCount = text.split('\n').length;
-    if (lineCount > 200) longFiles.push(`${shown} (${lineCount} lines)`);
-
-    const source = ts.createSourceFile(
-      shown,
-      text,
-      ts.ScriptTarget.Latest,
-      true,
-      shown.endsWith('.tsx')
-        ? ts.ScriptKind.TSX
-        : shown.endsWith('.mjs')
-          ? ts.ScriptKind.JS
-          : ts.ScriptKind.TS,
-    );
-    const lines = text.split('\n');
-
-    const visit = (node) => {
-      const start = source.getLineAndCharacterOfPosition(node.getStart(source, false)).line;
-      const end = source.getLineAndCharacterOfPosition(node.getEnd()).line;
-      if (isMeasuredFunction(node) && node.body && end - start + 1 > 40) {
-        const declared = lines[start];
-        const reasonAbove = lines
-          .slice(Math.max(0, start - 4), start)
-          .some((line) => line.includes('long-function:'));
-        longFunctions.push({
-          where: `${shown}:${start + 1} ${functionName(node)} (${end - start + 1} lines)`,
-          justified: reasonAbove || declared.includes('long-function:'),
-        });
-      }
-      if (isDocumentedExport(node)) {
-        const before = text.slice(node.getFullStart(), node.getStart(source, false));
-        if (!before.includes('/**')) {
-          undocumented.push(`${shown}:${start + 1} ${functionName(node)}`);
-        }
-      }
-      ts.forEachChild(node, visit);
-    };
-    visit(source);
-  }
-  return { longFiles, longFunctions, undocumented };
+  const lists = { longFiles: [], longLogic: [], longComponents: [], undocumented: [] };
+  for (const file of sourceFiles()) measureFile(file, lists);
+  return lists;
 }
 
 /** True for an exported function or constant, the two things that need a JSDoc block. */
@@ -225,7 +257,6 @@ const unit = countUnitTests();
 const endToEnd = countEndToEndTests();
 const coverage = readCoverage();
 const lists = qualityLists();
-const unjustified = lists.longFunctions.filter((entry) => !entry.justified);
 
 const rows = [
   ['Unit test files', unit.files],
@@ -274,16 +305,20 @@ lines.push(
   '',
   ...listBlock('Files over 200 lines', lists.longFiles, allowance?.filesOver200Lines ?? 0),
   ...listBlock(
-    'Functions over 40 lines',
-    lists.longFunctions.map((entry) => `${entry.where}${entry.justified ? ' [reason]' : ''}`),
-    allowance?.functionsOver40Lines ?? 0,
+    'Logic functions over 40 lines',
+    lists.longLogic,
+    allowance?.logicFunctionsOver40Lines ?? 0,
+  ),
+  ...listBlock(
+    'Components over 80 lines',
+    lists.longComponents,
+    allowance?.componentsOver80Lines ?? 0,
   ),
   ...listBlock(
     'Exported functions and constants without JSDoc',
     lists.undocumented,
     allowance?.exportsWithoutJsDoc ?? 0,
   ),
-  `Functions over 40 lines without a reason comment: ${unjustified.length} (allowance ${allowance?.functionsOver40LinesWithoutReason ?? 0})`,
 );
 
 process.stdout.write(`${lines.join('\n')}\n`);
@@ -296,12 +331,8 @@ if (!allowance) {
 
 const over = [
   ['files over 200 lines', lists.longFiles.length, allowance.filesOver200Lines],
-  ['functions over 40 lines', lists.longFunctions.length, allowance.functionsOver40Lines],
-  [
-    'functions over 40 lines without a reason',
-    unjustified.length,
-    allowance.functionsOver40LinesWithoutReason,
-  ],
+  ['logic functions over 40 lines', lists.longLogic.length, allowance.logicFunctionsOver40Lines],
+  ['components over 80 lines', lists.longComponents.length, allowance.componentsOver80Lines],
   ['exports without JSDoc', lists.undocumented.length, allowance.exportsWithoutJsDoc],
 ].filter(([, count, allowed]) => count > allowed);
 

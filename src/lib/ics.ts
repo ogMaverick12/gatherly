@@ -88,51 +88,64 @@ export interface CalendarOptions {
  * @param options the clock used for DTSTAMP and the locale for descriptions
  * @returns RFC 5545 text with folded lines and CRLF endings
  */
-// long-function: one pass over the inputs; splitting it would only pass the same state between more functions.
+/** The event's all-day calendar entry. */
+function eventLines(plan: Plan, eventDate: string, stamp: string, locale: string): string[] {
+  return [
+    'BEGIN:VEVENT',
+    `UID:${plan.id}-event@gatherly`,
+    `DTSTAMP:${stamp}`,
+    `DTSTART;VALUE=DATE:${toIcsDate(eventDate)}`,
+    `DTEND;VALUE=DATE:${toIcsDate(eventDate)}`,
+    `SUMMARY:${escapeText('Gatherly plan')}`,
+    `DESCRIPTION:${escapeText(
+      `${plan.intake.guests} guests. ${formatDateOnly(eventDate, locale)}.`,
+    )}`,
+    'TRANSP:TRANSPARENT',
+    'END:VEVENT',
+  ];
+}
+
+/** One dated milestone's all-day calendar entry. */
+function milestoneLines(
+  plan: Plan,
+  milestone: Plan['milestones'][number],
+  stamp: string,
+): string[] {
+  if (!milestone.date) return [];
+  return [
+    'BEGIN:VEVENT',
+    `UID:${plan.id}-${milestone.id}@gatherly`,
+    `DTSTAMP:${stamp}`,
+    `DTSTART;VALUE=DATE:${toIcsDate(milestone.date)}`,
+    `DTEND;VALUE=DATE:${toIcsDate(milestone.date)}`,
+    `SUMMARY:${escapeText(milestone.title)}`,
+    `DESCRIPTION:${escapeText(milestone.whyItMatters)}`,
+    'TRANSP:TRANSPARENT',
+    'END:VEVENT',
+  ];
+}
+
+/**
+ * Build an iCalendar document for the event and its dated milestones.
+ *
+ * @param plan the plan to export
+ * @param options the clock used for DTSTAMP and the locale for descriptions
+ * @returns RFC 5545 text with folded lines and CRLF endings
+ */
 export function buildCalendar(plan: Plan, options: CalendarOptions = {}): string {
-  const now = options.now ?? new Date();
-  const stamp = toStamp(now);
-  const lines: string[] = [
+  const stamp = toStamp(options.now ?? new Date());
+  const lines = [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
     'PRODID:-//Gatherly//Event plan//EN',
     'CALSCALE:GREGORIAN',
     'METHOD:PUBLISH',
   ];
-
   const eventDate = plan.intake.eventDate;
-
-  if (eventDate) {
-    lines.push(
-      'BEGIN:VEVENT',
-      `UID:${plan.id}-event@gatherly`,
-      `DTSTAMP:${stamp}`,
-      `DTSTART;VALUE=DATE:${toIcsDate(eventDate)}`,
-      `DTEND;VALUE=DATE:${toIcsDate(eventDate)}`,
-      `SUMMARY:${escapeText('Gatherly plan')}`,
-      `DESCRIPTION:${escapeText(
-        `${plan.intake.guests} guests. ${formatDateOnly(eventDate, options.locale ?? 'en')}.`,
-      )}`,
-      'TRANSP:TRANSPARENT',
-      'END:VEVENT',
-    );
-  }
-
+  if (eventDate) lines.push(...eventLines(plan, eventDate, stamp, options.locale ?? 'en'));
   for (const milestone of plan.milestones) {
-    if (!milestone.date) continue;
-    lines.push(
-      'BEGIN:VEVENT',
-      `UID:${plan.id}-${milestone.id}@gatherly`,
-      `DTSTAMP:${stamp}`,
-      `DTSTART;VALUE=DATE:${toIcsDate(milestone.date)}`,
-      `DTEND;VALUE=DATE:${toIcsDate(milestone.date)}`,
-      `SUMMARY:${escapeText(milestone.title)}`,
-      `DESCRIPTION:${escapeText(milestone.whyItMatters)}`,
-      'TRANSP:TRANSPARENT',
-      'END:VEVENT',
-    );
+    lines.push(...milestoneLines(plan, milestone, stamp));
   }
-
   lines.push('END:VCALENDAR');
   return lines.map(foldLine).join('\r\n');
 }

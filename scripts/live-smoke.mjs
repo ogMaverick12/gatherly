@@ -182,18 +182,153 @@ const IDEAS_CONTEXT = {
   month: 12,
 };
 
-// long-function: one probe per provider: request, classified failure and printed evidence are one sequential run.
+/** The three skipped checks when a provider has no key. */
+function skippedChecks() {
+  return ['/api/parse', '/api/ideas', '/api/chat'].map((route) => ({
+    route,
+    result: 'skipped',
+    detail: 'no key in the environment',
+  }));
+}
+
+/** The three failure checks when the local server does not start. */
+function serverFailedChecks() {
+  return ['/api/parse', '/api/ideas', '/api/chat'].map((route) => ({
+    route,
+    result: 'fail',
+    detail: 'the server did not start',
+  }));
+}
+
+/** Report a missing model and return its failed check. */
+function modelMissingCheck(provider, route, model) {
+  say(`MODEL NOT FOUND: ${model} - set ${provider.modelName}`);
+  return { route, result: 'fail', detail: `model not found: ${model}` };
+}
+
+/** Check that every parsed field has one of the published JSON types. */
+function fieldsAreTyped(fields) {
+  return Object.entries(PARSED_FIELD_TYPES).every(([key, types]) => {
+    const value = fields[key];
+    return value !== undefined && types.includes(Array.isArray(value) ? 'array' : typeof value);
+  });
+}
+
+/** Parse: free text into plan fields. */
+async function checkParse(provider, model, key) {
+  const parse = await callRoute('/api/parse', {
+    text: 'A wedding on 5 December for 120 guests in Pune, about 8 lakh rupees.',
+  });
+  if (modelIsMissing(parse.status, parse.parsed)) {
+    return { check: modelMissingCheck(provider, '/api/parse', model), stop: true };
+  }
+  const parseOk =
+    parse.status === 200 &&
+    parse.parsed?.mode === 'provider' &&
+    parse.parsed?.provider === provider.id &&
+    parse.parsed?.fields &&
+    fieldsAreTyped(parse.parsed.fields) &&
+    !parse.text.includes(key);
+  return {
+    check: {
+      route: '/api/parse',
+      result: parseOk ? 'pass' : 'fail',
+      detail: parseOk
+        ? `mode=${parse.parsed.mode}, provider=${parse.parsed.provider}`
+        : `status=${parse.status}, mode=${parse.parsed?.mode}, provider=${parse.parsed?.provider}`,
+    },
+    stop: false,
+  };
+}
+
+/** Ideas: a list of ideas with the promised shape. */
+async function checkIdeas(provider, model, key) {
+  const ideas = await callRoute('/api/ideas', {
+    planSummary: PLAN_SUMMARY,
+    context: IDEAS_CONTEXT,
+  });
+  if (modelIsMissing(ideas.status, ideas.parsed)) {
+    return { check: modelMissingCheck(provider, '/api/ideas', model), stop: true };
+  }
+  const ideasOk =
+    ideas.status === 200 &&
+    ideas.parsed?.mode === 'provider' &&
+    ideas.parsed?.provider === provider.id &&
+    Array.isArray(ideas.parsed?.ideas) &&
+    ideas.parsed.ideas.length > 0 &&
+    ideas.parsed.ideas.every(ideaShapeIsRight) &&
+    !ideas.text.includes(key);
+  return {
+    check: {
+      route: '/api/ideas',
+      result: ideasOk ? 'pass' : 'fail',
+      detail: ideasOk
+        ? `mode=${ideas.parsed.mode}, ${ideas.parsed.ideas.length} ideas`
+        : `status=${ideas.status}, mode=${ideas.parsed?.mode}, provider=${ideas.parsed?.provider}`,
+    },
+    stop: false,
+  };
+}
+
+/** Read the mode, delta and done frames from a chat stream. */
+function chatFrames(chatText) {
+  const frames = readFrames(chatText);
+  // A streamed answer arrives in more than one delta; one delta would mean
+  // the route is buffering the whole answer again.
+  const deltaFrames = frames.filter(
+    (frame) =>
+      frame.name === 'delta' && typeof frame.data?.text === 'string' && frame.data.text.length > 0,
+  );
+  return {
+    frames,
+    modeFrame: frames.find((frame) => frame.name === 'mode'),
+    doneFrame: frames.find((frame) => frame.name === 'done'),
+    deltaFrames,
+    answerText: deltaFrames.map((frame) => frame.data.text).join(''),
+  };
+}
+
+/** Chat: the stream says which provider answered, then the answer. */
+async function checkChat(provider, model, key) {
+  const chat = await fetch(`${BASE}/api/chat`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      message: 'What should we do next?',
+      planSummary: PLAN_SUMMARY,
+      snapshot: SNAPSHOT,
+    }),
+  });
+  const chatText = await chat.text();
+  const { frames, modeFrame, doneFrame, deltaFrames, answerText } = chatFrames(chatText);
+  if (modelIsMissing(chat.status, doneFrame?.data)) {
+    return { check: modelMissingCheck(provider, '/api/chat', model), stop: true };
+  }
+  const chatOk =
+    chat.status === 200 &&
+    modeFrame?.data?.provider === provider.id &&
+    modeFrame?.data?.live === true &&
+    deltaFrames.length > 1 &&
+    answerText.length > 0 &&
+    doneFrame?.data?.mode === 'provider' &&
+    !chatText.includes(key);
+  return {
+    check: {
+      route: '/api/chat',
+      result: chatOk ? 'pass' : 'fail',
+      detail: chatOk
+        ? `provider=${modeFrame.data.provider}, ${deltaFrames.length} deltas, ${frames.length} frames`
+        : `status=${chat.status}, provider=${modeFrame?.data?.provider}, live=${modeFrame?.data?.live}, deltas=${deltaFrames.length}, mode=${doneFrame?.data?.mode}`,
+    },
+    stop: false,
+  };
+}
+
+/** Probe one provider end to end and return its ordered checks. */
 async function checkProvider(provider) {
   const key = process.env[provider.keyName];
   const model = process.env[provider.modelName] ?? DEFAULT_MODELS[provider.id];
-  const checks = [];
-
-  if (!key) {
-    checks.push({ route: '/api/parse', result: 'skipped', detail: 'no key in the environment' });
-    checks.push({ route: '/api/ideas', result: 'skipped', detail: 'no key in the environment' });
-    checks.push({ route: '/api/chat', result: 'skipped', detail: 'no key in the environment' });
-    return checks;
-  }
+  if (!key) return skippedChecks();
 
   const server = await startServer(provider.id, {
     GATHERLY_AI_PROVIDER: provider.id,
@@ -201,114 +336,17 @@ async function checkProvider(provider) {
   });
 
   try {
-    if (!server.ready) {
-      for (const route of ['/api/parse', '/api/ideas', '/api/chat']) {
-        checks.push({ route, result: 'fail', detail: 'the server did not start' });
-      }
-      return checks;
+    if (!server.ready) return serverFailedChecks();
+    const checks = [];
+    for (const probe of [checkParse, checkIdeas, checkChat]) {
+      const { check, stop } = await probe(provider, model, key);
+      checks.push(check);
+      if (stop) return checks;
     }
-
-    // Parse: free text into plan fields.
-    const parse = await callRoute('/api/parse', {
-      text: 'A wedding on 5 December for 120 guests in Pune, about 8 lakh rupees.',
-    });
-    if (modelIsMissing(parse.status, parse.parsed)) {
-      say(`MODEL NOT FOUND: ${model} - set ${provider.modelName}`);
-      checks.push({ route: '/api/parse', result: 'fail', detail: `model not found: ${model}` });
-      return checks;
-    }
-    const parseOk =
-      parse.status === 200 &&
-      parse.parsed?.mode === 'provider' &&
-      parse.parsed?.provider === provider.id &&
-      parse.parsed?.fields &&
-      Object.entries(PARSED_FIELD_TYPES).every(([key, types]) => {
-        const value = parse.parsed.fields[key];
-        return value !== undefined && types.includes(Array.isArray(value) ? 'array' : typeof value);
-      }) &&
-      !parse.text.includes(key);
-    checks.push({
-      route: '/api/parse',
-      result: parseOk ? 'pass' : 'fail',
-      detail: parseOk
-        ? `mode=${parse.parsed.mode}, provider=${parse.parsed.provider}`
-        : `status=${parse.status}, mode=${parse.parsed?.mode}, provider=${parse.parsed?.provider}`,
-    });
-
-    // Ideas: a list of ideas with the promised shape.
-    const ideas = await callRoute('/api/ideas', {
-      planSummary: PLAN_SUMMARY,
-      context: IDEAS_CONTEXT,
-    });
-    if (modelIsMissing(ideas.status, ideas.parsed)) {
-      say(`MODEL NOT FOUND: ${model} - set ${provider.modelName}`);
-      checks.push({ route: '/api/ideas', result: 'fail', detail: `model not found: ${model}` });
-      return checks;
-    }
-    const ideasOk =
-      ideas.status === 200 &&
-      ideas.parsed?.mode === 'provider' &&
-      ideas.parsed?.provider === provider.id &&
-      Array.isArray(ideas.parsed?.ideas) &&
-      ideas.parsed.ideas.length > 0 &&
-      ideas.parsed.ideas.every(ideaShapeIsRight) &&
-      !ideas.text.includes(key);
-    checks.push({
-      route: '/api/ideas',
-      result: ideasOk ? 'pass' : 'fail',
-      detail: ideasOk
-        ? `mode=${ideas.parsed.mode}, ${ideas.parsed.ideas.length} ideas`
-        : `status=${ideas.status}, mode=${ideas.parsed?.mode}, provider=${ideas.parsed?.provider}`,
-    });
-
-    // Chat: the stream says which provider answered, then the answer.
-    const chat = await fetch(`${BASE}/api/chat`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        message: 'What should we do next?',
-        planSummary: PLAN_SUMMARY,
-        snapshot: SNAPSHOT,
-      }),
-    });
-    const chatText = await chat.text();
-    const frames = readFrames(chatText);
-    const modeFrame = frames.find((frame) => frame.name === 'mode');
-    const doneFrame = frames.find((frame) => frame.name === 'done');
-    // A streamed answer arrives in more than one delta; one delta would mean
-    // the route is buffering the whole answer again.
-    const deltaFrames = frames.filter(
-      (frame) =>
-        frame.name === 'delta' &&
-        typeof frame.data?.text === 'string' &&
-        frame.data.text.length > 0,
-    );
-    const answerText = deltaFrames.map((frame) => frame.data.text).join('');
-    if (modelIsMissing(chat.status, doneFrame?.data)) {
-      say(`MODEL NOT FOUND: ${model} - set ${provider.modelName}`);
-      checks.push({ route: '/api/chat', result: 'fail', detail: `model not found: ${model}` });
-      return checks;
-    }
-    const chatOk =
-      chat.status === 200 &&
-      modeFrame?.data?.provider === provider.id &&
-      modeFrame?.data?.live === true &&
-      deltaFrames.length > 1 &&
-      answerText.length > 0 &&
-      doneFrame?.data?.mode === 'provider' &&
-      !chatText.includes(key);
-    checks.push({
-      route: '/api/chat',
-      result: chatOk ? 'pass' : 'fail',
-      detail: chatOk
-        ? `provider=${modeFrame.data.provider}, ${deltaFrames.length} deltas, ${frames.length} frames`
-        : `status=${chat.status}, provider=${modeFrame?.data?.provider}, live=${modeFrame?.data?.live}, deltas=${deltaFrames.length}, mode=${doneFrame?.data?.mode}`,
-    });
+    return checks;
   } finally {
     server.child.kill();
   }
-
-  return checks;
 }
 
 async function main() {

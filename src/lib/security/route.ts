@@ -61,7 +61,70 @@ function mergeHeaders(response: Response, headers: Record<string, string>): void
   response.headers.set('Cache-Control', NO_STORE);
 }
 
-// long-function: one pass over the inputs; splitting it would only pass the same state between more functions.
+interface RouteState {
+  status: number;
+  deferred: boolean;
+  logged: boolean;
+  rateHeaders: Record<string, string>;
+}
+
+/** Write the one log line for a request, at most once. */
+function completeRoute(
+  state: RouteState,
+  name: string,
+  request: Request,
+  startedAt: number,
+  providerError?: ProviderErrorKind,
+): void {
+  if (state.logged) return;
+  state.logged = true;
+  logRequest(name, state.status, Date.now() - startedAt, request, providerError);
+}
+
+/** Build the context handed to a route handler. */
+function createRouteContext(
+  request: Request,
+  name: string,
+  startedAt: number,
+  deadline: AbortController,
+  state: RouteState,
+): RouteContext {
+  return {
+    request,
+    signal: deadline.signal,
+    complete: (providerError) => completeRoute(state, name, request, startedAt, providerError),
+    deferLog: () => {
+      state.deferred = true;
+    },
+  };
+}
+
+/** The method-mismatch response, with the allowed method advertised. */
+function methodNotAllowed(method: 'GET' | 'POST', state: RouteState): Response {
+  state.status = 405;
+  const response = jsonResponse({ error: 'Method not allowed.' }, { status: state.status });
+  response.headers.set('Allow', method);
+  return response;
+}
+
+/** Apply the response status and shared headers to a successful handler. */
+function acceptResponse(response: Response, state: RouteState): Response {
+  state.status = response.status;
+  mergeHeaders(response, state.rateHeaders);
+  return response;
+}
+
+/** Apply the response status and shared headers to a failed handler. */
+function rejectResponse(error: unknown, state: RouteState): Response {
+  // A failed handler is logged now, even if it had asked to defer.
+  state.deferred = false;
+  const response = errorResponse(error);
+  state.status = response.status;
+  mergeHeaders(response, state.rateHeaders);
+  return response;
+}
+
+/** Run one route through the shared method, rate-limit and deadline guards. */
 async function runRoute(
   request: Request,
   name: string,
@@ -70,50 +133,18 @@ async function runRoute(
 ): Promise<Response> {
   const startedAt = Date.now();
   const deadline = new AbortController();
-  let status = 200;
-  let deferred = false;
-  let logged = false;
-  let rateHeaders: Record<string, string> = {};
-
-  const complete = (providerError?: ProviderErrorKind) => {
-    if (logged) return;
-    logged = true;
-    logRequest(name, status, Date.now() - startedAt, request, providerError);
-  };
-
-  const context: RouteContext = {
-    request,
-    signal: deadline.signal,
-    complete,
-    deferLog: () => {
-      deferred = true;
-    },
-  };
+  const state: RouteState = { status: 200, deferred: false, logged: false, rateHeaders: {} };
+  const context = createRouteContext(request, name, startedAt, deadline, state);
 
   try {
-    if (request.method !== method) {
-      status = 405;
-      const response = jsonResponse({ error: 'Method not allowed.' }, { status });
-      response.headers.set('Allow', method);
-      return response;
-    }
-
+    if (request.method !== method) return methodNotAllowed(method, state);
     const rate = await enforceRateLimit(request, name);
-    rateHeaders = rate.headers;
-
-    const response = await withinBudget(execute(context), deadline);
-    status = response.status;
-    mergeHeaders(response, rateHeaders);
-    return response;
+    state.rateHeaders = rate.headers;
+    return acceptResponse(await withinBudget(execute(context), deadline), state);
   } catch (error) {
-    // A failed handler is logged now, even if it had asked to defer.
-    deferred = false;
-    const response = errorResponse(error);
-    status = response.status;
-    mergeHeaders(response, rateHeaders);
-    return response;
+    return rejectResponse(error, state);
   } finally {
-    if (!deferred) complete();
+    if (!state.deferred) completeRoute(state, name, request, startedAt);
   }
 }
 

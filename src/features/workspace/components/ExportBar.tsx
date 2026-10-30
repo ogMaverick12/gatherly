@@ -13,40 +13,35 @@ import { buildCalendar } from '@/lib/ics';
 import { buildShareUrl, decodeShareFragment, encodeShareFragment } from '@/lib/share';
 import { PlanSchema, type Plan } from '@/lib/plan';
 import type { PlanView } from '@/lib/plan-view';
+import type { Dictionary } from '@/lib/i18n';
 
 const BUTTON_CLASS =
   'inline-flex min-h-[44px] items-center justify-center rounded-pill border border-line-strong px-4 py-2 text-sm font-medium text-ink transition-colors duration-200 hover:border-ink hover:bg-raised';
 
-/**
- * Offer printing, calendar, CSV, JSON, share and import actions for the plan.
- * Copy and import feedback is announced through a polite status region.
- */
-// long-function: one view section, kept in one block so its reading order stays visible.
-export function ExportBar({ view }: { view: PlanView }) {
-  const { dictionary } = useAccessibility();
-  const t = dictionary;
-  const [shareState, setShareState] = useState<'idle' | 'copied' | 'failed'>('idle');
-  const [importError, setImportError] = useState<string | null>(null);
-  const fileInput = useRef<HTMLInputElement>(null);
-
+/** Build the print, calendar, CSV and JSON download actions. */
+function useExportActions(view: PlanView) {
   const onPrint = () => {
     if (typeof window !== 'undefined') window.print();
   };
-
   const onCalendar = () => {
     const calendar = buildCalendar(view.plan);
     downloadFile('gatherly-plan.ics', calendar, 'text/calendar');
   };
-
   const onCsv = () => {
     const csv = withBom(budgetCsv(view.plan, view.budget));
     downloadFile('gatherly-budget.csv', csv, 'text/csv');
   };
-
   const onJson = () => {
     downloadFile('gatherly-plan.json', JSON.stringify(view.plan, null, 2), 'application/json');
   };
+  return { onPrint, onCalendar, onCsv, onJson };
+}
 
+/** Own the share result, the import error and their user feedback. */
+function useShareImport(view: PlanView, t: Dictionary) {
+  const [shareState, setShareState] = useState<'idle' | 'copied' | 'failed'>('idle');
+  const [importError, setImportError] = useState<string | null>(null);
+  const fileInput = useRef<HTMLInputElement>(null);
   const onShare = async () => {
     const fragment = await encodeShareFragment(view.plan);
     const url = buildShareUrl(window.location.origin, fragment);
@@ -54,7 +49,6 @@ export function ExportBar({ view }: { view: PlanView }) {
     setShareState(copied ? 'copied' : 'failed');
     window.setTimeout(() => setShareState('idle'), 4000);
   };
-
   const onImport = async (file: File) => {
     setImportError(null);
     try {
@@ -70,6 +64,18 @@ export function ExportBar({ view }: { view: PlanView }) {
       setImportError(t.errors.generic);
     }
   };
+  return { shareState, importError, fileInput, onShare, onImport };
+}
+
+/**
+ * Offer printing, calendar, CSV, JSON, share and import actions for the plan.
+ * Copy and import feedback is announced through a polite status region.
+ */
+export function ExportBar({ view }: { view: PlanView }) {
+  const { dictionary } = useAccessibility();
+  const t = dictionary;
+  const { onPrint, onCalendar, onCsv, onJson } = useExportActions(view);
+  const { shareState, importError, fileInput, onShare, onImport } = useShareImport(view, t);
 
   return (
     <div className="no-print">

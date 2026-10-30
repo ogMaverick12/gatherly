@@ -41,30 +41,9 @@ export interface PlanView {
   readonly snapshot: PlanSnapshot;
 }
 
-/**
- * Compute every derived value for a plan in one pass.
- *
- * @param plan the plan to read
- * @param today the calendar date used for overdue and countdown checks (ISO date YYYY-MM-DD)
- * @returns the budget, timeline, health, risks, ideas and snapshot for the plan
- */
-// long-function: one pass over the inputs; splitting it would only pass the same state between more functions.
-export function computePlanView(plan: Plan, today: DateOnly = todayDateOnly(new Date())): PlanView {
-  const budget = computeBudget(plan);
-
-  const allocationByCategory = Object.fromEntries(
-    budget.categories.map((category) => [category.id, category.amountMinor]),
-  ) as Record<BudgetCategoryId, number>;
-
-  const coverage = computeVendorCoverage(plan, allocationByCategory);
-  const milestones = mergeMilestoneState(plan.milestones, buildMilestoneLadder(plan, today));
-  const timeline = summariseTimeline(milestones, today);
-  const catering = computeCatering(plan);
-  const health = computeHealth({ plan, budget, coverage, timeline });
-  const risks = computeRisks({ plan, budget, coverage, timeline, catering });
-  const snapshot = buildSnapshot(plan, budget, coverage, timeline, health, catering, risks);
-
-  const ideaContext: IdeaContext = {
+/** Build the idea generator's context from the plan's intake. */
+function buildIdeaContext(plan: Plan): IdeaContext {
+  return {
     guests: plan.intake.guests,
     eventType: plan.intake.eventType,
     cityTier: plan.intake.cityTier,
@@ -76,7 +55,27 @@ export function computePlanView(plan: Plan, today: DateOnly = todayDateOnly(new 
     perGuestMinor:
       plan.intake.guests > 0 ? Math.round(plan.intake.budgetMinor / plan.intake.guests) : 0,
   };
+}
 
+/**
+ * Compute every derived value for a plan in one pass.
+ *
+ * @param plan the plan to read
+ * @param today the calendar date used for overdue and countdown checks (ISO date YYYY-MM-DD)
+ * @returns the budget, timeline, health, risks, ideas and snapshot for the plan
+ */
+export function computePlanView(plan: Plan, today: DateOnly = todayDateOnly(new Date())): PlanView {
+  const budget = computeBudget(plan);
+  const allocationByCategory = Object.fromEntries(
+    budget.categories.map((category) => [category.id, category.amountMinor]),
+  ) as Record<BudgetCategoryId, number>;
+  const coverage = computeVendorCoverage(plan, allocationByCategory);
+  const milestones = mergeMilestoneState(plan.milestones, buildMilestoneLadder(plan, today));
+  const timeline = summariseTimeline(milestones, today);
+  const catering = computeCatering(plan);
+  const health = computeHealth({ plan, budget, coverage, timeline });
+  const risks = computeRisks({ plan, budget, coverage, timeline, catering });
+  const snapshot = buildSnapshot(plan, budget, coverage, timeline, health, catering, risks);
   return {
     plan,
     budget,
@@ -89,7 +88,7 @@ export function computePlanView(plan: Plan, today: DateOnly = todayDateOnly(new 
     catering,
     health,
     risks,
-    ideas: generateIdeas(ideaContext),
+    ideas: generateIdeas(buildIdeaContext(plan)),
     snapshot,
   };
 }

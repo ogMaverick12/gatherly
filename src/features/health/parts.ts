@@ -135,16 +135,9 @@ interface GuestCheck {
   readonly passed: boolean;
 }
 
-/**
- * Scores whether recorded guest needs have a task or a caterer behind them, out of 100, weighted 10.
- * @param plan the stored plan whose vendors, tasks and needs are checked
- * @returns the weighted part listing the checks still open
- */
-// long-function: one pass over the inputs; splitting it would only pass the same state between more functions.
-function guestPart(plan: Plan): HealthPart {
-  const weight = 10;
+/** Collect the guest, dietary, access and venue checks in display order. */
+function guestChecks(plan: Plan): GuestCheck[] {
   const checks: GuestCheck[] = [];
-
   const caterer = plan.vendors.find((vendor) => vendor.category === 'caterer');
   checks.push({
     label: 'A caterer is in the plan',
@@ -173,11 +166,20 @@ function guestPart(plan: Plan): HealthPart {
       (vendor) => vendor.category === 'venue' && vendor.status === 'booked',
     ),
   });
+  return checks;
+}
 
+/**
+ * Scores whether recorded guest needs have a task or a caterer behind them, out of 100, weighted 10.
+ * @param plan the stored plan whose vendors, tasks and needs are checked
+ * @returns the weighted part listing the checks still open
+ */
+function guestPart(plan: Plan): HealthPart {
+  const weight = 10;
+  const checks = guestChecks(plan);
   const passed = checks.filter((check) => check.passed).length;
   const score = checks.length > 0 ? (passed / checks.length) * 100 : 0;
   const failing = checks.filter((check) => !check.passed);
-
   return {
     id: 'guests',
     label: 'Guest experience',

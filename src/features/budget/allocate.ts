@@ -24,54 +24,61 @@ import {
 import type { BudgetAllocation, CategoryAllocation } from './types';
 import { budgetWarnings } from './warnings';
 
-/**
- * Spread the spendable budget across the categories, applying the priority
- * boost and the pack shifts before the money is divided.
- * long-function: the weight, priority, pack and remainder steps share one working copy of the rows, so they run in one pass.
- */
-function allocateCategories(
-  plan: Plan,
-  spendableMinor: number,
-): {
-  categories: CategoryAllocation[];
-  packShifts: Record<string, number>;
-  weightTotal: number;
-} {
-  const { intake } = plan;
-  const guests = intake.guests;
+interface EffectiveWeight {
+  readonly category: BudgetCategoryId;
+  readonly base: number;
+  readonly boosted: number;
+  readonly shifted: number;
+}
 
-  const baseWeights = BASE_WEIGHTS[intake.eventType];
-  const priorityTargets = new Set<BudgetCategoryId>();
-  for (const priority of intake.priorities) {
-    for (const category of PRIORITY_CATEGORY_MAP[priority]) priorityTargets.add(category);
+/** The categories the selected priorities want to boost. */
+function priorityTargetsFor(priorities: Plan['intake']['priorities']): Set<BudgetCategoryId> {
+  const targets = new Set<BudgetCategoryId>();
+  for (const priority of priorities) {
+    for (const category of PRIORITY_CATEGORY_MAP[priority]) targets.add(category);
   }
+  return targets;
+}
 
+/** Combine every selected pack into per-category shifts. */
+function packShiftMaps(packs: Plan['intake']['packs']) {
   const packShifts: Record<string, number> = {};
   const shiftByCategory: Record<string, number> = {};
-  for (const pack of intake.packs) {
+  for (const pack of packs) {
     for (const [category, points] of Object.entries(PACKS[pack].budgetShift)) {
       const key = category as BudgetCategoryId;
       shiftByCategory[key] = (shiftByCategory[key] ?? 0) + (points ?? 0);
       packShifts[key] = (packShifts[key] ?? 0) + (points ?? 0);
     }
   }
+  return { packShifts, shiftByCategory };
+}
 
-  const effectiveWeights = BUDGET_CATEGORIES.map((category) => {
+/** Apply priority boosts and pack shifts to every category's base weight. */
+function effectiveWeightsFor(
+  eventType: Plan['intake']['eventType'],
+  priorityTargets: ReadonlySet<BudgetCategoryId>,
+  shiftByCategory: Readonly<Record<string, number>>,
+): EffectiveWeight[] {
+  const baseWeights = BASE_WEIGHTS[eventType];
+  return BUDGET_CATEGORIES.map((category) => {
     const base = baseWeights[category];
     const boosted = priorityTargets.has(category) ? Math.round(base * PRIORITY_MULTIPLIER) : base;
     const shifted = Math.max(0, boosted + (shiftByCategory[category] ?? 0));
     return { category, base, boosted, shifted };
   });
+}
 
-  const weightTotal = effectiveWeights.reduce((sum, item) => sum + item.shifted, 0);
-  const amounts = allocateByWeight(
-    spendableMinor,
-    effectiveWeights.map((item) => item.shifted),
-  );
-
-  const benchmarks = benchmarkSharesFor(intake.eventType, guests);
-
-  const categories: CategoryAllocation[] = effectiveWeights.map((item, index) => {
+/** Turn the weighted shares into the display rows, including rounding variance. */
+function buildCategoryRows(
+  weights: readonly EffectiveWeight[],
+  amounts: readonly number[],
+  spendableMinor: number,
+  guests: number,
+  shiftByCategory: Readonly<Record<string, number>>,
+  benchmarks: ReturnType<typeof benchmarkSharesFor>,
+): CategoryAllocation[] {
+  return weights.map((item, index) => {
     const amountMinor = amounts[index] ?? 0;
     const share = sharePercent(amountMinor, spendableMinor);
     const benchmarkSharePercent = benchmarks[item.category];
@@ -92,7 +99,38 @@ function allocateCategories(
       varianceFromBenchmark: Math.round((share - benchmarkSharePercent) * 10) / 10,
     };
   });
+}
 
+/**
+ * Spread the spendable budget across the categories, applying the priority
+ * boost and the pack shifts before the money is divided.
+ */
+function allocateCategories(
+  plan: Plan,
+  spendableMinor: number,
+): {
+  categories: CategoryAllocation[];
+  packShifts: Record<string, number>;
+  weightTotal: number;
+} {
+  const { intake } = plan;
+  const priorityTargets = priorityTargetsFor(intake.priorities);
+  const { packShifts, shiftByCategory } = packShiftMaps(intake.packs);
+  const weights = effectiveWeightsFor(intake.eventType, priorityTargets, shiftByCategory);
+  const weightTotal = weights.reduce((sum, item) => sum + item.shifted, 0);
+  const amounts = allocateByWeight(
+    spendableMinor,
+    weights.map((item) => item.shifted),
+  );
+  const benchmarks = benchmarkSharesFor(intake.eventType, intake.guests);
+  const categories = buildCategoryRows(
+    weights,
+    amounts,
+    spendableMinor,
+    intake.guests,
+    shiftByCategory,
+    benchmarks,
+  );
   return { categories, packShifts, weightTotal };
 }
 

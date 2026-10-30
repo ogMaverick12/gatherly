@@ -1,25 +1,17 @@
 'use client';
 
-import {
-  createContext,
-  startTransition,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-  type ReactNode,
-} from 'react';
-import { getDictionary, LANGUAGE_TAGS, type Dictionary } from '@/lib/i18n';
+import { createContext, useContext, useMemo, type ReactNode } from 'react';
+import { getDictionary, type Dictionary } from '@/lib/i18n';
 import type { Language } from '@/lib/plan';
+import type { AccessibilityPreferences, TextSize, ThemePreference } from './preferences';
 import {
-  DEFAULT_PREFERENCES,
-  readStoredPreferences,
-  writeStoredPreferences,
-  type AccessibilityPreferences,
-  type TextSize,
-  type ThemePreference,
-} from './preferences';
+  useDocumentPreferences,
+  useHydratedPreferences,
+  usePersistedPreferences,
+  useResolvedTheme,
+  useSpeech,
+  useSpeechSupport,
+} from './provider-hooks';
 
 export { DEFAULT_PREFERENCES, writeStoredPreferences } from './preferences';
 export type { AccessibilityPreferences, TextSize, ThemePreference } from './preferences';
@@ -45,102 +37,16 @@ export interface AccessibilityContextValue {
 
 const AccessibilityContext = createContext<AccessibilityContextValue | null>(null);
 
-/**
- * Supplies preferences, the dictionary and speech, mirroring choices onto the root element.
- * @param props children plus an optional language resolved on the server
- * @returns the provider element wrapping the children
- */
-// long-function: one view section, kept in one block so its reading order stays visible.
-export function AccessibilityProvider({
-  children,
-  initialLanguage,
-}: {
-  children: ReactNode;
-  initialLanguage?: Language;
-}) {
-  // Start from server-safe defaults and apply storage after hydration: reading
-  // it during the first render would make the markup disagree with the server.
-  const [preferences, setPreferences] = useState<AccessibilityPreferences>(DEFAULT_PREFERENCES);
-  const [ready, setReady] = useState(false);
-  const [speaking, setSpeaking] = useState(false);
-  // Speech is only rendered behind the closed display-settings menu, so this
-  // can be resolved on the first client render without a second tree render.
-  const [speechSupported] = useState(
-    () =>
-      typeof window !== 'undefined' &&
-      'speechSynthesis' in window &&
-      typeof window.SpeechSynthesisUtterance === 'function',
-  );
-
-  useEffect(() => {
-    const stored = readStoredPreferences();
-    // Preferences are device polish, not the critical path: let the shell paint
-    // first and apply them as a non-urgent update.
-    startTransition(() => {
-      setPreferences(initialLanguage ? { ...stored, language: initialLanguage } : stored);
-      setReady(true);
-    });
-  }, [initialLanguage]);
-
-  const resolvedTheme = useMemo<'light' | 'dark'>(() => {
-    if (preferences.theme !== 'system') return preferences.theme;
-    if (typeof window === 'undefined' || !window.matchMedia) return 'light';
-    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-  }, [preferences.theme]);
-
-  useEffect(() => {
-    const root = document.documentElement;
-    // Do not write an attribute the server already rendered. Redundant root
-    // writes invalidate style after paint for no visual change.
-    if (root.dataset['theme'] !== resolvedTheme) root.dataset['theme'] = resolvedTheme;
-    if (root.dataset['textSize'] !== preferences.textSize) {
-      root.dataset['textSize'] = preferences.textSize;
-    }
-    if (root.dataset['calm'] !== String(preferences.calmMode)) {
-      root.dataset['calm'] = preferences.calmMode ? 'true' : 'false';
-    }
-    if (root.dataset['motion'] !== (preferences.reducedMotion ? 'off' : 'on')) {
-      root.dataset['motion'] = preferences.reducedMotion ? 'off' : 'on';
-    }
-    const languageTag = LANGUAGE_TAGS[preferences.language];
-    if (root.lang !== languageTag) root.lang = languageTag;
-  }, [preferences, resolvedTheme]);
-
-  useEffect(() => {
-    if (!ready) return;
-    writeStoredPreferences(preferences);
-  }, [preferences, ready]);
-
-  const update = useCallback((patch: Partial<AccessibilityPreferences>) => {
-    setPreferences((current) => ({ ...current, ...patch }));
-  }, []);
-
-  const stopSpeaking = useCallback(() => {
-    if (typeof window === 'undefined' || !speechSupported) return;
-    window.speechSynthesis.cancel();
-    setSpeaking(false);
-  }, [speechSupported]);
-
-  const speak = useCallback(
-    (text: string) => {
-      if (!speechSupported || !text.trim()) return;
-      try {
-        window.speechSynthesis.cancel();
-        const utterance = new window.SpeechSynthesisUtterance(text);
-        utterance.lang = LANGUAGE_TAGS[preferences.language];
-        utterance.rate = preferences.calmMode ? 0.9 : 1;
-        utterance.onend = () => setSpeaking(false);
-        utterance.onerror = () => setSpeaking(false);
-        setSpeaking(true);
-        window.speechSynthesis.speak(utterance);
-      } catch {
-        setSpeaking(false);
-      }
-    },
-    [preferences.calmMode, preferences.language, speechSupported],
-  );
-
-  const value = useMemo<AccessibilityContextValue>(
+/** Build the stable context value from preferences and speech controls. */
+function useAccessibilityValue(
+  preferences: AccessibilityPreferences,
+  speechSupported: boolean,
+  speaking: boolean,
+  speak: (text: string) => void,
+  stopSpeaking: () => void,
+  update: (patch: Partial<AccessibilityPreferences>) => void,
+): AccessibilityContextValue {
+  return useMemo(
     () => ({
       preferences,
       dictionary: getDictionary(preferences.language),
@@ -156,7 +62,34 @@ export function AccessibilityProvider({
     }),
     [preferences, speaking, speak, speechSupported, stopSpeaking, update],
   );
+}
 
+/**
+ * Supplies preferences, the dictionary and speech, mirroring choices onto the root element.
+ * @param props children plus an optional language resolved on the server
+ * @returns the provider element wrapping the children
+ */
+export function AccessibilityProvider({
+  children,
+  initialLanguage,
+}: {
+  children: ReactNode;
+  initialLanguage?: Language;
+}) {
+  const { preferences, ready, update } = useHydratedPreferences(initialLanguage);
+  const speechSupported = useSpeechSupport();
+  const { speaking, speak, stopSpeaking } = useSpeech(preferences, speechSupported);
+  const resolvedTheme = useResolvedTheme(preferences.theme);
+  useDocumentPreferences(preferences, resolvedTheme);
+  usePersistedPreferences(preferences, ready);
+  const value = useAccessibilityValue(
+    preferences,
+    speechSupported,
+    speaking,
+    speak,
+    stopSpeaking,
+    update,
+  );
   return <AccessibilityContext.Provider value={value}>{children}</AccessibilityContext.Provider>;
 }
 

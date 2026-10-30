@@ -18,7 +18,42 @@ import {
 import type { IntakeFormValues } from '../../schema';
 import { ChipGroup } from '../ChipGroup';
 
-// long-function: one view section, kept in one block so its reading order stays visible.
+/** The free culture note field and its help and error text. */
+function CultureNoteField({
+  label,
+  help,
+  hasError,
+  message,
+  register,
+}: {
+  label: string;
+  help: string;
+  hasError: boolean;
+  message?: string;
+  register: UseFormReturn<IntakeFormValues>['register'];
+}) {
+  return (
+    <div>
+      <label htmlFor="cultureNote" className="font-display text-title">
+        {label}
+      </label>
+      <p id="cultureNoteHelp" className="mt-1 text-sm text-ink-muted">
+        {help}
+      </p>
+      <textarea
+        id="cultureNote"
+        rows={3}
+        maxLength={300}
+        aria-describedby="cultureNoteHelp"
+        aria-invalid={hasError || undefined}
+        className="mt-2 w-full rounded-card border border-line-strong bg-raised px-3 py-2 text-ink"
+        {...register('cultureNote')}
+      />
+      {hasError ? <p className="mt-1 text-sm font-medium text-rose">{message}</p> : null}
+    </div>
+  );
+}
+
 /** What the household cares about, what guests need, and a free note. */
 export function NeedsStep({ form }: { form: UseFormReturn<IntakeFormValues> }) {
   const { dictionary: t } = useAccessibility();
@@ -79,26 +114,13 @@ export function NeedsStep({ form }: { form: UseFormReturn<IntakeFormValues> }) {
         )}
       />
 
-      <div>
-        <label htmlFor="cultureNote" className="font-display text-title">
-          {t.intake.cultureNote}
-        </label>
-        <p id="cultureNoteHelp" className="mt-1 text-sm text-ink-muted">
-          {t.intake.cultureNoteHelp}
-        </p>
-        <textarea
-          id="cultureNote"
-          rows={3}
-          maxLength={300}
-          aria-describedby="cultureNoteHelp"
-          aria-invalid={Boolean(errors.cultureNote) || undefined}
-          className="mt-2 w-full rounded-card border border-line-strong bg-raised px-3 py-2 text-ink"
-          {...register('cultureNote')}
-        />
-        {errors.cultureNote ? (
-          <p className="mt-1 text-sm font-medium text-rose">{errors.cultureNote.message}</p>
-        ) : null}
-      </div>
+      <CultureNoteField
+        label={t.intake.cultureNote}
+        help={t.intake.cultureNoteHelp}
+        hasError={Boolean(errors.cultureNote)}
+        message={errors.cultureNote?.message}
+        register={register}
+      />
     </section>
   );
 }
