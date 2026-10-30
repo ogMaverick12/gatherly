@@ -7,8 +7,9 @@
 
 import { useMemo } from 'react';
 import { useAccessibility } from '@/features/accessibility/provider';
-import { computeBudget } from '@/features/budget/services';
 import { createSamplePlan, SAMPLE_PLAN_TEMPLATES } from '@/lib/plan';
+import { todayDateOnly } from '@/lib/dates';
+import { computePlanView } from '@/lib/plan-view';
 import {
   FeaturesSection,
   InclusionSection,
@@ -22,10 +23,11 @@ function useSamplePreview(): LandingPreview | null {
   return useMemo(() => {
     const template = SAMPLE_PLAN_TEMPLATES[0];
     if (!template) return null;
-    const plan = createSamplePlan(template, new Date('2026-01-01T00:00:00.000Z'));
-    const budget = computeBudget(plan);
-    const top = budget.categories.filter((category) => category.amountMinor > 0).slice(0, 3);
-    return { plan, budget, top };
+    const now = new Date('2026-01-01T00:00:00.000Z');
+    const plan = createSamplePlan(template, now);
+    const view = computePlanView(plan, todayDateOnly(now));
+    const top = view.budget.categories.filter((category) => category.amountMinor > 0).slice(0, 3);
+    return { plan, budget: view.budget, top, health: view.health };
   }, []);
 }
 

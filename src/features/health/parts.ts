@@ -1,4 +1,4 @@
-import type { Plan } from '@/lib/plan';
+import { ACCESS_LABELS, DIETARY_LABELS, type Plan } from '@/lib/plan';
 import type { BudgetAllocation } from '@/features/budget/services';
 import type { VendorCoverage } from '@/features/vendors/services';
 import type { TimelineSummary } from '@/features/timeline/services';
@@ -145,7 +145,7 @@ function guestChecks(plan: Plan): GuestCheck[] {
   });
   for (const need of plan.intake.dietary) {
     checks.push({
-      label: `Dietary need recorded with the caterer: ${need}`,
+      label: `Dietary need recorded with the caterer: ${DIETARY_LABELS[need]}`,
       passed: caterer !== undefined && caterer.notes.trim().length > 0,
     });
   }
@@ -156,7 +156,7 @@ function guestChecks(plan: Plan): GuestCheck[] {
         task.title.toLowerCase().includes(need.split(' ')[0] ?? ''),
     );
     checks.push({
-      label: `Access need has a task: ${need}`,
+      label: `Access need has a task: ${ACCESS_LABELS[need]}`,
       passed: hasTask,
     });
   }

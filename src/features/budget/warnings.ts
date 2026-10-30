@@ -6,7 +6,7 @@
  */
 
 import type { Plan } from '@/lib/plan';
-import { formatMinorPlain, sumMinor } from '@/lib/money';
+import { formatMoneyPlain, sumMinor } from '@/lib/money';
 import {
   BASE_WEIGHTS,
   CATERING_HEAVY_PERCENT,
@@ -109,7 +109,7 @@ function quoteWarnings(plan: Plan, totalMinor: number): BudgetWarning[] {
       id: 'quotes-over-budget',
       severity: 'attention',
       title: 'The quotes you have recorded are more than the plan',
-      detail: `Recorded quotes come to ${formatMinorPlain(quotedMinor, currency)} against a budget of ${formatMinorPlain(totalMinor, currency)}. Something has to give: a smaller quote, a different vendor, or a bigger budget.`,
+      detail: `Recorded quotes come to ${formatMoneyPlain(quotedMinor, currency)} against a budget of ${formatMoneyPlain(totalMinor, currency)}. Something has to give: a smaller quote, a different vendor, or a bigger budget.`,
     },
   ];
 }

@@ -7,7 +7,7 @@
 
 import { useAccessibility } from '@/features/accessibility/provider';
 import { CITY_TIER_LABELS, EVENT_TYPE_LABELS, PRIORITY_LABELS, type Currency } from '@/lib/plan';
-import { formatMinorPlain } from '@/lib/money';
+import { formatMoneyPlain } from '@/lib/money';
 import type { IntakeFormValues } from '../schema';
 
 // long-function: one view section, kept in one block so its reading order stays visible.
@@ -42,7 +42,7 @@ export function ReviewSummary({
         <div className="flex justify-between gap-4 sm:block">
           <dt className="text-ink-muted">{t.intake.budget}</dt>
           <dd>
-            {formatMinorPlain(Math.round(budget * 100), currency)} {currency}
+            {formatMoneyPlain(Math.round(budget * 100), currency)} {currency}
           </dd>
         </div>
         <div className="flex justify-between gap-4 sm:block">

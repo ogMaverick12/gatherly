@@ -9,8 +9,8 @@ import { Wordmark } from './Wordmark';
 /** Close every page with the privacy note and links to intake and the plan. */
 export function SiteFooter() {
   return (
-    <footer className="no-print mt-16 border-t border-line bg-paper-raised">
-      <div className="mx-auto flex max-w-6xl flex-col gap-4 px-5 py-10 text-sm text-ink-muted sm:flex-row sm:items-center sm:justify-between">
+    <footer className="no-print mt-10 border-t border-line bg-paper-raised sm:mt-16">
+      <div className="mx-auto flex max-w-6xl flex-col gap-4 px-5 py-6 text-sm text-ink-muted sm:flex-row sm:items-center sm:justify-between sm:py-10">
         <div>
           <Wordmark className="text-ink" />
           <p className="mt-2 max-w-prose">

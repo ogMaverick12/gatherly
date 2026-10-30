@@ -13,7 +13,7 @@ import {
   type WhatsAppLink,
 } from '@/features/vendors/services';
 import type { Dictionary } from '@/lib/i18n';
-import { formatMinor } from '@/lib/money';
+import { formatMoney } from '@/lib/money';
 import { VENDOR_CATEGORY_LABELS, type Currency, type Vendor } from '@/lib/plan';
 import type { PlanView } from '@/lib/plan-view';
 import { VendorQuoteScore } from './VendorQuoteScore';
@@ -71,7 +71,7 @@ function VendorFooter({
       )}
       {quotedMinor !== null ? (
         <span className="text-sm text-ink-muted">
-          {formatMinor(quotedMinor, currency)} / {formatMinor(allocationMinor, currency)} planned
+          {formatMoney(quotedMinor, currency)} / {formatMoney(allocationMinor, currency)} planned
         </span>
       ) : null}
     </div>

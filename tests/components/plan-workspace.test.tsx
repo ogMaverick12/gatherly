@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { PlanWorkspace } from '@/features/workspace/components/PlanWorkspace';
+import { SAMPLE_PLAN_TEMPLATES, createSamplePlan } from '@/lib/plan';
 import { getPlan, setPlan } from '@/lib/plan-store';
 import { makePlan, renderWithProvider } from '../helpers';
 
@@ -25,6 +26,17 @@ describe('the plan workspace', () => {
     setPlan(makePlan());
     renderWithProvider(<PlanWorkspace />);
     expect(await screen.findByRole('heading', { name: /120 guests/ })).toBeInTheDocument();
+  });
+
+  it('labels a sample plan and offers a fresh start', async () => {
+    const template = SAMPLE_PLAN_TEMPLATES[0];
+    expect(template).toBeDefined();
+    if (!template) return;
+    setPlan(createSamplePlan(template, new Date('2026-01-01T00:00:00.000Z')));
+    renderWithProvider(<PlanWorkspace />);
+
+    expect(await screen.findByText('Sample plan')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Start fresh' })).toBeInTheDocument();
   });
 
   it('seeds the plan with the generated milestones', async () => {

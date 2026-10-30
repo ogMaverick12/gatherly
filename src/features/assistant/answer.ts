@@ -4,13 +4,13 @@
  * Every answer is built from the plan snapshot alone, so Basic mode needs no model.
  */
 
-import { formatMinor, sharePercent } from '@/lib/money';
+import { formatMoney, sharePercent } from '@/lib/money';
 import type { AssistantIntent } from './intent';
 import type { PlanSnapshot } from './snapshot';
 
 /** Format an integer minor-unit amount for an answer. */
 function money(minor: number, currency: PlanSnapshot['currency']): string {
-  return formatMinor(minor, currency);
+  return formatMoney(minor, currency);
 }
 
 /** The budget answer, including the largest lines and health caveat. */

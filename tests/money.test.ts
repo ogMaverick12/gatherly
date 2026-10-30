@@ -1,8 +1,11 @@
 import { describe, expect, it } from 'vitest';
+import fc from 'fast-check';
 import {
   allocateByWeight,
   formatMinor,
   formatMinorPlain,
+  formatMoney,
+  formatMoneyPlain,
   fromMajorUnits,
   minorUnitFactor,
   roundMinor,
@@ -81,5 +84,29 @@ describe('formatting', () => {
 
   it('formats a plain number without a symbol', () => {
     expect(formatMinorPlain(123_456, 'INR')).toBe('1,234.56');
+  });
+
+  it('groups INR in the Indian style with whole rupees', () => {
+    expect(formatMoney(150_000_000, 'INR')).toBe('₹15,00,000');
+    expect(formatMoney(833_333, 'INR')).toBe('₹8,333');
+    expect(formatMoney(37_636_364, 'INR')).toBe('₹3,76,364');
+  });
+
+  it('keeps other currencies on their existing formatter', () => {
+    expect(formatMoney(123_456, 'USD')).toBe(formatMinor(123_456, 'USD'));
+  });
+
+  it('uses Indian grouping for plain INR display too', () => {
+    expect(formatMoneyPlain(150_000_000, 'INR')).toBe('15,00,000');
+    expect(formatMoneyPlain(123_456, 'USD')).toBe(formatMinorPlain(123_456, 'USD'));
+  });
+
+  it('never shows an INR amount more than half a rupee from the stored value', () => {
+    fc.assert(
+      fc.property(fc.integer({ min: 0, max: 100_000_000_000 }), (minor) => {
+        const shown = Number(formatMoney(minor, 'INR').replace(/[^\d.-]/g, ''));
+        return Math.abs(shown - minor / 100) <= 0.5;
+      }),
+    );
   });
 });

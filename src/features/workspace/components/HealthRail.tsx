@@ -9,7 +9,7 @@ import { useAccessibility } from '@/features/accessibility/provider';
 import type { HealthBand } from '@/features/health/services';
 import { formatDateOnly } from '@/lib/dates';
 import type { Dictionary } from '@/lib/i18n';
-import { formatMinor } from '@/lib/money';
+import { formatMoney } from '@/lib/money';
 import type { PlanView } from '@/lib/plan-view';
 import { CelebrationDot, HealthRing } from './HealthRing';
 
@@ -20,13 +20,28 @@ const BAND_LABEL: Record<HealthBand, string> = {
 };
 
 /** The score ring, band and one-line explanation. */
-export function HealthSummary({ view, t }: { readonly view: PlanView; readonly t: Dictionary }) {
+export function HealthSummary({
+  view,
+  t,
+  compact = false,
+}: {
+  readonly view: PlanView;
+  readonly t: Dictionary;
+  readonly compact?: boolean;
+}) {
   const { health } = view;
   return (
-    <div className="flex items-center gap-4">
-      <HealthRing score={health.score} band={health.band} size={104} label={t.workspace.health} />
+    <div className={compact ? 'flex items-center gap-3' : 'flex items-center gap-4'}>
+      <HealthRing
+        score={health.score}
+        band={health.band}
+        size={compact ? 80 : 104}
+        label={t.workspace.health}
+      />
       <div>
-        <h2 className="font-display text-title-lg">{t.workspace.health}</h2>
+        <h2 className={compact ? 'font-display text-title' : 'font-display text-title-lg'}>
+          {t.workspace.health}
+        </h2>
         <p className="mt-1 flex items-center gap-2 text-sm font-semibold text-ink">
           <CelebrationDot
             status={
@@ -35,8 +50,25 @@ export function HealthSummary({ view, t }: { readonly view: PlanView; readonly t
           />
           {BAND_LABEL[health.band]}
         </p>
-        <p className="mt-1 text-xs text-ink-muted">{t.workspace.healthExplainer}</p>
+        {compact ? null : (
+          <p className="mt-1 text-xs text-ink-muted">{t.workspace.healthExplainer}</p>
+        )}
       </div>
+    </div>
+  );
+}
+
+/** The compact health card shown above the panel on phones. */
+export function MobileHealthSummary({
+  view,
+  t,
+}: {
+  readonly view: PlanView;
+  readonly t: Dictionary;
+}) {
+  return (
+    <div className="mt-4 rounded-card border border-line bg-raised p-3 shadow-card lg:hidden">
+      <HealthSummary view={view} t={t} compact />
     </div>
   );
 }
@@ -79,7 +111,7 @@ export function HealthFigures({ view, t }: { readonly view: PlanView; readonly t
       <div className="flex items-baseline justify-between gap-3">
         <dt className="text-ink-muted">{t.workspace.perGuest}</dt>
         <dd className="font-medium">
-          {formatMinor(
+          {formatMoney(
             plan.intake.guests > 0 ? Math.round(budget.totalMinor / plan.intake.guests) : 0,
             currency,
           )}
@@ -87,7 +119,7 @@ export function HealthFigures({ view, t }: { readonly view: PlanView; readonly t
       </div>
       <div className="flex items-baseline justify-between gap-3">
         <dt className="text-ink-muted">{t.workspace.contingency}</dt>
-        <dd className="font-medium">{formatMinor(budget.contingencyMinor, currency)}</dd>
+        <dd className="font-medium">{formatMoney(budget.contingencyMinor, currency)}</dd>
       </div>
       <div className="flex items-baseline justify-between gap-3">
         <dt className="text-ink-muted">{t.workspace.coverage}</dt>

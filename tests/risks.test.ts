@@ -68,6 +68,16 @@ describe('computeRisks', () => {
     expect(risks.some((risk) => risk.id === 'access-wheelchair')).toBe(true);
   });
 
+  it('groups several access needs into one readable risk', () => {
+    const risks = risksFor({ access: ['reserved-seating', 'rest-area'] });
+    const grouped = risks.find((risk) => risk.id === 'access-needs');
+    expect(grouped?.title).toBe('2 access needs have no task behind them');
+    expect(grouped?.explanation).toContain('Reserved seating');
+    expect(grouped?.explanation).toContain('Rest area for elders');
+    expect(JSON.stringify(grouped)).not.toContain('reserved-seating');
+    expect(JSON.stringify(grouped)).not.toContain('rest-area');
+  });
+
   it('is satisfied when the access need has a task', () => {
     const risks = risksFor(
       { access: ['wheelchair'] },

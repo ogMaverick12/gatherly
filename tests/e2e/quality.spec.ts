@@ -92,7 +92,7 @@ test.describe('the quality promises', () => {
     const before = await ring.getAttribute('aria-label');
 
     await page.getByRole('tab', { name: /Timeline/ }).click();
-    await page.getByRole('checkbox').first().check();
+    await page.getByRole('checkbox', { checked: false }).first().check();
 
     await page.getByRole('tab', { name: 'Overview' }).click();
     await expect(ring).not.toHaveAttribute('aria-label', before ?? '');
@@ -119,7 +119,52 @@ test.describe('the quality promises', () => {
     const contingency = await moneyIn(footRows.nth(0).locator('td').nth(3));
     const total = await moneyIn(footRows.nth(1).locator('td').nth(3));
 
-    expect(categories + contingency).toBeCloseTo(total, 1);
+    // INR is displayed in whole rupees, so each row can round by up to half a
+    // rupee. A rupee of drift across the visible rows is expected and honest.
+    expect(Math.abs(categories + contingency - total)).toBeLessThanOrEqual(1);
+  });
+});
+
+test.describe('the phone workspace', () => {
+  test.use({ viewport: { width: 412, height: 844 } });
+
+  test('keeps the overview dense and the exports behind one control', async ({ page }) => {
+    await openSamplePlan(page);
+
+    const stats = page.getByTestId('overview-stats').locator(':scope > li');
+    const first = await stats.nth(0).boundingBox();
+    const second = await stats.nth(1).boundingBox();
+    expect(first).not.toBeNull();
+    expect(second).not.toBeNull();
+    expect(Math.abs((first?.y ?? 0) - (second?.y ?? 0))).toBeLessThan(2);
+    expect(second?.x ?? 0).toBeGreaterThan(first?.x ?? 0);
+
+    await expect(page.getByRole('img', { name: /Plan health: \d+ out of 100/ })).toBeVisible();
+
+    const height = await page.evaluate(() => document.documentElement.scrollHeight);
+    expect(height).toBeLessThan(2200);
+
+    const toggle = page.getByRole('button', { name: 'Export', exact: true });
+    const csv = page.getByRole('button', { name: 'Export the budget as CSV' });
+    await expect(toggle).toBeVisible();
+    await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    await expect(csv).toBeHidden();
+
+    const toggleBox = await toggle.boundingBox();
+    expect(toggleBox?.height ?? 0).toBeGreaterThanOrEqual(44);
+
+    await toggle.focus();
+    await page.keyboard.press('Enter');
+    await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+    await expect(csv).toBeVisible();
+    const csvBox = await csv.boundingBox();
+    expect(csvBox?.height ?? 0).toBeGreaterThanOrEqual(44);
+  });
+
+  test('the phone overview passes axe', async ({ page }) => {
+    await openSamplePlan(page);
+    const results = await new AxeBuilder({ page }).analyze();
+    expect(results.violations).toEqual([]);
   });
 });
 

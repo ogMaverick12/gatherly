@@ -12,7 +12,7 @@ import type { Risk } from '@/features/risks/services';
  * The severity dot is decoration: the severity is written in the text as well,
  * so it survives a monochrome screen or a reader.
  */
-function RiskRow({ risk }: { risk: Risk }) {
+function RiskRow({ risk, areaLabel }: { risk: Risk; areaLabel: string }) {
   const colour =
     risk.severity === 'high'
       ? 'var(--color-rose)'
@@ -21,8 +21,8 @@ function RiskRow({ risk }: { risk: Risk }) {
         : 'var(--color-line-strong)';
 
   return (
-    <li className="rounded-card border border-line bg-raised p-4">
-      <div className="flex items-start gap-3">
+    <li className="rounded-card border border-line bg-raised p-3 sm:p-4">
+      <div className="flex items-start gap-2.5 sm:gap-3">
         <span
           aria-hidden="true"
           className="mt-1.5 inline-block h-2.5 w-2.5 shrink-0 rounded-full"
@@ -31,8 +31,8 @@ function RiskRow({ risk }: { risk: Risk }) {
         <div className="min-w-0">
           <h3 className="font-semibold text-ink">{risk.title}</h3>
           <p className="mt-1 text-sm text-ink-muted">{risk.explanation}</p>
-          <p className="mt-2 text-sm text-ink">
-            <span className="font-medium">{risk.area}:</span> {risk.mitigation}
+          <p className="mt-1.5 text-sm text-ink">
+            <span className="font-medium">{areaLabel}:</span> {risk.mitigation}
           </p>
         </div>
       </div>
@@ -57,7 +57,7 @@ export function RiskList({ risks }: { risks: readonly Risk[] }) {
       ) : (
         <ul className="mt-3 grid gap-3 lg:grid-cols-2">
           {risks.map((risk) => (
-            <RiskRow key={risk.id} risk={risk} />
+            <RiskRow key={risk.id} risk={risk} areaLabel={t.workspace.riskAreas[risk.area]} />
           ))}
         </ul>
       )}

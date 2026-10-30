@@ -8,7 +8,7 @@
 import { useAccessibility } from '@/features/accessibility/provider';
 import type { BudgetAllocation, CategoryAllocation } from '@/features/budget/services';
 import type { Dictionary } from '@/lib/i18n';
-import { formatMinor } from '@/lib/money';
+import { formatMoney } from '@/lib/money';
 import type { Plan } from '@/lib/plan';
 
 /** The eight column headings. */
@@ -16,28 +16,28 @@ export function BudgetTableHead({ t }: { readonly t: Dictionary }) {
   return (
     <thead>
       <tr className="border-b border-line text-left">
-        <th scope="col" className="px-4 py-3 font-semibold">
+        <th scope="col" className="px-3 py-3 sm:px-4 font-semibold">
           {t.workspace.allocation}
         </th>
-        <th scope="col" className="px-4 py-3 text-right font-semibold">
+        <th scope="col" className="hidden px-3 py-3 text-right font-semibold sm:table-cell sm:px-4">
           {t.workspace.baseShare}
         </th>
-        <th scope="col" className="px-4 py-3 text-right font-semibold">
+        <th scope="col" className="hidden px-3 py-3 text-right font-semibold sm:table-cell sm:px-4">
           {t.workspace.afterPriorities}
         </th>
-        <th scope="col" className="px-4 py-3 text-right font-semibold">
+        <th scope="col" className="px-3 py-3 text-right font-semibold sm:px-4">
           {t.workspace.share}
         </th>
-        <th scope="col" className="px-4 py-3 text-right font-semibold">
+        <th scope="col" className="px-3 py-3 text-right font-semibold sm:px-4">
           {t.workspace.amount}
         </th>
-        <th scope="col" className="px-4 py-3 text-right font-semibold">
+        <th scope="col" className="hidden px-3 py-3 text-right font-semibold sm:table-cell sm:px-4">
           {t.workspace.perGuestColumn}
         </th>
-        <th scope="col" className="px-4 py-3 text-right font-semibold">
+        <th scope="col" className="hidden px-3 py-3 text-right font-semibold sm:table-cell sm:px-4">
           {t.workspace.typical}
         </th>
-        <th scope="col" className="px-4 py-3 text-right font-semibold">
+        <th scope="col" className="hidden px-3 py-3 text-right font-semibold sm:table-cell sm:px-4">
           {t.workspace.difference}
         </th>
       </tr>
@@ -55,7 +55,7 @@ export function BudgetTableRow({
 }) {
   return (
     <tr className="border-b border-line/70 last:border-0">
-      <th scope="row" className="px-4 py-3 text-left font-medium">
+      <th scope="row" className="px-3 py-3 sm:px-4 text-left font-medium">
         {category.label}
         {category.priorityBoost ? (
           <span className="ml-2 rounded-pill bg-teal/15 px-2 py-0.5 text-[0.65rem] font-semibold text-teal">
@@ -69,19 +69,23 @@ export function BudgetTableRow({
           </span>
         ) : null}
       </th>
-      <td className="px-4 py-3 text-right tabular-nums text-ink-muted">{category.baseWeight}</td>
-      <td className="px-4 py-3 text-right tabular-nums">{category.effectiveWeight}</td>
-      <td className="px-4 py-3 text-right tabular-nums">{category.sharePercent}%</td>
-      <td className="px-4 py-3 text-right tabular-nums font-medium">
-        {formatMinor(category.amountMinor, currency)}
+      <td className="hidden px-3 py-3 text-right tabular-nums text-ink-muted sm:table-cell sm:px-4">
+        {category.baseWeight}
       </td>
-      <td className="px-4 py-3 text-right tabular-nums text-ink-muted">
-        {category.perGuestMinor === null ? '-' : formatMinor(category.perGuestMinor, currency)}
+      <td className="hidden px-3 py-3 text-right tabular-nums sm:table-cell sm:px-4">
+        {category.effectiveWeight}
       </td>
-      <td className="px-4 py-3 text-right tabular-nums text-ink-muted">
+      <td className="px-3 py-3 text-right tabular-nums sm:px-4">{category.sharePercent}%</td>
+      <td className="px-3 py-3 text-right tabular-nums font-medium sm:px-4">
+        {formatMoney(category.amountMinor, currency)}
+      </td>
+      <td className="hidden px-3 py-3 text-right tabular-nums text-ink-muted sm:table-cell sm:px-4">
+        {category.perGuestMinor === null ? '-' : formatMoney(category.perGuestMinor, currency)}
+      </td>
+      <td className="hidden px-3 py-3 text-right tabular-nums text-ink-muted sm:table-cell sm:px-4">
         {category.benchmarkSharePercent}%
       </td>
-      <td className="px-4 py-3 text-right tabular-nums">
+      <td className="hidden px-3 py-3 text-right tabular-nums sm:table-cell sm:px-4">
         <span
           className={
             Math.abs(category.varianceFromBenchmark) >= 5
@@ -112,34 +116,36 @@ export function BudgetTableFoot({
   return (
     <tfoot>
       <tr className="border-t-2 border-line-strong">
-        <th scope="row" className="px-4 py-3 text-left font-semibold">
+        <th scope="row" className="px-3 py-3 sm:px-4 text-left font-semibold">
           {t.workspace.contingency}
         </th>
-        <td className="px-4 py-3" />
-        <td className="px-4 py-3" />
-        <td className="px-4 py-3 text-right tabular-nums">{budget.math.contingencyPercent}%</td>
-        <td className="px-4 py-3 text-right tabular-nums font-semibold">
-          {formatMinor(budget.contingencyMinor, currency)}
+        <td className="hidden px-3 py-3 sm:table-cell sm:px-4" />
+        <td className="hidden px-3 py-3 sm:table-cell sm:px-4" />
+        <td className="px-3 py-3 text-right tabular-nums sm:px-4">
+          {budget.math.contingencyPercent}%
         </td>
-        <td className="px-4 py-3" />
-        <td className="px-4 py-3" />
-        <td className="px-4 py-3" />
+        <td className="px-3 py-3 text-right tabular-nums font-semibold sm:px-4">
+          {formatMoney(budget.contingencyMinor, currency)}
+        </td>
+        <td className="hidden px-3 py-3 sm:table-cell sm:px-4" />
+        <td className="hidden px-3 py-3 sm:table-cell sm:px-4" />
+        <td className="hidden px-3 py-3 sm:table-cell sm:px-4" />
       </tr>
       <tr>
-        <th scope="row" className="px-4 py-3 text-left font-semibold">
+        <th scope="row" className="px-3 py-3 sm:px-4 text-left font-semibold">
           {t.workspace.budget}
         </th>
-        <td className="px-4 py-3" />
-        <td className="px-4 py-3" />
-        <td className="px-4 py-3 text-right tabular-nums">100%</td>
-        <td className="px-4 py-3 text-right tabular-nums font-semibold">
-          {formatMinor(budget.totalMinor, currency)}
+        <td className="hidden px-3 py-3 sm:table-cell sm:px-4" />
+        <td className="hidden px-3 py-3 sm:table-cell sm:px-4" />
+        <td className="px-3 py-3 text-right tabular-nums sm:px-4">100%</td>
+        <td className="px-3 py-3 text-right tabular-nums font-semibold sm:px-4">
+          {formatMoney(budget.totalMinor, currency)}
         </td>
-        <td className="px-4 py-3 text-right tabular-nums text-ink-muted">
-          {guests > 0 ? formatMinor(Math.round(budget.totalMinor / guests), currency) : '-'}
+        <td className="hidden px-3 py-3 text-right tabular-nums text-ink-muted sm:table-cell sm:px-4">
+          {guests > 0 ? formatMoney(Math.round(budget.totalMinor / guests), currency) : '-'}
         </td>
-        <td className="px-4 py-3" />
-        <td className="px-4 py-3" />
+        <td className="hidden px-3 py-3 sm:table-cell sm:px-4" />
+        <td className="hidden px-3 py-3 sm:table-cell sm:px-4" />
       </tr>
     </tfoot>
   );
@@ -159,7 +165,7 @@ export function BudgetTable({ budget, plan }: { budget: BudgetAllocation; plan: 
 
   return (
     <div className="mt-3 overflow-x-auto rounded-card border border-line bg-raised">
-      <table className="w-full min-w-[46rem] border-collapse text-sm">
+      <table className="w-full min-w-0 border-collapse text-sm sm:min-w-[46rem]">
         <caption className="sr-only">
           {t.workspace.allocation}. {t.workspace.allocationHelp}
         </caption>

@@ -7,7 +7,7 @@
 
 import { useAccessibility } from '@/features/accessibility/provider';
 import type { BudgetScenario } from '@/features/budget/services';
-import { formatMinor } from '@/lib/money';
+import { formatMoney } from '@/lib/money';
 import type { Currency } from '@/lib/plan';
 
 /**
@@ -44,7 +44,7 @@ export function ScenarioCards({
                   {t.workspace.amount}
                 </dt>
                 <dd className="tabular-nums font-medium">
-                  {formatMinor(scenario.committedMinor, currency)}
+                  {formatMoney(scenario.committedMinor, currency)}
                 </dd>
               </div>
               <div>
@@ -57,7 +57,7 @@ export function ScenarioCards({
                   }`}
                 >
                   {scenario.deltaVsBaseMinor > 0 ? '+' : ''}
-                  {formatMinor(scenario.deltaVsBaseMinor, currency)}
+                  {formatMoney(scenario.deltaVsBaseMinor, currency)}
                 </dd>
               </div>
             </dl>

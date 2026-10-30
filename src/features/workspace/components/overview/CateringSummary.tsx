@@ -25,8 +25,8 @@ export function CateringSummary({ catering }: { catering: CateringEstimate }) {
       <h2 id="catering-heading" className="font-display text-title">
         {t.workspace.vendorsChecklist}
       </h2>
-      <div className="mt-3 rounded-card border border-line bg-raised p-5">
-        <dl className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mt-3 rounded-card border border-line bg-raised p-4 sm:p-5">
+        <dl className="grid grid-cols-2 gap-3 lg:grid-cols-4">
           <div>
             <dt className="text-xs uppercase tracking-[0.14em] text-ink-muted">Plates</dt>
             <dd className="mt-1 font-display text-title-lg">{catering.totalPlates}</dd>
@@ -48,12 +48,13 @@ export function CateringSummary({ catering }: { catering: CateringEstimate }) {
         </dl>
 
         {catering.dietary.length > 0 ? (
-          <ul className="mt-5 space-y-2">
+          <ul className="mt-4 space-y-1.5 text-xs sm:mt-5 sm:space-y-2 sm:text-sm">
             {catering.dietary.map((need) => (
-              <li key={need.need} className="flex items-start gap-2.5 text-sm">
-                <CelebrationDot status={need.confirmed ? 'done' : 'late'} className="mt-1.5" />
-                <span className={need.confirmed ? 'text-ink' : 'text-ink'}>
-                  <span className="font-medium">{need.label}</span> - {need.action}
+              <li key={need.need} className="flex items-start gap-2.5">
+                <CelebrationDot status={need.confirmed ? 'done' : 'late'} className="mt-1" />
+                <span className="text-ink">
+                  <span className="font-medium">{need.label}</span>
+                  {need.confirmed ? null : <> - {need.action}</>}
                 </span>
               </li>
             ))}

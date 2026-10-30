@@ -74,6 +74,7 @@ function useShareImport(view: PlanView, t: Dictionary) {
 export function ExportBar({ view }: { view: PlanView }) {
   const { dictionary } = useAccessibility();
   const t = dictionary;
+  const [open, setOpen] = useState(false);
   const { onPrint, onCalendar, onCsv, onJson } = useExportActions(view);
   const { shareState, importError, fileInput, onShare, onImport } = useShareImport(view, t);
 
@@ -82,7 +83,19 @@ export function ExportBar({ view }: { view: PlanView }) {
       <h2 className="text-xs font-semibold uppercase tracking-[0.16em] text-ink-muted">
         {t.workspace.exports}
       </h2>
-      <div className="mt-2 flex flex-wrap gap-2">
+      <button
+        type="button"
+        aria-expanded={open}
+        aria-controls="plan-export-actions"
+        onClick={() => setOpen((current) => !current)}
+        className={`${BUTTON_CLASS} mt-2 w-full min-[641px]:hidden`}
+      >
+        {t.workspace.exportToggle}
+      </button>
+      <div
+        id="plan-export-actions"
+        className={`${open ? 'flex' : 'hidden'} mt-2 flex-wrap gap-2 min-[641px]:mt-0 min-[641px]:flex`}
+      >
         <button type="button" onClick={onPrint} className={BUTTON_CLASS}>
           {t.workspace.exportPrint}
         </button>
@@ -115,7 +128,7 @@ export function ExportBar({ view }: { view: PlanView }) {
         />
       </div>
 
-      <p role="status" aria-live="polite" className="mt-2 min-h-[1.25rem] text-sm text-teal">
+      <p role="status" aria-live="polite" className="mt-2 text-sm text-teal">
         {shareState === 'copied' ? t.workspace.shareCopied : null}
         {shareState === 'failed' ? t.errors.generic : null}
         {importError ? <span className="text-rose">{importError}</span> : null}

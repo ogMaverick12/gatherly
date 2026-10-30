@@ -1,8 +1,9 @@
-import type { Plan } from '@/lib/plan';
+import { type Plan } from '@/lib/plan';
 import type { BudgetAllocation } from '@/features/budget/services';
 import type { VendorCoverage } from '@/features/vendors/services';
 import type { TimelineSummary } from '@/features/timeline/services';
 import type { CateringEstimate } from '@/features/catering/services';
+import { accessRisks, dietaryRisk, estimateRisk } from './guest-risks';
 
 /**
  * Risk engine.
@@ -111,43 +112,6 @@ function coverageRisk(inputs: RiskInputs): Risk | null {
   };
 }
 
-/** A dietary need nobody has confirmed with the caterer in writing. */
-function dietaryRisk(inputs: RiskInputs): Risk | null {
-  const unconfirmed = inputs.catering.dietary.filter((need) => !need.confirmed);
-  if (unconfirmed.length === 0) return null;
-  const labels = unconfirmed.map((need) => need.label).join(', ');
-  return {
-    id: 'dietary-unconfirmed',
-    severity: 'high',
-    area: 'catering',
-    title: 'Dietary needs are not confirmed with a caterer',
-    explanation: `${unconfirmed.length} dietary need${unconfirmed.length === 1 ? ' is' : 's are'} recorded but not yet confirmed in writing: ${labels}.`,
-    mitigation: 'Send the list to the caterer and keep their written reply.',
-  };
-}
-
-/** An access need the checklist never turns into work. */
-function accessRisks(inputs: RiskInputs): Risk[] {
-  return inputs.plan.intake.access.flatMap((need) => {
-    const hasTask = inputs.plan.tasks.some(
-      (task) =>
-        task.area === 'accessibility' &&
-        task.title.toLowerCase().includes((need.split(' ')[0] ?? '').toLowerCase()),
-    );
-    if (hasTask) return [];
-    return [
-      {
-        id: `access-${need}`,
-        severity: 'medium' as const,
-        area: 'guest-experience' as const,
-        title: 'An access need has no task behind it',
-        explanation: `"${need}" is recorded, but nothing on the checklist is going to make it happen.`,
-        mitigation: 'Add a task and ask the venue in writing, not on the day.',
-      },
-    ];
-  });
-}
-
 /** A general seasonal caution, never a forecast and never a location. */
 function weatherRisk(inputs: RiskInputs): Risk | null {
   if (inputs.plan.intake.venueType !== 'outdoor') return null;
@@ -161,19 +125,6 @@ function weatherRisk(inputs: RiskInputs): Risk | null {
     title: 'Outdoor event in a month that is often wet',
     explanation: `The date falls in month ${month}. We do not know where you are, so this is a general seasonal caution rather than a forecast.`,
     mitigation: 'Have a covered plan agreed in writing, with the decision date written down too.',
-  };
-}
-
-/** An estimate is not a number to order food against. */
-function estimateRisk(inputs: RiskInputs): Risk | null {
-  if (!inputs.plan.intake.guestCountIsEstimate) return null;
-  return {
-    id: 'guests-estimate',
-    severity: 'low',
-    area: 'planning',
-    title: 'The guest count is still an estimate',
-    explanation: 'Catering, seating and print all move when the number moves.',
-    mitigation: 'Re-run the catering estimate once the list settles, and keep a 8% plate buffer.',
   };
 }
 

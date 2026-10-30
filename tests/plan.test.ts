@@ -9,6 +9,8 @@ import {
   parsePlan,
   SAMPLE_PLAN_TEMPLATES,
 } from '@/lib/plan';
+import { todayDateOnly } from '@/lib/dates';
+import { computePlanView } from '@/lib/plan-view';
 import { asInvalid, TEST_INTAKE as INTAKE } from './factories';
 
 describe('the plan schema', () => {
@@ -87,6 +89,18 @@ describe('sample plans', () => {
       for (const pack of plan.intake.packs) {
         expect(PACK_IDS).toContain(pack);
       }
+    }
+  });
+
+  it('starts with real progress and a real healthy score', () => {
+    for (const template of SAMPLE_PLAN_TEMPLATES) {
+      const now = new Date('2026-01-01T00:00:00.000Z');
+      const plan = createSamplePlan(template, now);
+      const view = computePlanView(plan, todayDateOnly(now));
+      expect(view.timeline.done, template.id).toBeGreaterThanOrEqual(3);
+      expect(view.coverage.bookedMinor, template.id).toBeGreaterThan(0);
+      expect(view.health.score, template.id).toBeGreaterThanOrEqual(55);
+      expect(view.health.score, template.id).toBeLessThanOrEqual(70);
     }
   });
 });

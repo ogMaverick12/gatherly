@@ -6,7 +6,7 @@
  */
 
 import type { ProviderIdea } from '@/lib/api-schema';
-import { formatMinor } from '@/lib/money';
+import { formatMoney } from '@/lib/money';
 import type { CityTier, Idea } from '@/lib/plan';
 import type { IdeaContext } from './context';
 import { TEMPLATES } from './templates';
@@ -65,5 +65,5 @@ export function generateIdeas(context: IdeaContext): Idea[] {
 
 /** A short, plan-specific summary used by the assistant and the overview. */
 export function describePlanShape(context: IdeaContext): string {
-  return `${context.guests} guests, ${formatMinor(context.perGuestMinor, context.currency)} per guest, in ${tierNote(context.cityTier)}.`;
+  return `${context.guests} guests, ${formatMoney(context.perGuestMinor, context.currency)} per guest, in ${tierNote(context.cityTier)}.`;
 }

@@ -6,7 +6,7 @@
  */
 
 import { DIETARY_LABELS } from '@/lib/plan';
-import { formatMinor } from '@/lib/money';
+import { formatMoney } from '@/lib/money';
 import type { IdeaTemplate } from './template';
 
 /** Ideas that suit any event type. */
@@ -17,7 +17,7 @@ export const GENERIC_IDEAS: readonly IdeaTemplate[] = [
     title: 'Decide now what the contingency is for',
     body: 'Ring-fence the reserve and write down the three things it is allowed to cover: a last-minute guest, a broken rental, or a re-print.',
     rationale: (context) =>
-      `You set aside 8% of ${formatMinor(context.budgetMinor, context.currency)} - that is money that only helps if it is protected.`,
+      `You set aside 8% of ${formatMoney(context.budgetMinor, context.currency)} - that is money that only helps if it is protected.`,
     costImpact: 'none',
     tags: ['budget', 'calm'],
     relevance: () => 3,

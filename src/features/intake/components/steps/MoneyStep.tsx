@@ -8,7 +8,7 @@
 import { type UseFormReturn } from 'react-hook-form';
 import { useAccessibility } from '@/features/accessibility/provider';
 import { CURRENCIES, CURRENCY_META, type Currency } from '@/lib/plan';
-import { formatMinorPlain } from '@/lib/money';
+import { formatMoneyPlain } from '@/lib/money';
 import type { IntakeFormValues } from '../../schema';
 
 // long-function: one view section, kept in one block so its reading order stays visible.
@@ -79,7 +79,7 @@ export function MoneyStep({
         ) : null}
         <p id="budgetPerGuest" className="mt-2 text-sm text-ink-muted">
           {guests > 0
-            ? `${formatMinorPlain(Math.round(perGuest * 100), currency)} ${CURRENCY_META[currency].code} per guest, before the 8% contingency.`
+            ? `${formatMoneyPlain(Math.round(perGuest * 100), currency)} ${CURRENCY_META[currency].code} per guest, before the 8% contingency.`
             : t.intake.guestsHelp}
         </p>
       </div>

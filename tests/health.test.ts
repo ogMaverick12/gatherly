@@ -92,6 +92,16 @@ describe('computeHealth', () => {
     expect(taskPart(withTasks)).toBeGreaterThan(taskPart(done));
   });
 
+  it('names access and dietary needs with human labels', () => {
+    const health = healthFor({ access: ['wheelchair'], dietary: ['gluten-free'] });
+    const guest = health.parts.find((part) => part.id === 'guests');
+    const text = guest?.nextActions.join(' ') ?? '';
+    expect(text).toContain('Wheelchair access');
+    expect(text).toContain('Gluten free');
+    expect(text).not.toContain('wheelchair');
+    expect(text).not.toContain('gluten-free');
+  });
+
   it('moves the score when a milestone is completed', () => {
     const plan = createPlan(BASE, new Date('2026-01-01T00:00:00.000Z'));
     const ladder = buildMilestoneLadder(plan, TODAY);

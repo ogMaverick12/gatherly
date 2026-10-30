@@ -9,7 +9,7 @@ import dynamic from 'next/dynamic';
 import { useAccessibility } from '@/features/accessibility/provider';
 import { usePlanWorkspace } from '../hooks/use-plan-workspace';
 import { useWideLayout } from '../hooks/use-wide-layout';
-import { HealthRail } from './HealthRail';
+import { HealthRail, MobileHealthSummary } from './HealthRail';
 import { NoPlanScreen } from './NoPlanScreen';
 import { WorkspaceHeader } from './WorkspaceHeader';
 import { WorkspaceTabs, workspaceTabs, type WorkspaceTabId } from './WorkspaceTabs';
@@ -114,11 +114,13 @@ export function PlanWorkspace() {
   })();
 
   return (
-    <div className="mx-auto min-h-[100svh] max-w-7xl px-5 pb-28 pt-8 lg:pb-14">
+    <div className="mx-auto min-h-[100svh] max-w-7xl px-5 pb-24 pt-8 lg:pb-14">
       <WorkspaceHeader view={view} plan={plan} onClear={controller.clear} />
 
-      <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_19rem]">
-        <div>
+      <MobileHealthSummary view={view} t={t} />
+
+      <div className="mt-4 grid gap-8 lg:mt-8 lg:grid-cols-[minmax(0,1fr)_19rem]">
+        <div className="min-w-0">
           <WorkspaceTabs
             tabs={tabs}
             activeTab={activeTab as WorkspaceTabId}
@@ -130,7 +132,7 @@ export function PlanWorkspace() {
             role="tabpanel"
             aria-labelledby={`workspace-tab-${activeTab}`}
             tabIndex={0}
-            className="mt-6 focus:outline-none"
+            className="mt-4 focus:outline-none lg:mt-6"
           >
             {panel}
           </div>

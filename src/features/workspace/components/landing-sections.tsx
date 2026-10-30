@@ -10,8 +10,9 @@ import { GarlandLine } from '@/features/workspace/components/GarlandLine';
 import { HealthRing } from '@/features/workspace/components/HealthRing';
 import { SamplePlanCards } from '@/features/workspace/components/SamplePlanCards';
 import type { Dictionary } from '@/lib/i18n';
-import { formatMinor } from '@/lib/money';
+import { formatMoney } from '@/lib/money';
 import { SAMPLE_PLAN_TEMPLATES, type Plan } from '@/lib/plan';
+import type { PlanView } from '@/lib/plan-view';
 
 const FEATURE_KEYS = ['budget', 'timeline', 'vendors', 'health', 'ideas', 'export'] as const;
 
@@ -20,6 +21,7 @@ export interface LandingPreview {
   readonly plan: Plan;
   readonly budget: BudgetAllocation;
   readonly top: readonly CategoryAllocation[];
+  readonly health: PlanView['health'];
 }
 
 /** The hero copy and sample plan preview. */
@@ -67,12 +69,17 @@ export function SamplePreview({ preview }: { readonly preview: LandingPreview })
   return (
     <div className="rounded-card border border-line bg-raised p-6 shadow-card">
       <div className="flex items-center gap-5">
-        <HealthRing score={72} band="attention" size={96} label="Plan health" />
+        <HealthRing
+          score={preview.health.score}
+          band={preview.health.band}
+          size={96}
+          label="Plan health"
+        />
         <div>
           <p className="font-display text-title-lg">A sample plan</p>
           <p className="mt-1 text-sm text-ink-muted">
             {preview.plan.intake.guests} guests,{' '}
-            {formatMinor(preview.budget.totalMinor, preview.plan.intake.currency)} planned
+            {formatMoney(preview.budget.totalMinor, preview.plan.intake.currency)} planned
           </p>
         </div>
       </div>
@@ -83,7 +90,7 @@ export function SamplePreview({ preview }: { readonly preview: LandingPreview })
             <dd className="font-display text-base">
               {category.sharePercent}%
               <span className="ms-3 text-sm text-ink-muted">
-                {formatMinor(category.amountMinor, preview.plan.intake.currency)}
+                {formatMoney(category.amountMinor, preview.plan.intake.currency)}
               </span>
             </dd>
           </div>

@@ -234,6 +234,15 @@ describe('the health rail', () => {
 });
 
 describe('the export bar', () => {
+  it('discloses the actions from a single keyboard-operable control', async () => {
+    const user = userEvent.setup();
+    renderWithProvider(<ExportBar view={makeView()} />);
+    const toggle = screen.getByRole('button', { name: 'Export' });
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    await user.click(toggle);
+    expect(toggle).toHaveAttribute('aria-expanded', 'true');
+  });
+
   it('prints the plan', async () => {
     const user = userEvent.setup();
     const print = vi.fn();

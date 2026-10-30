@@ -7,7 +7,7 @@
 
 import { useAccessibility } from '@/features/accessibility/provider';
 import { formatDateOnly } from '@/lib/dates';
-import { formatMinor } from '@/lib/money';
+import { formatMoney } from '@/lib/money';
 import type { PlanView } from '@/lib/plan-view';
 import { CateringSummary } from './overview/CateringSummary';
 import { RiskList } from './overview/RiskList';
@@ -30,8 +30,8 @@ export function OverviewPanel({
   const daysToEvent = timeline.daysToEvent;
 
   return (
-    <div className="space-y-6">
-      <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+    <div className="space-y-4 sm:space-y-6">
+      <ul data-testid="overview-stats" className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-3">
         <li>
           <StatCard
             label={t.workspace.guests}
@@ -55,8 +55,8 @@ export function OverviewPanel({
         <li>
           <StatCard
             label={t.workspace.budget}
-            value={formatMinor(budget.totalMinor, currency)}
-            hint={`${formatMinor(budget.contingencyMinor, currency)} held back as a contingency`}
+            value={formatMoney(budget.totalMinor, currency)}
+            hint={`${formatMoney(budget.contingencyMinor, currency)} held back as a contingency`}
           />
         </li>
         <li>

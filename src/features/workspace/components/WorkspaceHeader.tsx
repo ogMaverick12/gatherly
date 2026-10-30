@@ -7,8 +7,8 @@
 
 import { useAccessibility } from '@/features/accessibility/provider';
 import { formatDateOnly } from '@/lib/dates';
-import { formatMinor } from '@/lib/money';
-import type { Plan } from '@/lib/plan';
+import { formatMoney } from '@/lib/money';
+import { isSamplePlan, type Plan } from '@/lib/plan';
 import type { PlanView } from '@/lib/plan-view';
 import { OfflineBanner } from '@/features/accessibility/components/OfflineBanner';
 import { ExportBar } from './ExportBar';
@@ -27,14 +27,22 @@ export function WorkspaceHeader({
   const { dictionary, preferences } = useAccessibility();
   const t = dictionary;
   const currency = plan.intake.currency;
+  const sample = isSamplePlan(plan);
 
   return (
     <header className="no-print">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal">
-            {t.workspace.planTitle}
-          </p>
+          <div className="flex flex-wrap items-center gap-2">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal">
+              {t.workspace.planTitle}
+            </p>
+            {sample ? (
+              <span className="rounded-pill border border-teal bg-teal/5 px-3 py-1 text-xs font-semibold text-teal">
+                {t.workspace.sampleBadge}
+              </span>
+            ) : null}
+          </div>
           <h1 className="mt-1 font-display text-title-lg">
             {view.plan.intake.guests} {t.workspace.guests.toLowerCase()}
             {view.plan.intake.eventDate
@@ -43,11 +51,11 @@ export function WorkspaceHeader({
           </h1>
           <ul className="mt-3 flex flex-wrap gap-2 text-xs text-ink-muted">
             <li className="rounded-pill border border-line px-3 py-1">
-              {t.workspace.budget}: {formatMinor(view.budget.totalMinor, currency)}
+              {t.workspace.budget}: {formatMoney(view.budget.totalMinor, currency)}
             </li>
             <li className="rounded-pill border border-line px-3 py-1">
               {t.workspace.perGuest}:{' '}
-              {formatMinor(
+              {formatMoney(
                 plan.intake.guests > 0
                   ? Math.round(view.budget.totalMinor / plan.intake.guests)
                   : 0,
@@ -64,16 +72,16 @@ export function WorkspaceHeader({
             ) : null}
           </ul>
         </div>
-        <div className="flex flex-col items-start gap-3">
+        <div className="flex flex-wrap items-center gap-3 lg:flex-col lg:items-start">
           <ExportBar view={view} />
           <button
             type="button"
             onClick={() => {
               if (window.confirm(t.workspace.clearConfirm)) onClear();
             }}
-            className="text-sm text-ink-muted underline-offset-4 hover:text-rose hover:underline"
+            className="inline-flex min-h-[44px] items-center text-sm text-ink-muted underline-offset-4 hover:text-rose hover:underline"
           >
-            {t.workspace.clearPlan}
+            {sample ? t.workspace.startFresh : t.workspace.clearPlan}
           </button>
         </div>
       </div>
