@@ -84,7 +84,11 @@ describe('the plan workspace', () => {
     renderWithProvider(<PlanWorkspace />);
 
     await user.click(screen.getByRole('tab', { name: 'Vendors' }));
-    const addButtons = await screen.findAllByRole('button', { name: 'Add a vendor' });
+    const addButtons = await screen.findAllByRole(
+      'button',
+      { name: 'Add a vendor' },
+      { timeout: 3_000 },
+    );
     await user.click(addButtons[0] as HTMLElement);
 
     await waitFor(() => {

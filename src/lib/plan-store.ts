@@ -19,6 +19,8 @@ export const PLAN_STORAGE_KEY = 'gatherly:plan:v1';
 
 let currentPlan: Plan | null = null;
 let hydrated = false;
+let lastRaw: string | null = null;
+let lastStored: Plan | null = null;
 const listeners = new Set<() => void>();
 
 function emit(): void {
@@ -29,13 +31,22 @@ function readStoredPlan(): Plan | null {
   if (typeof window === 'undefined') return null;
   try {
     const raw = window.localStorage.getItem(PLAN_STORAGE_KEY);
-    if (!raw) return null;
+    if (raw === lastRaw) return lastStored;
+    if (!raw) {
+      lastRaw = null;
+      lastStored = null;
+      return null;
+    }
     const parsed = PlanSchema.safeParse(JSON.parse(raw));
     if (!parsed.success) {
       window.localStorage.removeItem(PLAN_STORAGE_KEY);
+      lastRaw = null;
+      lastStored = null;
       return null;
     }
-    return parsed.data;
+    lastRaw = raw;
+    lastStored = parsed.data;
+    return lastStored;
   } catch {
     return null;
   }
@@ -46,9 +57,14 @@ function writeStoredPlan(plan: Plan | null): void {
   try {
     if (plan === null) {
       window.localStorage.removeItem(PLAN_STORAGE_KEY);
+      lastRaw = null;
+      lastStored = null;
       return;
     }
-    window.localStorage.setItem(PLAN_STORAGE_KEY, JSON.stringify(plan));
+    const raw = JSON.stringify(plan);
+    window.localStorage.setItem(PLAN_STORAGE_KEY, raw);
+    lastRaw = raw;
+    lastStored = plan;
   } catch {
     // Storage may be full or unavailable. The in-memory plan still works.
   }
@@ -76,14 +92,34 @@ function getServerSnapshot(): Plan | null {
  * the store, so it has to notify the subscribers itself. Without that
  * notification a page reload would leave the workspace showing "no plan"
  * even though the plan is sitting in local storage.
+ *
+ * @param prepare optional one-time transform applied before the first render
+ * @returns the current plan after hydration and preparation
  */
-export function hydratePlan(): Plan | null {
-  if (hydrated) return currentPlan;
+export function hydratePlan(prepare?: (plan: Plan) => Plan): Plan | null {
+  const prepareCurrent = (): void => {
+    if (!prepare || !currentPlan) return;
+    const next = prepare(currentPlan);
+    if (next === currentPlan) return;
+    currentPlan = next;
+    writeStoredPlan(next);
+    emit();
+  };
+
+  if (hydrated) {
+    prepareCurrent();
+    return currentPlan;
+  }
+
   hydrated = true;
   const stored = readStoredPlan();
   if (stored) {
-    currentPlan = stored;
+    const next = prepare ? prepare(stored) : stored;
+    currentPlan = next;
+    if (next !== stored) writeStoredPlan(next);
     emit();
+  } else {
+    prepareCurrent();
   }
   return currentPlan;
 }

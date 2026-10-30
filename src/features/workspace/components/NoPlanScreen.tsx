@@ -15,7 +15,7 @@ export function NoPlanScreen({ onOpen }: { onOpen: (plan: Plan) => void }) {
   const t = dictionary;
 
   return (
-    <div className="mx-auto max-w-2xl px-5 py-20 text-center">
+    <div className="mx-auto min-h-[100svh] max-w-2xl px-5 py-20 text-center">
       <h1 className="font-display text-title-lg">{t.workspace.noPlan}</h1>
       <p className="mt-2 text-ink-muted">{t.workspace.noPlanCta}</p>
       <div className="mt-6 flex justify-center">

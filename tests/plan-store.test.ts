@@ -54,6 +54,23 @@ describe('the plan store', () => {
     expect(reloaded.hydratePlan()?.intake.guests).toBe(40);
   });
 
+  it('applies a one-time prepare transform before returning the stored plan', () => {
+    const plan = createPlan(BASE, new Date('2026-01-01T00:00:00.000Z'));
+    window.localStorage.setItem(store.PLAN_STORAGE_KEY, JSON.stringify(plan));
+    const prepare = vi.fn((stored: typeof plan) => ({
+      ...stored,
+      tasks: [{ id: 't1', title: 'Check the venue', done: false, area: 'vendors' as const }],
+    }));
+
+    const hydrated = store.hydratePlan(prepare);
+
+    expect(prepare).toHaveBeenCalledOnce();
+    expect(hydrated?.tasks).toHaveLength(1);
+    expect(
+      JSON.parse(window.localStorage.getItem(store.PLAN_STORAGE_KEY) as string).tasks,
+    ).toHaveLength(1);
+  });
+
   it('discards a stored plan that does not match the schema', () => {
     window.localStorage.setItem(store.PLAN_STORAGE_KEY, '{"not":"a plan"}');
     expect(store.hydratePlan()).toBeNull();

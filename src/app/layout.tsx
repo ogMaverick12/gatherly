@@ -12,29 +12,30 @@ import { ServiceWorkerRegistrar } from '@/features/accessibility/components/Serv
 import { SiteHeader } from '@/features/workspace/components/SiteHeader';
 import { SiteFooter } from '@/features/workspace/components/SiteFooter';
 
+// Optional loading keeps a late web-font swap from moving the header and copy.
 const display = Fraunces({
   subsets: ['latin'],
-  display: 'swap',
+  display: 'optional',
   variable: '--font-display',
   axes: ['SOFT', 'WONK'],
 });
 
 const sans = Plus_Jakarta_Sans({
   subsets: ['latin'],
-  display: 'swap',
+  display: 'optional',
   variable: '--font-sans',
 });
 
 const devanagari = Noto_Sans_Devanagari({
   subsets: ['devanagari'],
-  display: 'swap',
+  display: 'optional',
   preload: false,
   variable: '--font-devanagari',
 });
 
 const bengali = Noto_Sans_Bengali({
   subsets: ['bengali'],
-  display: 'swap',
+  display: 'optional',
   preload: false,
   variable: '--font-bengali',
 });
@@ -98,7 +99,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <head>
         <script nonce={nonce} dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
       </head>
-      <body className="min-h-screen bg-paper text-ink antialiased">
+      <body className="flex min-h-[100svh] flex-col bg-paper text-ink antialiased">
         <AccessibilityProvider>
           <a
             href="#main"
@@ -107,7 +108,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             Skip to main content
           </a>
           <SiteHeader />
-          <main id="main" tabIndex={-1} className="focus:outline-none">
+          <main id="main" tabIndex={-1} className="flex-1 focus:outline-none">
             {children}
           </main>
           <SiteFooter />

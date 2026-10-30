@@ -2,6 +2,7 @@
 
 import {
   createContext,
+  startTransition,
   useCallback,
   useContext,
   useEffect,
@@ -62,19 +63,24 @@ export function AccessibilityProvider({
   const [preferences, setPreferences] = useState<AccessibilityPreferences>(DEFAULT_PREFERENCES);
   const [ready, setReady] = useState(false);
   const [speaking, setSpeaking] = useState(false);
-  const [speechSupported, setSpeechSupported] = useState(false);
+  // Speech is only rendered behind the closed display-settings menu, so this
+  // can be resolved on the first client render without a second tree render.
+  const [speechSupported] = useState(
+    () =>
+      typeof window !== 'undefined' &&
+      'speechSynthesis' in window &&
+      typeof window.SpeechSynthesisUtterance === 'function',
+  );
 
   useEffect(() => {
     const stored = readStoredPreferences();
-    setPreferences(initialLanguage ? { ...stored, language: initialLanguage } : stored);
-    setReady(true);
+    // Preferences are device polish, not the critical path: let the shell paint
+    // first and apply them as a non-urgent update.
+    startTransition(() => {
+      setPreferences(initialLanguage ? { ...stored, language: initialLanguage } : stored);
+      setReady(true);
+    });
   }, [initialLanguage]);
-
-  useEffect(() => {
-    setSpeechSupported(
-      'speechSynthesis' in window && typeof window.SpeechSynthesisUtterance === 'function',
-    );
-  }, []);
 
   const resolvedTheme = useMemo<'light' | 'dark'>(() => {
     if (preferences.theme !== 'system') return preferences.theme;

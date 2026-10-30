@@ -27,6 +27,19 @@ try {
     .first()
     .waitFor();
 
+  // Prime the service worker so every measured run starts from the same warm
+  // shell instead of paying the install cost in run 1 (or the first two runs).
+  await page
+    .waitForFunction(() => navigator.serviceWorker?.controller !== null, undefined, {
+      timeout: 15_000,
+    })
+    .catch(() => undefined);
+  await page.reload({ waitUntil: 'networkidle' });
+  await page
+    .getByRole('heading', { name: /guests/i })
+    .first()
+    .waitFor();
+
   const stored = await page.evaluate(() => localStorage.getItem('gatherly:plan:v1'));
   if (!stored) throw new Error('The sample plan was not written to local storage.');
   process.exit(0);

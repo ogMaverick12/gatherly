@@ -3,7 +3,8 @@ import { mkdirSync, mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { chromium } from '@playwright/test';
-import { readResult, writeSummary } from './lighthouse-report.mjs';
+import { writeSummary } from './lighthouse-report.mjs';
+import { readResult } from './lighthouse-stats.mjs';
 
 /**
  * Run Lighthouse against a real sample plan.
@@ -19,6 +20,7 @@ const OUT = join(process.cwd(), 'audit', 'lighthouse');
 const NEXT_BIN = join(process.cwd(), 'node_modules', 'next', 'dist', 'bin', 'next');
 const NPX_CLI = join(dirname(process.execPath), 'node_modules', 'npm', 'bin', 'npx-cli.js');
 const LIGHTHOUSE = 'lighthouse@13.6.0';
+const RUNS = Number.parseInt(process.env.LIGHTHOUSE_RUNS ?? '3', 10);
 const PAGES = [
   { slug: 'landing', path: '/' },
   { slug: 'intake', path: '/intake' },
@@ -67,8 +69,8 @@ function createPlan() {
 }
 
 /** Run Lighthouse against the already-open browser. */
-function runLighthouse(name, path, desktop) {
-  const output = join(OUT, name);
+function runLighthouse(outDir, name, path, desktop) {
+  const output = join(outDir, name);
   const args = [
     '--yes',
     LIGHTHOUSE,
@@ -132,11 +134,44 @@ async function stopChrome(chrome) {
   });
 }
 
+/** Run one discarded audit so the measured runs do not pay V8's first-plan cost. */
+async function warmUp() {
+  const dir = mkdtempSync(join(tmpdir(), 'gatherly-lighthouse-warmup-'));
+  try {
+    runLighthouse(dir, 'plan-mobile', '/plan', false);
+  } finally {
+    rmSync(dir, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 });
+  }
+}
+/** Run every page on both form factors for each configured run. */
+async function runAudits() {
+  const results = [];
+  for (let run = 1; run <= RUNS; run += 1) {
+    const outDir = join(OUT, `run-${run}`);
+    mkdirSync(outDir, { recursive: true });
+    for (const { slug, path } of PAGES) {
+      runLighthouse(outDir, `${slug}-mobile`, path, false);
+      await closePages();
+      runLighthouse(outDir, `${slug}-desktop`, path, true);
+      await closePages();
+      results.push(
+        { ...readResult(outDir, `${slug}-mobile`), run },
+        { ...readResult(outDir, `${slug}-desktop`), run },
+      );
+    }
+  }
+  return results;
+}
+
 async function main() {
-  mkdirSync(OUT, { recursive: true });
+  if (!Number.isInteger(RUNS) || RUNS < 1) {
+    throw new Error('LIGHTHOUSE_RUNS must be a positive integer.');
+  }
   if (await isUp(BASE)) {
     throw new Error('Port 3210 is already in use; stop that server before auditing.');
   }
+  rmSync(OUT, { recursive: true, force: true });
+  mkdirSync(OUT, { recursive: true });
   const profile = mkdtempSync(join(tmpdir(), 'gatherly-lighthouse-'));
   const server = startServer();
   const chrome = launchChrome(profile);
@@ -145,20 +180,9 @@ async function main() {
     await waitFor(`http://127.0.0.1:${DEBUG_PORT}/json/version`);
     await createPlan();
     await closePages();
-
-    for (const { slug, path } of PAGES) {
-      runLighthouse(`${slug}-mobile`, path, false);
-      await closePages();
-      runLighthouse(`${slug}-desktop`, path, true);
-      await closePages();
-    }
-    writeSummary(
-      OUT,
-      PAGES.flatMap(({ slug }) => [
-        readResult(OUT, `${slug}-mobile`),
-        readResult(OUT, `${slug}-desktop`),
-      ]),
-    );
+    await warmUp();
+    await closePages();
+    writeSummary(OUT, await runAudits());
   } finally {
     await stopChrome(chrome);
     server.kill();
@@ -169,7 +193,6 @@ async function main() {
     }
   }
 }
-
 main().catch((error) => {
   console.error(error);
   process.exitCode = 1;

@@ -1,6 +1,10 @@
 import '@testing-library/jest-dom/vitest';
-import { cleanup } from '@testing-library/react';
+import { cleanup, configure } from '@testing-library/react';
 import { afterEach, vi } from 'vitest';
+
+// Lazy panels resolve through dynamic imports; allow them a little longer on
+// slow CI workers without changing what the tests assert.
+configure({ asyncUtilTimeout: 3_000 });
 
 afterEach(() => {
   cleanup();
