@@ -76,6 +76,12 @@ describe('budgetCsv', () => {
     expect(csv).toContain('10000000');
     expect(csv).toContain('₹100,000');
   });
+
+  it('leaves per-guest cells empty when there are no guests', () => {
+    const plan = createPlan({ ...BASE, guests: 0 }, new Date());
+    const rows = budgetCsv(plan, computeBudget(plan)).split('\r\n');
+    expect(rows.at(-1)).toBe('"Total","10000000","₹100,000","100","","",""');
+  });
 });
 
 describe('milestonesCsv', () => {
@@ -84,6 +90,28 @@ describe('milestonesCsv', () => {
     const csv = milestonesCsv(plan);
     expect(csv.split('\r\n')).toHaveLength(1);
   });
+
+  it('writes an unscheduled, completed milestone', () => {
+    const plan = {
+      ...createPlan(BASE, new Date()),
+      milestones: [
+        {
+          id: 'm1',
+          title: 'Book the venue',
+          date: null,
+          offsetDays: -10,
+          done: true,
+          owner: 'You',
+          whyItMatters: 'It unlocks everything else.',
+        },
+      ],
+    };
+    const csv = milestonesCsv(plan);
+    expect(csv).toContain('"Book the venue"');
+    expect(csv).toContain('"not scheduled"');
+    expect(csv).toContain('"10"');
+    expect(csv).toContain('"yes"');
+  });
 });
 
 describe('vendorsCsv', () => {
@@ -91,5 +119,14 @@ describe('vendorsCsv', () => {
     const plan = { ...createPlan(BASE, new Date()), vendors: [VENDOR] };
     const csv = vendorsCsv(plan);
     expect(csv).toContain("'=SUM(A1:A9)");
+  });
+
+  it('leaves missing quotes and dates empty', () => {
+    const plan = {
+      ...createPlan(BASE, new Date()),
+      vendors: [{ ...VENDOR, quotedMinor: null, dueDate: null, notes: '' }],
+    };
+    const row = vendorsCsv(plan).split('\r\n')[1];
+    expect(row).toBe('"caterer","Sharma, Caterers","quoted","","",""');
   });
 });

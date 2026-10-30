@@ -9,43 +9,11 @@ import {
   vendorChecklist,
   vendorCoverageShare,
 } from '@/features/vendors/services';
-import { createPlan, type Intake, type Vendor } from '@/lib/plan';
-
-const BASE: Intake = {
-  eventType: 'wedding',
-  eventDate: '2026-12-05',
-  guests: 100,
-  cityTier: 'tier2',
-  currency: 'INR',
-  budgetMinor: 10_000_000,
-  priorities: [],
-  cultureNote: '',
-  dietary: [],
-  access: [],
-  language: 'en',
-  packs: [],
-  venueType: 'indoor',
-  guestCountIsEstimate: false,
-  notes: '',
-};
+import type { Intake, Vendor } from '@/lib/plan';
+import { makePlan, makeVendor as vendor } from './factories';
 
 function planWith(vendors: Vendor[] = [], patch: Partial<Intake> = {}) {
-  return { ...createPlan({ ...BASE, ...patch }, new Date()), vendors };
-}
-
-function vendor(patch: Partial<Vendor> = {}): Vendor {
-  return {
-    id: 'v1',
-    category: 'caterer',
-    name: 'Sharma Caterers',
-    status: 'to_contact',
-    quotedMinor: null,
-    depositMinor: null,
-    dueDate: null,
-    phone: '',
-    notes: '',
-    ...patch,
-  };
+  return { ...makePlan(patch), vendors };
 }
 
 describe('vendorChecklist', () => {
@@ -112,7 +80,7 @@ describe('computeVendorCoverage', () => {
     officiant: 200_000,
     accommodation: 200_000,
     gifts: 100_000,
-  } as never;
+  };
 
   it('reports zero coverage when nothing is booked', () => {
     const coverage = computeVendorCoverage(planWith(), allocation);
@@ -175,7 +143,7 @@ describe('computeVendorCoverage', () => {
   it('counts a booked vendor at full coverage when the line has no allocation', () => {
     const coverage = computeVendorCoverage(
       planWith([vendor({ category: 'caterer', status: 'booked', quotedMinor: 250_000 })]),
-      {} as never,
+      {},
     );
     const catering = coverage.categories.find((category) => category.category === 'caterer');
     expect(catering?.coveragePercent).toBe(100);
@@ -243,13 +211,13 @@ describe('vendorCoverageShare', () => {
       planWith([vendor({ category: 'caterer', status: 'booked', quotedMinor: 250_000 })]),
       {
         catering: 1_000_000,
-      } as never,
+      },
     );
     expect(vendorCoverageShare(coverage, 'caterer')).toBe(25);
   });
 
   it('reports zero for a category that is not in the plan', () => {
-    const coverage = computeVendorCoverage(planWith(), {} as never);
+    const coverage = computeVendorCoverage(planWith(), {});
     expect(vendorCoverageShare(coverage, 'music')).toBe(0);
   });
 });

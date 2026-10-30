@@ -36,6 +36,7 @@ import {
   type Intake,
   type Plan,
 } from '@/lib/plan';
+import { computePlanView } from '@/lib/plan-view';
 
 /** The day the plan is looked at. Fixed, so no test depends on the clock. */
 const TODAY = '2026-10-22';
@@ -318,7 +319,7 @@ describe('share link invariants', () => {
     );
   });
 
-  it('rejects a fragment that was never a share link', async () => {
+  it('rejects a fragment that was not a share link', async () => {
     await fc.assert(
       fc.asyncProperty(fc.string({ maxLength: 40 }), async (noise) => {
         expect(await decodeShareFragment(noise)).toBeNull();
@@ -380,9 +381,7 @@ describe('plan invariants', () => {
       fc.property(intakeArb, (intake) => {
         const plan = createPlan(intake, NOW);
         const budget = computeBudget(plan);
-        const allocation = Object.fromEntries(
-          budget.categories.map((category) => [category.id, category.amountMinor]),
-        ) as never;
+        const allocation = computePlanView(plan, TODAY).allocationByCategory;
         const coverage = computeVendorCoverage(plan, allocation);
         const milestones = mergeMilestoneState(plan.milestones, buildMilestoneLadder(plan, TODAY));
         const timeline = summariseTimeline(milestones, '2026-06-01');

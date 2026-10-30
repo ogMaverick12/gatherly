@@ -63,6 +63,26 @@ const config = [
     },
   },
   {
+    files: ['src/**/*.{ts,tsx}'],
+    rules: {
+      'no-console': 'error',
+    },
+  },
+  {
+    // The logger is the single sink; every other src module goes through it.
+    files: ['src/lib/security/logger.ts'],
+    rules: {
+      'no-console': 'off',
+    },
+  },
+  {
+    // Build and audit scripts are development tooling, not shipped code.
+    files: ['scripts/**/*.mjs'],
+    rules: {
+      'no-console': 'off',
+    },
+  },
+  {
     plugins: { import: importPlugin },
     settings: {
       'import/resolver': {

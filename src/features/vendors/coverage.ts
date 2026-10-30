@@ -43,7 +43,7 @@ function statusOf(vendors: readonly Vendor[]): CategoryCoverage['status'] {
 function categoryCoverage(
   category: VendorCategoryId,
   plan: Plan,
-  allocationByCategory: Readonly<Record<BudgetCategoryId, number>>,
+  allocationByCategory: Readonly<Partial<Record<BudgetCategoryId, number>>>,
 ): CategoryCoverage {
   const budgetLine = VENDOR_CATEGORY_BUDGET_LINE[category];
   const allocatedMinor = allocationByCategory[budgetLine] ?? 0;
@@ -80,7 +80,7 @@ function categoryCoverage(
  */
 export function computeVendorCoverage(
   plan: Plan,
-  allocationByCategory: Readonly<Record<BudgetCategoryId, number>>,
+  allocationByCategory: Readonly<Partial<Record<BudgetCategoryId, number>>>,
 ): VendorCoverage {
   const categories = vendorChecklist(plan.intake.eventType).map((category) =>
     categoryCoverage(category, plan, allocationByCategory),

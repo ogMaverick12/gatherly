@@ -8,26 +8,8 @@ import {
   createSamplePlan,
   parsePlan,
   SAMPLE_PLAN_TEMPLATES,
-  type Intake,
 } from '@/lib/plan';
-
-const INTAKE: Intake = {
-  eventType: 'wedding',
-  eventDate: '2026-12-05',
-  guests: 120,
-  cityTier: 'tier2',
-  currency: 'INR',
-  budgetMinor: 10_000_000,
-  priorities: ['food', 'photography'],
-  cultureNote: '',
-  dietary: ['vegetarian'],
-  access: ['wheelchair'],
-  language: 'en',
-  packs: [],
-  venueType: 'mixed',
-  guestCountIsEstimate: false,
-  notes: '',
-};
+import { asInvalid, TEST_INTAKE as INTAKE } from './factories';
 
 describe('the plan schema', () => {
   it('accepts a well-formed plan', () => {
@@ -37,7 +19,7 @@ describe('the plan schema', () => {
   });
 
   it('rejects an unknown currency', () => {
-    const plan = createPlan({ ...INTAKE, currency: 'XYZ' as never }, new Date());
+    const plan = createPlan({ ...INTAKE, currency: asInvalid('XYZ') }, new Date());
     expect(PlanSchema.safeParse(plan).success).toBe(false);
   });
 
@@ -47,13 +29,13 @@ describe('the plan schema', () => {
   });
 
   it('rejects unknown keys', () => {
-    const plan = { ...createPlan(INTAKE, new Date()), surprise: true } as never;
+    const plan: unknown = { ...createPlan(INTAKE, new Date()), surprise: true };
     expect(PlanSchema.safeParse(plan).success).toBe(false);
   });
 
   it('rejects more than four priorities', () => {
     const plan = createPlan(
-      { ...INTAKE, priorities: ['food', 'music', 'decor', 'photography', 'logistics'] as never },
+      { ...INTAKE, priorities: asInvalid(['food', 'music', 'decor', 'photography', 'logistics']) },
       new Date(),
     );
     expect(PlanSchema.safeParse(plan).success).toBe(false);

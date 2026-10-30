@@ -1,10 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type * as AiModule from '@/lib/ai';
-import type { ApiSnapshot } from '@/lib/api-schema';
 import { ProviderError, type GenerationRequest } from '@/lib/ai/provider';
-import { computePlanView } from '@/lib/plan-view';
-import { createPlan } from '@/lib/plan';
-import { TEST_INTAKE } from '../helpers';
+import { makeSnapshot } from '../factories';
 
 /**
  * The streamed chat route.
@@ -26,9 +23,7 @@ vi.mock('@/lib/ai/openrouter', () => ({ OpenRouterProvider: class {} }));
 
 const { POST: chat } = await import('@/app/api/chat/route');
 
-const snapshot: ApiSnapshot = structuredClone(
-  computePlanView(createPlan(TEST_INTAKE, new Date('2026-01-01T00:00:00.000Z'))).snapshot,
-) as ApiSnapshot;
+const snapshot = makeSnapshot();
 
 let ip = 0;
 

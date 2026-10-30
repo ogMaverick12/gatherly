@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { DICTIONARIES, dictionaryKeyPaths, getDictionary, LANGUAGE_TAGS } from '@/lib/i18n';
 import { LANGUAGES } from '@/lib/plan';
+import { asInvalid } from './factories';
 
 describe('the dictionaries', () => {
   it('cover every language the app offers', () => {
@@ -34,7 +35,7 @@ describe('the dictionaries', () => {
   });
 
   it('fall back to English for an unknown language', () => {
-    expect(getDictionary('zz' as never)).toBe(DICTIONARIES.en);
+    expect(getDictionary(asInvalid('zz'))).toBe(DICTIONARIES.en);
   });
 
   it('give a BCP-47 tag for every language', () => {

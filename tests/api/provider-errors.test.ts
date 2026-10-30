@@ -1,10 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type * as AiModule from '@/lib/ai';
-import type { ApiSnapshot } from '@/lib/api-schema';
 import { ProviderError, type GenerationResult, type ProviderErrorKind } from '@/lib/ai/provider';
-import { computePlanView } from '@/lib/plan-view';
-import { createPlan } from '@/lib/plan';
-import { TEST_INTAKE } from '../helpers';
+import { makeSnapshot } from '../factories';
 
 /**
  * What the routes say and log when a provider fails.
@@ -27,9 +24,7 @@ const { POST: chat } = await import('@/app/api/chat/route');
 const { POST: ideas } = await import('@/app/api/ideas/route');
 const { POST: parse } = await import('@/app/api/parse/route');
 
-const snapshot: ApiSnapshot = structuredClone(
-  computePlanView(createPlan(TEST_INTAKE, new Date('2026-01-01T00:00:00.000Z'))).snapshot,
-) as ApiSnapshot;
+const snapshot = makeSnapshot();
 
 const IDEAS_CONTEXT = {
   guests: 120,
@@ -177,9 +172,9 @@ describe('the failure kind shown to the user', () => {
   it('logs the kind and never the provider message', async () => {
     selectProvider.mockReturnValue(rejecting('auth'));
 
+    const warn = vi.spyOn(console, 'warn');
     await ideasBody();
 
-    const warn = console.warn as unknown as ReturnType<typeof vi.fn>;
     const line = String(warn.mock.calls.at(-1)?.[0]);
     const payload = JSON.parse(line) as Record<string, unknown>;
 

@@ -8,6 +8,7 @@
  * atomic instead of a pipeline of three independent commands.
  */
 
+import { logWarn } from './logger';
 import type { RateLimitResult, RateLimiter } from './rate-limit';
 
 /**
@@ -128,7 +129,7 @@ export class UpstashRateLimiter implements RateLimiter {
     if (now - this.lastFailOpenWarnAt < FAIL_OPEN_WARN_INTERVAL_MS) return;
     this.lastFailOpenWarnAt = now;
     // An outage is a property of the store: no key, no address, no user text.
-    console.warn(JSON.stringify({ app: 'gatherly', event: 'rate_limit_fail_open' }));
+    logWarn({ app: 'gatherly', event: 'rate_limit_fail_open' });
   }
 
   private async send(commands: unknown[][]): Promise<unknown[] | null> {

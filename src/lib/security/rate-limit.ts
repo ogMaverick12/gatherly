@@ -10,6 +10,7 @@
  */
 
 import { readConfig } from '../ai/config';
+import { logWarn } from './logger';
 import { UpstashRateLimiter } from './upstash-limiter';
 
 export interface RateLimitResult {
@@ -97,14 +98,12 @@ export function warnWhenRateLimitIsPerInstance(): void {
   if (process.env['NODE_ENV'] !== 'production') return;
   if (rateLimitMode() === 'shared') return;
 
-  console.warn(
-    JSON.stringify({
-      app: 'gatherly',
-      event: 'rate_limit_per_instance',
-      message:
-        'Rate limiting is per-instance because UPSTASH_REDIS_REST_URL or UPSTASH_REDIS_REST_TOKEN is missing. Set both to share the bucket across instances.',
-    }),
-  );
+  logWarn({
+    app: 'gatherly',
+    event: 'rate_limit_per_instance',
+    message:
+      'Rate limiting is per-instance because UPSTASH_REDIS_REST_URL or UPSTASH_REDIS_REST_TOKEN is missing. Set both to share the bucket across instances.',
+  });
 }
 
 let limiter: RateLimiter | null = null;

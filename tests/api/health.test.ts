@@ -122,13 +122,12 @@ describe('the startup warning', () => {
     vi.stubEnv('NODE_ENV', 'production');
     vi.stubEnv('UPSTASH_REDIS_REST_URL', '');
     vi.stubEnv('UPSTASH_REDIS_REST_TOKEN', '');
+    const warn = vi.spyOn(console, 'warn');
 
     warnWhenRateLimitIsPerInstance();
 
-    expect(console.warn).toHaveBeenCalledTimes(1);
-    expect(
-      String((console.warn as unknown as ReturnType<typeof vi.fn>).mock.calls[0]?.[0]),
-    ).toContain('UPSTASH_REDIS_REST_URL');
+    expect(warn).toHaveBeenCalledTimes(1);
+    expect(String(warn.mock.calls[0]?.[0])).toContain('UPSTASH_REDIS_REST_URL');
   });
 
   it('stays quiet when the shared store is configured', () => {

@@ -8,6 +8,7 @@ import {
   summariseTimeline,
 } from '@/features/timeline/services';
 import { createPlan, type Intake } from '@/lib/plan';
+import { computePlanView } from '@/lib/plan-view';
 
 /** The day the plan is looked at. Fixed, so no test depends on the clock. */
 const TODAY = '2026-10-22';
@@ -33,9 +34,7 @@ const BASE: Intake = {
 function healthFor(patch: Partial<Intake> = {}) {
   const plan = createPlan({ ...BASE, ...patch }, new Date('2026-01-01T00:00:00.000Z'));
   const budget = computeBudget(plan);
-  const allocation = Object.fromEntries(
-    budget.categories.map((category) => [category.id, category.amountMinor]),
-  ) as never;
+  const allocation = computePlanView(plan, TODAY).allocationByCategory;
   const coverage = computeVendorCoverage(plan, allocation);
   const milestones = mergeMilestoneState(plan.milestones, buildMilestoneLadder(plan, TODAY));
   const timeline = summariseTimeline(milestones, '2026-11-25');
@@ -82,7 +81,7 @@ describe('computeHealth', () => {
         tasks: [{ id: 't1', title: 'Book the venue', done: true, area: 'vendors' }],
       },
       budget: computeBudget(createPlan(BASE, new Date())),
-      coverage: computeVendorCoverage(createPlan(BASE, new Date()), {} as never),
+      coverage: computeVendorCoverage(createPlan(BASE, new Date()), {}),
       timeline: summariseTimeline(
         mergeMilestoneState([], buildMilestoneLadder(createPlan(BASE, new Date()), TODAY)),
         '2026-11-25',
@@ -97,9 +96,7 @@ describe('computeHealth', () => {
     const plan = createPlan(BASE, new Date('2026-01-01T00:00:00.000Z'));
     const ladder = buildMilestoneLadder(plan, TODAY);
     const budget = computeBudget(plan);
-    const allocation = Object.fromEntries(
-      budget.categories.map((category) => [category.id, category.amountMinor]),
-    ) as never;
+    const allocation = computePlanView(plan, TODAY).allocationByCategory;
     const coverage = computeVendorCoverage(plan, allocation);
 
     const scoreWith = (done: number) => {

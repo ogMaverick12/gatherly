@@ -1,11 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ChatRequestSchema, IdeasRequestSchema, ParseRequestSchema } from '@/lib/api-schema';
-import type { ApiSnapshot } from '@/lib/api-schema';
 import type * as AiModule from '@/lib/ai';
 import type { GenerationResult } from '@/lib/ai/provider';
-import { computePlanView } from '@/lib/plan-view';
-import { createPlan } from '@/lib/plan';
-import { TEST_INTAKE } from '../helpers';
+import { makeSnapshot } from '../factories';
 
 /**
  * The API routes.
@@ -29,9 +26,7 @@ const { POST: chat } = await import('@/app/api/chat/route');
 const { POST: ideas } = await import('@/app/api/ideas/route');
 const { POST: parse } = await import('@/app/api/parse/route');
 
-const snapshot: ApiSnapshot = structuredClone(
-  computePlanView(createPlan(TEST_INTAKE, new Date('2026-01-01T00:00:00.000Z'))).snapshot,
-) as ApiSnapshot;
+const snapshot = makeSnapshot();
 
 function request(body: unknown, init: RequestInit = {}): Request {
   return new Request('https://gatherly.test/api/chat', {

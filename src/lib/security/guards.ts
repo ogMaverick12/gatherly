@@ -1,4 +1,5 @@
 import type { ProviderErrorKind } from '../ai/provider';
+import { logWarn } from './logger';
 import { getRateLimiter } from './rate-limit';
 
 /**
@@ -156,14 +157,12 @@ export function logRequest(
   request: Request,
   providerError?: ProviderErrorKind,
 ): void {
-  console.warn(
-    JSON.stringify({
-      app: 'gatherly',
-      route,
-      status,
-      durationMs,
-      correlationId: correlationId(request),
-      ...(providerError ? { providerError } : {}),
-    }),
-  );
+  logWarn({
+    app: 'gatherly',
+    route,
+    status,
+    durationMs,
+    correlationId: correlationId(request),
+    ...(providerError ? { providerError } : {}),
+  });
 }

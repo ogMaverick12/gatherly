@@ -11,6 +11,7 @@ import { AccessibilityProvider } from '@/features/accessibility/provider';
 import { ServiceWorkerRegistrar } from '@/features/accessibility/components/ServiceWorkerRegistrar';
 import { SiteHeader } from '@/features/workspace/components/SiteHeader';
 import { SiteFooter } from '@/features/workspace/components/SiteFooter';
+import { DARK_THEME_COLOR, LIGHT_THEME_COLOR } from '@/lib/theme-colors';
 
 // Optional loading keeps a late web-font swap from moving the header and copy.
 const display = Fraunces({
@@ -40,8 +41,9 @@ const bengali = Noto_Sans_Bengali({
   variable: '--font-bengali',
 });
 
-// Runs before paint so a stored dark theme never flashes light; the nonce above
-// is what lets this one inline script through the policy.
+// THEME_SCRIPT is a constant string with no user input; its script tag carries
+// the CSP nonce. It runs before paint so a stored dark theme never flashes
+// light.
 const THEME_SCRIPT =
   "(function(){try{var p=JSON.parse(localStorage.getItem('gatherly:prefs:v1')||'null');" +
   "var t=p&&p.theme;var d=t==='dark'||(t!=='light'&&window.matchMedia('(prefers-color-scheme: dark)').matches);" +
@@ -72,8 +74,8 @@ export const metadata: Metadata = {
 /** Mobile viewport and theme colours for light and dark browser chrome. */
 export const viewport: Viewport = {
   themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#FBF6EE' },
-    { media: '(prefers-color-scheme: dark)', color: '#17120F' },
+    { media: '(prefers-color-scheme: light)', color: LIGHT_THEME_COLOR },
+    { media: '(prefers-color-scheme: dark)', color: DARK_THEME_COLOR },
   ],
   width: 'device-width',
   initialScale: 1,

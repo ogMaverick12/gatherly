@@ -114,8 +114,7 @@ describe('encode and decode', () => {
   it('falls back to plain JSON when the browser cannot compress', async () => {
     const plan = createPlan(BASE, new Date());
     const original = globalThis.CompressionStream;
-    // @ts-expect-error - removing the API on purpose
-    delete globalThis.CompressionStream;
+    Reflect.deleteProperty(globalThis, 'CompressionStream');
     try {
       const fragment = await encodeShareFragment(plan);
       expect(fragment).toMatch(/^g1j\./);

@@ -8,7 +8,8 @@ import {
   mergeMilestoneState,
   summariseTimeline,
 } from '@/features/timeline/services';
-import { createPlan, type Intake, type Vendor } from '@/lib/plan';
+import { createPlan, type Intake, type PlanTask, type Vendor } from '@/lib/plan';
+import { computePlanView } from '@/lib/plan-view';
 
 /** The day the plan is looked at. Fixed, so no test depends on the clock. */
 const TODAY = '2026-10-22';
@@ -31,16 +32,14 @@ const BASE: Intake = {
   notes: '',
 };
 
-function risksFor(patch: Partial<Intake> = {}, vendors: Vendor[] = [], tasks: never[] = []) {
+function risksFor(patch: Partial<Intake> = {}, vendors: Vendor[] = [], tasks: PlanTask[] = []) {
   const plan = {
     ...createPlan({ ...BASE, ...patch }, new Date('2026-01-01T00:00:00.000Z')),
     vendors,
     tasks,
   };
   const budget = computeBudget(plan);
-  const allocation = Object.fromEntries(
-    budget.categories.map((category) => [category.id, category.amountMinor]),
-  ) as never;
+  const allocation = computePlanView(plan, TODAY).allocationByCategory;
   const coverage = computeVendorCoverage(plan, allocation);
   const milestones = mergeMilestoneState(plan.milestones, buildMilestoneLadder(plan, TODAY));
   const timeline = summariseTimeline(milestones, '2026-11-25');
@@ -70,14 +69,18 @@ describe('computeRisks', () => {
   });
 
   it('is satisfied when the access need has a task', () => {
-    const risks = risksFor({ access: ['wheelchair'] }, [], [
-      {
-        id: 't1',
-        title: 'Confirm the wheelchair step-free route',
-        done: false,
-        area: 'accessibility',
-      },
-    ] as never);
+    const risks = risksFor(
+      { access: ['wheelchair'] },
+      [],
+      [
+        {
+          id: 't1',
+          title: 'Confirm the wheelchair step-free route',
+          done: false,
+          area: 'accessibility',
+        },
+      ],
+    );
     expect(risks.some((risk) => risk.id === 'access-wheelchair')).toBe(false);
   });
 
