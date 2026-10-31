@@ -218,7 +218,9 @@ describe('the export bar', () => {
     renderWithProvider(<ExportBar view={makeView()} />);
     await user.click(screen.getByRole('button', { name: 'Copy a share link' }));
 
-    expect(writeText).toHaveBeenCalledOnce();
+    // Building the link compresses the plan first, so the copy happens after
+    // the click handler returns. Wait for it instead of assuming the timing.
+    await waitFor(() => expect(writeText).toHaveBeenCalledOnce());
     expect(String(writeText.mock.calls[0]?.[0])).toContain('#g1');
   });
 

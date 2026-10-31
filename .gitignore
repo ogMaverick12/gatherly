@@ -5,9 +5,7 @@ build/
 coverage/
 playwright-report/
 test-results/
-audit/*
-!audit/screens/
-!audit/screens/*.png
+audit/
 .env
 .env.local
 .env*.local

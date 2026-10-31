@@ -281,10 +281,12 @@ describe('the export bar', () => {
     const user = userEvent.setup();
     renderWithProvider(<ExportBar view={makeView()} />);
     await user.click(screen.getByRole('button', { name: 'Copy a share link' }));
-    expect(copyToClipboard).toHaveBeenCalled();
+    // The share link is built asynchronously, so wait for the status message
+    // first and only then check what was copied.
     expect(
       await screen.findByText('Share link copied. It never leaves your browser.'),
     ).toBeInTheDocument();
+    expect(copyToClipboard).toHaveBeenCalled();
   });
 
   it('downloads the plan as JSON', async () => {
