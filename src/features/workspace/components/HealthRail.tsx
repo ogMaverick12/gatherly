@@ -5,12 +5,12 @@
  * The formula is disclosed in place so the score can be checked, not just trusted.
  */
 
-import { useAccessibility } from '@/features/accessibility/provider';
-import type { HealthBand } from '@/features/health/services';
+import { useAccessibility } from '@/features/accessibility';
+import type { HealthBand } from '@/features/health';
 import { formatDateOnly } from '@/lib/dates';
 import type { Dictionary } from '@/lib/i18n';
 import { formatMoney } from '@/lib/money';
-import type { PlanView } from '@/lib/plan-view';
+import type { PlanView } from '../plan-view';
 import { CelebrationDot, HealthRing } from './HealthRing';
 
 const BAND_LABEL: Record<HealthBand, string> = {

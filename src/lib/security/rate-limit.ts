@@ -12,21 +12,9 @@
 import { readConfig } from '../ai/config';
 import { logWarn } from './logger';
 import { UpstashRateLimiter } from './upstash-limiter';
+import type { RateLimiter, RateLimitResult } from './rate-limit-types';
 
-export interface RateLimitResult {
-  readonly allowed: boolean;
-  readonly remaining: number;
-  readonly limit: number;
-  /** Milliseconds until the caller may try again. */
-  readonly retryAfterMs: number;
-  /** True when the shared store could not answer and the call was let through. */
-  readonly degraded?: boolean;
-}
-
-export interface RateLimiter {
-  readonly kind: 'memory' | 'upstash';
-  check(key: string): Promise<RateLimitResult>;
-}
+export type { RateLimiter, RateLimitResult } from './rate-limit-types';
 
 export class InMemoryRateLimiter implements RateLimiter {
   readonly kind = 'memory' as const;

@@ -6,7 +6,7 @@
 
 import { formatDateOnly } from '@/lib/dates';
 import type { Dictionary } from '@/lib/i18n';
-import type { PlanView } from '@/lib/plan-view';
+import type { PlanView } from '../plan-view';
 
 function relativeLabel(offsetDays: number): string {
   if (offsetDays === 0) return 'T';

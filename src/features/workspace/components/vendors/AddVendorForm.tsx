@@ -6,7 +6,7 @@
  */
 
 import { useState } from 'react';
-import { useAccessibility } from '@/features/accessibility/provider';
+import { useAccessibility } from '@/features/accessibility';
 import { VENDOR_CATEGORY_LABELS, type VendorCategoryId } from '@/lib/plan';
 
 // long-function: one view section, kept in one block so its reading order stays visible.

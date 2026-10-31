@@ -5,10 +5,10 @@
  */
 
 import { useState } from 'react';
-import { renderSnapshotForModel } from '@/features/assistant/services';
+import { renderSnapshotForModel } from '@/features/assistant';
 import type { Dictionary } from '@/lib/i18n';
 import type { Idea } from '@/lib/plan';
-import type { PlanView } from '@/lib/plan-view';
+import type { PlanView } from '../plan-view';
 
 interface IdeasResponse {
   readonly mode: 'basic' | 'provider';

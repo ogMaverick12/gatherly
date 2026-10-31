@@ -6,7 +6,7 @@
  */
 
 import type { Dictionary } from '@/lib/i18n';
-import type { PlanView } from '@/lib/plan-view';
+import type { PlanView } from '../plan-view';
 import { Tabs, type TabDefinition } from './Tabs';
 
 export type WorkspaceTabId = 'overview' | 'budget' | 'timeline' | 'vendors' | 'ideas' | 'assistant';

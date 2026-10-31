@@ -4,7 +4,7 @@ import {
   buildRunOfShow,
   mergeMilestoneState,
   summariseTimeline,
-} from '@/features/timeline/services';
+} from '@/features/timeline';
 import { createPlan, type Intake } from '@/lib/plan';
 
 const BASE: Intake = {

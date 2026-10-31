@@ -3,7 +3,7 @@ import { selectProvider } from '@/lib/ai';
 import { chatEventStream } from '@/lib/ai/chat-stream';
 import { CHAT_SYSTEM_PROMPT } from '@/lib/ai/prompts';
 import { createRoute } from '@/lib/security/route';
-import { buildBasicAnswer, classifyIntent } from '@/features/assistant/services';
+import { buildBasicAnswer, classifyIntent } from '@/features/assistant';
 
 /** Node.js runtime: the provider adapters rely on Node APIs. */
 export const runtime = 'nodejs';

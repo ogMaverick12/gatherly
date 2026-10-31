@@ -5,9 +5,9 @@
  * A category with no vendor shows an add button instead of an empty list.
  */
 
-import { useAccessibility } from '@/features/accessibility/provider';
+import { useAccessibility } from '@/features/accessibility';
 import type { Vendor, VendorCategoryId } from '@/lib/plan';
-import type { PlanView } from '@/lib/plan-view';
+import type { PlanView } from '../../plan-view';
 import { VendorCard } from './VendorCard';
 
 // long-function: one view section, kept in one block so its reading order stays visible.

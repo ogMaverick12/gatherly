@@ -5,17 +5,17 @@
  * Edits stay local until a field loses focus, then are reported as a patch.
  */
 
-import { useAccessibility } from '@/features/accessibility/provider';
+import { useAccessibility } from '@/features/accessibility';
 import {
   buildWhatsAppLink,
   scoreQuote,
   VENDOR_CATEGORY_BUDGET_LINE,
   type WhatsAppLink,
-} from '@/features/vendors/services';
+} from '@/features/vendors';
 import type { Dictionary } from '@/lib/i18n';
 import { formatMoney } from '@/lib/money';
 import { VENDOR_CATEGORY_LABELS, type Currency, type Vendor } from '@/lib/plan';
-import type { PlanView } from '@/lib/plan-view';
+import type { PlanView } from '../../plan-view';
 import { VendorQuoteScore } from './VendorQuoteScore';
 import { useVendorDraft } from './use-vendor-draft';
 import { VendorIdentityFields, VendorScheduleFields } from './vendor-card-fields';

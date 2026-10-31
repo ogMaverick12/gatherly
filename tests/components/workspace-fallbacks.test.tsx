@@ -1,16 +1,18 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { CelebrationDot } from '@/features/workspace/components/HealthRing';
-import { HealthRail } from '@/features/workspace/components/HealthRail';
-import { MilestoneList } from '@/features/workspace/components/TimelinePanel';
-import { OverviewPanel } from '@/features/workspace/components/OverviewPanel';
-import { CateringSummary } from '@/features/workspace/components/overview/CateringSummary';
-import { RiskList } from '@/features/workspace/components/overview/RiskList';
-import { StatCard } from '@/features/workspace/components/overview/StatCard';
-import { WorkspaceHeader } from '@/features/workspace/components/WorkspaceHeader';
+import {
+  CelebrationDot,
+  HealthRail,
+  MilestoneList,
+  OverviewPanel,
+  CateringSummary,
+  RiskList,
+  StatCard,
+  WorkspaceHeader,
+} from '@/features/workspace';
 import { DICTIONARIES } from '@/lib/i18n';
-import type { PlanView } from '@/lib/plan-view';
+import type { PlanView } from '@/features/workspace';
 import { makeView, renderWithProvider } from '../helpers';
 
 const t = DICTIONARIES.en;

@@ -1,6 +1,6 @@
 import { createPlan, type Intake, type Plan, type Vendor } from '@/lib/plan';
-import type { PlanSnapshot } from '@/features/assistant/services';
-import { computePlanView } from '@/lib/plan-view';
+import type { PlanSnapshot } from '@/features/assistant';
+import { computePlanView } from '@/features/workspace';
 
 /** A valid intake every builder starts from. */
 export const TEST_INTAKE: Intake = {

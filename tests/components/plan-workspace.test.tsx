@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { PlanWorkspace } from '@/features/workspace/components/PlanWorkspace';
+import { PlanWorkspace } from '@/features/workspace';
 import { SAMPLE_PLAN_TEMPLATES, createSamplePlan } from '@/lib/plan';
 import { getPlan, setPlan } from '@/lib/plan-store';
 import { makePlan, renderWithProvider } from '../helpers';

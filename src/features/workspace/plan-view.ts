@@ -2,9 +2,9 @@
  * A single derived view of a plan: budget, timeline, health, risks and ideas.
  * The engines are pure, so the result can be memoised on the plan and date.
  */
-import type { BudgetCategoryId, Plan } from './plan';
-import { todayDateOnly, type DateOnly } from './dates';
-import { computeBudget, computeScenarios, type BudgetScenario } from '@/features/budget/services';
+import type { BudgetCategoryId, Plan } from '@/lib/plan';
+import { todayDateOnly, type DateOnly } from '@/lib/dates';
+import { computeBudget, computeScenarios, type BudgetScenario } from '@/features/budget';
 import {
   buildMilestoneLadder,
   buildRunOfShow,
@@ -13,13 +13,14 @@ import {
   type RunOfShowStep,
   type TimelineMilestone,
   type TimelineSummary,
-} from '@/features/timeline/services';
-import { computeVendorCoverage, type VendorCoverage } from '@/features/vendors/services';
-import { computeCatering, type CateringEstimate } from '@/features/catering/services';
-import { computeHealth, type HealthReport } from '@/features/health/services';
-import { computeRisks, type Risk } from '@/features/risks/services';
-import { generateIdeas, type IdeaContext } from '@/features/ideas/services';
-import { buildSnapshot, type PlanSnapshot } from '@/features/assistant/services';
+} from '@/features/timeline';
+import { computeVendorCoverage, type VendorCoverage } from '@/features/vendors';
+import { computeCatering, type CateringEstimate } from '@/features/catering';
+import { computeHealth, type HealthReport } from '@/features/health';
+import { computeRisks, type Risk } from '@/features/risks';
+import { generateIdeas, type IdeaContext } from '@/features/ideas';
+import { buildSnapshot } from '@/features/assistant';
+import type { PlanSnapshot } from '@/lib/plan-snapshot';
 
 /**
  * Every derived value the workspace needs for one plan.

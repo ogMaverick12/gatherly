@@ -5,14 +5,10 @@
  */
 
 import { useRef, useState, type RefObject } from 'react';
-import {
-  buildBasicAnswer,
-  classifyIntent,
-  renderSnapshotForModel,
-} from '@/features/assistant/services';
+import { buildBasicAnswer, classifyIntent, renderSnapshotForModel } from '@/features/assistant';
 import type { Dictionary } from '@/lib/i18n';
 import type { ChatMessage } from '@/lib/plan';
-import type { PlanView } from '@/lib/plan-view';
+import type { PlanView } from '../plan-view';
 import {
   applyFrame,
   emptyAnswer,

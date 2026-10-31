@@ -7,10 +7,8 @@ import {
   Plus_Jakarta_Sans,
 } from 'next/font/google';
 import './globals.css';
-import { AccessibilityProvider } from '@/features/accessibility/provider';
-import { ServiceWorkerRegistrar } from '@/features/accessibility/components/ServiceWorkerRegistrar';
-import { SiteHeader } from '@/features/workspace/components/SiteHeader';
-import { SiteFooter } from '@/features/workspace/components/SiteFooter';
+import { AccessibilityProvider, ServiceWorkerRegistrar } from '@/features/accessibility/app-shell';
+import { SiteFooter, SiteHeader } from '@/features/workspace/site-chrome';
 import { DARK_THEME_COLOR, LIGHT_THEME_COLOR } from '@/lib/theme-colors';
 
 // Optional loading keeps a late web-font swap from moving the header and copy.

@@ -5,8 +5,8 @@
  * Each section is its own component; this file only sets the reading order.
  */
 
-import { useAccessibility } from '@/features/accessibility/provider';
-import type { PlanView } from '@/lib/plan-view';
+import { useAccessibility } from '@/features/accessibility';
+import type { PlanView } from '../plan-view';
 import { BudgetTable } from './budget/BudgetTable';
 import { BudgetWarnings } from './budget/BudgetWarnings';
 import { ScenarioCards } from './budget/ScenarioCards';

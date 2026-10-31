@@ -1,9 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { IdeasPanel } from '@/features/workspace/components/IdeasPanel';
-import { AssistantPanel } from '@/features/workspace/components/AssistantPanel';
-import { ExportBar, SharedPlanPrompt } from '@/features/workspace/components/ExportBar';
+import { IdeasPanel, AssistantPanel, ExportBar, SharedPlanPrompt } from '@/features/workspace';
 import { getPlan, setPlan } from '@/lib/plan-store';
 import type { ChatMessage, Idea } from '@/lib/plan';
 import { encodeShareFragment } from '@/lib/share';

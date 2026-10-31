@@ -22,7 +22,7 @@ vi.mock('next/link', () => ({
   ),
 }));
 
-const { LandingContent } = await import('@/features/workspace/components/LandingContent');
+const { LandingContent } = await import('@/features/workspace');
 const { renderWithProvider } = await import('../helpers');
 
 describe('the landing page without a sample template', () => {

@@ -6,7 +6,7 @@ import {
   EventTypeSchema,
   PrioritySchema,
 } from '@/lib/plan';
-import type { PlanSnapshot } from '@/features/assistant/services';
+import type { PlanSnapshot } from './plan-snapshot';
 
 /**
  * Request and response schemas for the API routes.

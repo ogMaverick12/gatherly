@@ -7,10 +7,10 @@
 
 import { startTransition, useEffect, useMemo, useState } from 'react';
 import { todayDateOnly } from '@/lib/dates';
-import { computePlanView, type PlanView } from '@/lib/plan-view';
+import { computePlanView, type PlanView } from '../plan-view';
 import { hydratePlan, usePlan, usePlanActions } from '@/lib/plan-store';
 import type { ChatMessage, Idea, Plan, Vendor, VendorCategoryId } from '@/lib/plan';
-import { buildMilestoneLadder } from '@/features/timeline/services';
+import { buildMilestoneLadder } from '@/features/timeline';
 import {
   toStoredMilestones,
   withChatMessage,

@@ -5,8 +5,8 @@
  * Each row shows the base share, the adjusted share and the amount so the maths can be checked.
  */
 
-import { useAccessibility } from '@/features/accessibility/provider';
-import type { BudgetAllocation, CategoryAllocation } from '@/features/budget/services';
+import { useAccessibility } from '@/features/accessibility';
+import type { BudgetAllocation, CategoryAllocation } from '@/features/budget';
 import type { Dictionary } from '@/lib/i18n';
 import { formatMoney } from '@/lib/money';
 import type { Plan } from '@/lib/plan';

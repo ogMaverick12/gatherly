@@ -1,9 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { LandingContent } from '@/features/workspace/components/LandingContent';
-import { SamplePlanCards } from '@/features/workspace/components/SamplePlanCards';
-import { SiteFooter } from '@/features/workspace/components/SiteFooter';
+import { LandingContent, SamplePlanCards, SiteFooter } from '@/features/workspace';
 import { SAMPLE_PLAN_TEMPLATES } from '@/lib/plan';
 import { getPlan, setPlan } from '@/lib/plan-store';
 import { renderWithProvider } from '../helpers';

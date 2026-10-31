@@ -85,19 +85,24 @@ testable without a browser and usable without a network.
 
 ### 2.3 `src/lib/` - shared foundations
 
-| Module                            | Responsibility                                                                                                   |
-| --------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| `plan.ts`                         | The vocabulary (event types, currencies, categories, packs), the Zod schemas, `createPlan`, the sample templates |
-| `plan-store.ts`                   | The browser store: an external store over `localStorage`                                                         |
-| `plan-view.ts`                    | The single projection from a plan to everything the UI needs                                                     |
-| `money.ts`                        | Integer minor units, per-currency formatting                                                                     |
-| `dates.ts`                        | ISO date-only helpers                                                                                            |
-| `share.ts`                        | Share-fragment encode/decode                                                                                     |
-| `csv.ts`, `ics.ts`, `download.ts` | Exports                                                                                                          |
-| `ai/`                             | `Provider` interface, `BasicProvider`, `GeminiProvider`, `OpenRouterProvider`, prompts                           |
-| `security/`                       | Route guards, rate limiting, sanitising                                                                          |
-| `i18n/`                           | `en`, `hi`, `bn` dictionaries                                                                                    |
-| `api-schema.ts`                   | The schemas the API routes accept and return                                                                     |
+| Module                  | Responsibility                                                                                                   |
+| ----------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `plan.ts`               | The vocabulary (event types, currencies, categories, packs), the Zod schemas, `createPlan`, the sample templates |
+| `plan-store.ts`         | The browser store: an external store over `localStorage`                                                         |
+| `plan-snapshot.ts`      | The assistant snapshot shared by request schemas and the workspace                                               |
+| `health-band.ts`        | The shared plan-health band union                                                                                |
+| `money.ts`              | Integer minor units, per-currency formatting                                                                     |
+| `dates.ts`              | ISO date-only helpers                                                                                            |
+| `share.ts`              | Share-fragment encode/decode                                                                                     |
+| `ics.ts`, `download.ts` | Calendar and file-download helpers                                                                               |
+| `ai/`                   | `Provider` interface, `BasicProvider`, `GeminiProvider`, `OpenRouterProvider`, prompts                           |
+| `security/`             | Route guards, rate limiting, sanitising                                                                          |
+| `i18n/`                 | `en`, `hi`, `bn` dictionaries                                                                                    |
+| `api-schema.ts`         | The schemas the API routes accept and return                                                                     |
+
+The plan projection and CSV export live with the workspace feature
+(`src/features/workspace/plan-view.ts`, `src/features/workspace/csv.ts`), because they compose
+feature services and are consumed by the workspace UI.
 
 `plan.ts` imports nothing from `src/features`, so feature services can depend on the vocabulary
 without creating a cycle.
@@ -154,7 +159,7 @@ discarded if it does not match.
 
 ### 3.3 The projection
 
-`src/lib/plan-view.ts` turns a `Plan` into one object containing the budget summary, the milestone
+`src/features/workspace/plan-view.ts` turns a `Plan` into one object containing the budget summary, the milestone
 ladder, the vendor coverage, the health report, the risks, the run-of-show and the catering
 estimates. Every panel reads from that projection, so two panels can never disagree about the same
 number.
@@ -195,7 +200,7 @@ answer comes from Basic mode").
 
 All engines are pure and share the same conventions.
 
-### Budget (`src/features/budget/services.ts`)
+### Budget (`src/features/budget/index.ts`)
 
 - Allocation is proportional, from a base split per city tier and venue type, adjusted by the
   user's stated priorities.
@@ -205,21 +210,21 @@ All engines are pure and share the same conventions.
   exactly to the total - no lost paise, and the result is stable for identical inputs.
 - What-if scenarios re-run the same allocation for a different guest count.
 
-### Timeline (`src/features/timeline/services.ts`)
+### Timeline (`src/features/timeline/index.ts`)
 
 - The milestone ladder is computed **backwards** from the event date, so a milestone always has a
   real date rather than a vague "six weeks before".
 - A stored milestone's completion state is merged onto the computed ladder, so the dates stay
   correct while the user's ticks survive.
 
-### Vendors (`src/features/vendors/services.ts`)
+### Vendors (`src/features/vendors/index.ts`)
 
 - Coverage compares the booked and quoted spend against the planned vendor allocation.
 - A vendor is scored on the quote it has, the date it is needed and the lead time it needs.
 - The WhatsApp message is built as a plain URL-encoded text, never as a deep link with injected
   markup.
 
-### Health (`src/features/health/services.ts`)
+### Health (`src/features/health/index.ts`)
 
 - Five weighted parts - budget, timeline, vendors, tasks and guest experience - that add up to
   100 per cent.
@@ -227,7 +232,7 @@ All engines are pure and share the same conventions.
   rather than a black box.
 - The formula is displayed in the UI.
 
-### Catering (`src/features/catering/services.ts`)
+### Catering (`src/features/catering/index.ts`)
 
 - Quantity estimates for food and drink, derived from the guest count, the meal structure and the
   dietary needs that were stated.

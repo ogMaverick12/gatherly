@@ -1,7 +1,10 @@
 import type { Plan } from '@/lib/plan';
-import type { BudgetAllocation } from '@/features/budget/services';
-import type { VendorCoverage } from '@/features/vendors/services';
-import type { TimelineSummary } from '@/features/timeline/services';
+import type { HealthBand } from '@/lib/health-band';
+import type { BudgetAllocation } from '@/features/budget';
+import type { VendorCoverage } from '@/features/vendors';
+import type { TimelineSummary } from '@/features/timeline';
+
+export type { HealthBand } from '@/lib/health-band';
 
 /**
  * The shape of a health report.
@@ -9,8 +12,6 @@ import type { TimelineSummary } from '@/features/timeline/services';
  * A report is five named parts with published weights, so the number on the
  * screen can always be traced back to what was measured.
  */
-
-export type HealthBand = 'on_track' | 'attention' | 'at_risk';
 
 export interface HealthPart {
   readonly id: string;

@@ -1,5 +1,5 @@
 import { ACCESS_LABELS } from '@/lib/plan';
-import type { Risk, RiskInputs } from './services';
+import type { Risk, RiskInputs } from './types';
 
 /**
  * Guest-facing risks: dietary confirmation, access needs and an estimate that

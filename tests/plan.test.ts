@@ -10,7 +10,7 @@ import {
   SAMPLE_PLAN_TEMPLATES,
 } from '@/lib/plan';
 import { todayDateOnly } from '@/lib/dates';
-import { computePlanView } from '@/lib/plan-view';
+import { computePlanView } from '@/features/workspace';
 import { asInvalid, TEST_INTAKE as INTAKE } from './factories';
 
 describe('the plan schema', () => {

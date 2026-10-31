@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { computeBudget, computeScenarios, PRIORITY_MULTIPLIER } from '@/features/budget/services';
+import { computeBudget, computeScenarios, PRIORITY_MULTIPLIER } from '@/features/budget';
 import { createPlan, type Intake } from '@/lib/plan';
 
 const BASE: Intake = {

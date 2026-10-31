@@ -5,7 +5,7 @@
  * It renders the input, send and stop controls; the chat hook owns their state.
  */
 
-import { useAccessibility } from '@/features/accessibility/provider';
+import { useAccessibility } from '@/features/accessibility';
 
 // long-function: one view section, kept in one block so its reading order stays visible.
 /** The question box, its send button, and Stop while an answer is arriving. */

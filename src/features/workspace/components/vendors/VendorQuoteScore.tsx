@@ -5,8 +5,8 @@
  * Opening it shows every component, the points earned and the reason.
  */
 
-import { useAccessibility } from '@/features/accessibility/provider';
-import type { QuoteAssessment } from '@/features/vendors/services';
+import { useAccessibility } from '@/features/accessibility';
+import type { QuoteAssessment } from '@/features/vendors';
 
 /**
  * The score, and the working behind it.

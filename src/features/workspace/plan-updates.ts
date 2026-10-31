@@ -1,6 +1,6 @@
-import { computePlanView } from '@/lib/plan-view';
+import { computePlanView } from './plan-view';
 import type { ChatMessage, Idea, Milestone, Plan, TaskArea, Vendor } from '@/lib/plan';
-import type { PlanView } from '@/lib/plan-view';
+import type { PlanView } from './plan-view';
 
 /**
  * The changes the workspace can make to a plan.

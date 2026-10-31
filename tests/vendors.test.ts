@@ -8,7 +8,7 @@ import {
   scoreQuote,
   vendorChecklist,
   vendorCoverageShare,
-} from '@/features/vendors/services';
+} from '@/features/vendors';
 import type { Intake, Vendor } from '@/lib/plan';
 import { makePlan, makeVendor as vendor } from './factories';
 

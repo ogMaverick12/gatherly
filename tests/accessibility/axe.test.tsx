@@ -2,13 +2,15 @@ import { describe, expect, it, vi } from 'vitest';
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { axe } from 'jest-axe';
-import { LandingContent } from '@/features/workspace/components/LandingContent';
-import { SamplePlanCards } from '@/features/workspace/components/SamplePlanCards';
-import { SiteFooter } from '@/features/workspace/components/SiteFooter';
-import { SiteHeader } from '@/features/workspace/components/SiteHeader';
-import { PlanWorkspace } from '@/features/workspace/components/PlanWorkspace';
-import { IntakeForm } from '@/features/intake/components/IntakeForm';
-import { DisplaySettings } from '@/features/accessibility/components/DisplaySettings';
+import {
+  LandingContent,
+  SamplePlanCards,
+  SiteFooter,
+  SiteHeader,
+  PlanWorkspace,
+} from '@/features/workspace';
+import { IntakeForm } from '@/features/intake';
+import { DisplaySettings } from '@/features/accessibility';
 import { SAMPLE_PLAN_TEMPLATES } from '@/lib/plan';
 import { setPlan } from '@/lib/plan-store';
 import { makePlan, renderWithProvider } from '../helpers';

@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { PlanWorkspace } from '@/features/workspace/components/PlanWorkspace';
+import { PlanWorkspace } from '@/features/workspace/plan-page';
 
 /** Browser-tab metadata for the plan workspace. */
 export const metadata: Metadata = {

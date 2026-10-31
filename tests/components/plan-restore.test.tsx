@@ -25,7 +25,7 @@ describe('restoring a plan after a reload', () => {
     const plan = createPlan(TEST_INTAKE, new Date('2026-01-01T00:00:00.000Z'));
     window.localStorage.setItem('gatherly:plan:v1', JSON.stringify(plan));
 
-    const { PlanWorkspace } = await import('@/features/workspace/components/PlanWorkspace');
+    const { PlanWorkspace } = await import('@/features/workspace');
     const { renderWithProvider } = await import('../helpers');
     renderWithProvider(<PlanWorkspace />);
 
@@ -35,7 +35,7 @@ describe('restoring a plan after a reload', () => {
   it('discards a stored plan that no longer matches the schema', async () => {
     window.localStorage.setItem('gatherly:plan:v1', '{"version":1,"intake":{}}');
 
-    const { PlanWorkspace } = await import('@/features/workspace/components/PlanWorkspace');
+    const { PlanWorkspace } = await import('@/features/workspace');
     const { renderWithProvider } = await import('../helpers');
     renderWithProvider(<PlanWorkspace />);
 

@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { IntakeForm } from '@/features/intake/components/IntakeForm';
+import { IntakeForm } from '@/features/intake';
 import { getPlan, setPlan } from '@/lib/plan-store';
 import { renderWithProvider } from '../helpers';
 

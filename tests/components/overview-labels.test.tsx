@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { screen } from '@testing-library/react';
-import { OverviewPanel } from '@/features/workspace/components/OverviewPanel';
-import { DEFAULT_PREFERENCES, writeStoredPreferences } from '@/features/accessibility/provider';
+import { OverviewPanel, computePlanView } from '@/features/workspace';
+import { DEFAULT_PREFERENCES, writeStoredPreferences } from '@/features/accessibility';
 import { todayDateOnly } from '@/lib/dates';
 import { DICTIONARIES } from '@/lib/i18n';
 import {
@@ -19,7 +19,6 @@ import {
   createSamplePlan,
   type Language,
 } from '@/lib/plan';
-import { computePlanView } from '@/lib/plan-view';
 import { renderWithProvider } from '../helpers';
 
 const NOW = new Date('2026-01-01T00:00:00.000Z');

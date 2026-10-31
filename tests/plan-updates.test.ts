@@ -9,8 +9,8 @@ import {
   withTaskToggled,
   withVendorAdded,
   withVendorUpdated,
-} from '@/features/workspace/plan-updates';
-import { computePlanView } from '@/lib/plan-view';
+  computePlanView,
+} from '@/features/workspace';
 import type { ChatMessage, Idea, PlanTask, Vendor } from '@/lib/plan';
 import { makePlan, makeVendor } from './factories';
 

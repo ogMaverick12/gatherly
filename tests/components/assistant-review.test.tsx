@@ -1,10 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { createRef } from 'react';
 import { screen } from '@testing-library/react';
-import { AssistantLog } from '@/features/workspace/components/AssistantLog';
-import { BudgetWarnings } from '@/features/workspace/components/budget/BudgetWarnings';
-import { ReviewSummary } from '@/features/intake/components/ReviewSummary';
-import { DEFAULT_INTAKE_VALUES, type IntakeFormValues } from '@/features/intake/schema';
+import { AssistantLog, BudgetWarnings } from '@/features/workspace';
+import { ReviewSummary } from '@/features/intake';
+import { DEFAULT_INTAKE_VALUES, type IntakeFormValues } from '@/features/intake';
 import { DICTIONARIES } from '@/lib/i18n';
 import type { ChatMessage } from '@/lib/plan';
 import { renderWithProvider } from '../helpers';

@@ -5,7 +5,7 @@
  * It offers the intake wizard and the prompt for a plan shared through a link.
  */
 
-import { useAccessibility } from '@/features/accessibility/provider';
+import { useAccessibility } from '@/features/accessibility';
 import type { Plan } from '@/lib/plan';
 import { SharedPlanPrompt } from './ExportBar';
 

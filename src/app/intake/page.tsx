@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
-import { IntakeForm } from '@/features/intake/components/IntakeForm';
-import { IntakeHeading } from '@/features/intake/components/IntakeHeading';
+import { IntakeForm, IntakeHeading } from '@/features/intake/form-page';
 
 /** Browser-tab metadata for the intake wizard. */
 export const metadata: Metadata = {

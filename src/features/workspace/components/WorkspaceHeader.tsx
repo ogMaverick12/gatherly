@@ -5,12 +5,11 @@
  * Clearing the plan is confirmed first and is the only destructive action here.
  */
 
-import { useAccessibility } from '@/features/accessibility/provider';
+import { OfflineBanner, useAccessibility } from '@/features/accessibility';
 import { formatDateOnly } from '@/lib/dates';
 import { formatMoney } from '@/lib/money';
 import { isSamplePlan, type Plan } from '@/lib/plan';
-import type { PlanView } from '@/lib/plan-view';
-import { OfflineBanner } from '@/features/accessibility/components/OfflineBanner';
+import type { PlanView } from '../plan-view';
 import { ExportBar } from './ExportBar';
 
 // long-function: one view section, kept in one block so its reading order stays visible.

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { computePlanView } from '@/lib/plan-view';
+import { computePlanView } from '@/features/workspace';
 import { makePlan } from './factories';
 
 describe('the derived plan view', () => {

@@ -1,7 +1,7 @@
 import { ACCESS_LABELS, DIETARY_LABELS, type Plan } from '@/lib/plan';
-import type { BudgetAllocation } from '@/features/budget/services';
-import type { VendorCoverage } from '@/features/vendors/services';
-import type { TimelineSummary } from '@/features/timeline/services';
+import type { BudgetAllocation } from '@/features/budget';
+import type { VendorCoverage } from '@/features/vendors';
+import type { TimelineSummary } from '@/features/timeline';
 import type { HealthPart } from './types';
 
 /** The five measurements that make up the score. */

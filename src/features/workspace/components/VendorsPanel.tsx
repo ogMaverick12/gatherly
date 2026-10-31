@@ -6,7 +6,7 @@
  */
 
 import type { Vendor, VendorCategoryId } from '@/lib/plan';
-import type { PlanView } from '@/lib/plan-view';
+import type { PlanView } from '../plan-view';
 import { AddVendorForm } from './vendors/AddVendorForm';
 import { VendorChecklist } from './vendors/VendorChecklist';
 import { VendorCoverage } from './vendors/VendorCoverage';

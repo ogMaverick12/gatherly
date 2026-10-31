@@ -9,7 +9,7 @@
  */
 
 import { logWarn } from './logger';
-import type { RateLimitResult, RateLimiter } from './rate-limit';
+import type { RateLimiter, RateLimitResult } from './rate-limit-types';
 
 /**
  * Count, and start the window only when the counter is created.

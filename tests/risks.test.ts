@@ -1,15 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { computeRisks } from '@/features/risks/services';
-import { computeBudget } from '@/features/budget/services';
-import { computeVendorCoverage } from '@/features/vendors/services';
-import { computeCatering } from '@/features/catering/services';
-import {
-  buildMilestoneLadder,
-  mergeMilestoneState,
-  summariseTimeline,
-} from '@/features/timeline/services';
+import { computeRisks } from '@/features/risks';
+import { computeBudget } from '@/features/budget';
+import { computeVendorCoverage } from '@/features/vendors';
+import { computeCatering } from '@/features/catering';
+import { buildMilestoneLadder, mergeMilestoneState, summariseTimeline } from '@/features/timeline';
 import { createPlan, type Intake, type PlanTask, type Vendor } from '@/lib/plan';
-import { computePlanView } from '@/lib/plan-view';
+import { computePlanView } from '@/features/workspace';
 
 /** The day the plan is looked at. Fixed, so no test depends on the clock. */
 const TODAY = '2026-10-22';

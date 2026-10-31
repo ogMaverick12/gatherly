@@ -24,12 +24,12 @@ The server is stateless by design: the plan belongs to the browser and share lin
 | Brief area                    | Source                                       | Evidence                             |
 | ----------------------------- | -------------------------------------------- | ------------------------------------ |
 | Intake and sample plans       | `src/lib/plan.ts`                            | Plan schema + sample fixtures        |
-| Budget and scenarios          | `src/features/budget/services.ts`            | Allocation, warnings, scenarios      |
-| Timeline and calendar         | `src/features/timeline/services.ts`          | Backward milestones + ICS            |
-| Vendor checklist and WhatsApp | `src/features/vendors/services.ts`           | Status, quote score, encoder         |
-| Health score                  | `src/features/health/services.ts`            | Five explainable parts               |
-| Catering                      | `src/features/catering/services.ts`          | Quantity estimates                   |
-| Ideas and assistant           | `src/features/ideas/services.ts`, `app/api`  | Basic mode fallback and SSE          |
+| Budget and scenarios          | `src/features/budget/index.ts`               | Allocation, warnings, scenarios      |
+| Timeline and calendar         | `src/features/timeline/index.ts`             | Backward milestones + ICS            |
+| Vendor checklist and WhatsApp | `src/features/vendors/index.ts`              | Status, quote score, encoder         |
+| Health score                  | `src/features/health/index.ts`               | Five explainable parts               |
+| Catering                      | `src/features/catering/index.ts`             | Quantity estimates                   |
+| Ideas and assistant           | `src/features/ideas/index.ts`, `app/api`     | Basic mode fallback and SSE          |
 | Offline and accessibility     | `public/sw.js`, `src/features/accessibility` | PWA shell, offline banner, Calm mode |
 
 ## Setup

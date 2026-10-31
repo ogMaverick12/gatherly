@@ -5,8 +5,8 @@
  * Requests go to the ideas route, and the badge always names the answer's mode.
  */
 
-import { useAccessibility } from '@/features/accessibility/provider';
-import type { PlanView } from '@/lib/plan-view';
+import { useAccessibility } from '@/features/accessibility';
+import type { PlanView } from '../plan-view';
 import type { Idea } from '@/lib/plan';
 import { useIdeas } from '../hooks/use-ideas';
 import { IdeaCard } from './idea-card';

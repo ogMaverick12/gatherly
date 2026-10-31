@@ -5,8 +5,8 @@
  * Severity is repeated in text and dot colour, and every risk carries a mitigation.
  */
 
-import { useAccessibility } from '@/features/accessibility/provider';
-import type { Risk } from '@/features/risks/services';
+import { useAccessibility } from '@/features/accessibility';
+import type { Risk } from '@/features/risks';
 
 /**
  * The severity dot is decoration: the severity is written in the text as well,

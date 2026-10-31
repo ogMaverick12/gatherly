@@ -5,7 +5,7 @@
  * The title and subtitle come from the active dictionary.
  */
 
-import { useAccessibility } from '@/features/accessibility/provider';
+import { useAccessibility } from '@/features/accessibility';
 
 /** Render the intake page title and subtitle. */
 export function IntakeHeading() {

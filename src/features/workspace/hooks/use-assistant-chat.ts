@@ -6,9 +6,9 @@
  */
 
 import type { RefObject } from 'react';
-import { useAccessibility } from '@/features/accessibility/provider';
+import { useAccessibility } from '@/features/accessibility';
 import type { ChatMessage } from '@/lib/plan';
-import type { PlanView } from '@/lib/plan-view';
+import type { PlanView } from '../plan-view';
 import type { StreamedAnswer } from '../components/assistant-stream';
 import { useChatAsk, useChatState, useChatStop } from './assistant-chat-controller';
 

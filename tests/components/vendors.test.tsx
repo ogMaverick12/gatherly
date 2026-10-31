@@ -1,11 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { VendorsPanel } from '@/features/workspace/components/VendorsPanel';
-import { ServiceWorkerRegistrar } from '@/features/accessibility/components/ServiceWorkerRegistrar';
-import { OfflineBanner } from '@/features/accessibility/components/OfflineBanner';
+import { VendorsPanel, computePlanView } from '@/features/workspace';
+import { ServiceWorkerRegistrar, OfflineBanner } from '@/features/accessibility';
 import { setPlan } from '@/lib/plan-store';
-import { computePlanView } from '@/lib/plan-view';
 import type { Plan, Vendor } from '@/lib/plan';
 import { makePlan, makeView, renderWithProvider } from '../helpers';
 

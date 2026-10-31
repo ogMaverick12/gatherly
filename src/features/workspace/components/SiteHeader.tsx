@@ -5,9 +5,8 @@
  * It carries the wordmark, the two main links, language choice and display settings.
  */
 
-import { DisplaySettings } from '@/features/accessibility/components/DisplaySettings';
+import { DisplaySettings, useAccessibility } from '@/features/accessibility';
 import { Wordmark } from './Wordmark';
-import { useAccessibility } from '@/features/accessibility/provider';
 import Link from 'next/link';
 
 // long-function: one view section, kept in one block so its reading order stays visible.

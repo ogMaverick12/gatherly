@@ -5,8 +5,8 @@
  */
 
 import { formatMoney, sharePercent } from '@/lib/money';
+import type { PlanSnapshot } from '@/lib/plan-snapshot';
 import type { AssistantIntent } from './intent';
-import type { PlanSnapshot } from './snapshot';
 
 /** Format an integer minor-unit amount for an answer. */
 function money(minor: number, currency: PlanSnapshot['currency']): string {

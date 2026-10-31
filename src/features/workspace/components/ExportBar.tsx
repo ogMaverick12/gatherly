@@ -6,13 +6,13 @@
  */
 
 import { useRef, useState } from 'react';
-import { useAccessibility } from '@/features/accessibility/provider';
+import { useAccessibility } from '@/features/accessibility';
 import { copyToClipboard, downloadFile } from '@/lib/download';
-import { budgetCsv, withBom } from '@/lib/csv';
+import { budgetCsv, withBom } from '../csv';
 import { buildCalendar } from '@/lib/ics';
 import { buildShareUrl, decodeShareFragment, encodeShareFragment } from '@/lib/share';
 import { PlanSchema, type Plan } from '@/lib/plan';
-import type { PlanView } from '@/lib/plan-view';
+import type { PlanView } from '../plan-view';
 import type { Dictionary } from '@/lib/i18n';
 
 const BUTTON_CLASS =

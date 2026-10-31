@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { LandingContent } from '@/features/workspace/components/LandingContent';
+import { LandingContent } from '@/features/workspace/landing-page';
 
 /** Browser-tab metadata for the landing page. */
 export const metadata: Metadata = {

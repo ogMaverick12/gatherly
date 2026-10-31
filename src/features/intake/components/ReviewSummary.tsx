@@ -5,7 +5,7 @@
  * It restates the answers in the order they were asked, using the same labels.
  */
 
-import { useAccessibility } from '@/features/accessibility/provider';
+import { useAccessibility } from '@/features/accessibility';
 import { CITY_TIER_LABELS, EVENT_TYPE_LABELS, PRIORITY_LABELS, type Currency } from '@/lib/plan';
 import { formatMoneyPlain } from '@/lib/money';
 import type { IntakeFormValues } from '../schema';

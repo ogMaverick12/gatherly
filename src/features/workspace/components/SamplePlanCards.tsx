@@ -7,7 +7,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { useAccessibility } from '@/features/accessibility/provider';
+import { useAccessibility } from '@/features/accessibility';
 import { createSamplePlan, type SamplePlanTemplate } from '@/lib/plan';
 import { setPlan } from '@/lib/plan-store';
 import { EVENT_TYPE_LABELS } from '@/lib/plan';

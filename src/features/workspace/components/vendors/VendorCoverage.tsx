@@ -5,9 +5,9 @@
  * The bar is backed by a written percentage and status, so colour is never the only signal.
  */
 
-import { useAccessibility } from '@/features/accessibility/provider';
+import { useAccessibility } from '@/features/accessibility';
 import { VENDOR_STATUS_LABELS, type VendorStatus } from '@/lib/plan';
-import type { PlanView } from '@/lib/plan-view';
+import type { PlanView } from '../../plan-view';
 
 /**
  * How much of each vendor line is booked.

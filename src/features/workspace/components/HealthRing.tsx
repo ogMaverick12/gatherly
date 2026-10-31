@@ -3,7 +3,7 @@
  * Both draw with design tokens, and the ring states its score in words.
  */
 
-import type { HealthBand } from '@/features/health/services';
+import type { HealthBand } from '@/features/health';
 
 const BAND_COLOR: Record<HealthBand, string> = {
   on_track: 'var(--color-teal)',

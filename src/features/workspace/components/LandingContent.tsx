@@ -6,10 +6,10 @@
  */
 
 import { useMemo } from 'react';
-import { useAccessibility } from '@/features/accessibility/provider';
+import { useAccessibility } from '@/features/accessibility';
 import { createSamplePlan, SAMPLE_PLAN_TEMPLATES } from '@/lib/plan';
 import { todayDateOnly } from '@/lib/dates';
-import { computePlanView } from '@/lib/plan-view';
+import { computePlanView } from '../plan-view';
 import {
   FeaturesSection,
   InclusionSection,

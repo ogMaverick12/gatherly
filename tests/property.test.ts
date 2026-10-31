@@ -7,18 +7,14 @@ import {
   sumMinor,
   toMajorUnits,
 } from '@/lib/money';
-import { computeBudget } from '@/features/budget/services';
-import {
-  buildMilestoneLadder,
-  mergeMilestoneState,
-  summariseTimeline,
-} from '@/features/timeline/services';
-import { computeRisks } from '@/features/risks/services';
-import { computeVendorCoverage } from '@/features/vendors/services';
-import { computeCatering } from '@/features/catering/services';
+import { computeBudget } from '@/features/budget';
+import { buildMilestoneLadder, mergeMilestoneState, summariseTimeline } from '@/features/timeline';
+import { computeRisks } from '@/features/risks';
+import { computeVendorCoverage } from '@/features/vendors';
+import { computeCatering } from '@/features/catering';
 import { buildCalendar } from '@/lib/ics';
 import { decodeShareFragment, encodeShareFragment } from '@/lib/share';
-import { toCsv } from '@/lib/csv';
+import { toCsv, computePlanView } from '@/features/workspace';
 import { escapeCsvCell } from '@/lib/security/sanitize';
 import { addDays, diffDays, type DateOnly } from '@/lib/dates';
 import {
@@ -36,7 +32,6 @@ import {
   type Intake,
   type Plan,
 } from '@/lib/plan';
-import { computePlanView } from '@/lib/plan-view';
 
 /** The day the plan is looked at. Fixed, so no test depends on the clock. */
 const TODAY = '2026-10-22';

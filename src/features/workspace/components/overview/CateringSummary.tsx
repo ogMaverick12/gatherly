@@ -5,8 +5,8 @@
  * The figures are estimates, and the caveat stays with them.
  */
 
-import { useAccessibility } from '@/features/accessibility/provider';
-import type { CateringEstimate } from '@/features/catering/services';
+import { useAccessibility } from '@/features/accessibility';
+import type { CateringEstimate } from '@/features/catering';
 import { CelebrationDot } from '../HealthRing';
 
 /**

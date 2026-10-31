@@ -1,14 +1,16 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { OverviewPanel } from '@/features/workspace/components/OverviewPanel';
-import { BudgetPanel } from '@/features/workspace/components/BudgetPanel';
-import { TimelinePanel } from '@/features/workspace/components/TimelinePanel';
-import { VendorsPanel } from '@/features/workspace/components/VendorsPanel';
-import { IdeasPanel } from '@/features/workspace/components/IdeasPanel';
-import { AssistantPanel } from '@/features/workspace/components/AssistantPanel';
-import { HealthRail } from '@/features/workspace/components/HealthRail';
-import { ExportBar } from '@/features/workspace/components/ExportBar';
+import {
+  OverviewPanel,
+  BudgetPanel,
+  TimelinePanel,
+  VendorsPanel,
+  IdeasPanel,
+  AssistantPanel,
+  HealthRail,
+  ExportBar,
+} from '@/features/workspace';
 import { makePlan, makeView, renderWithProvider } from '../helpers';
 
 const downloadFile = vi.fn();

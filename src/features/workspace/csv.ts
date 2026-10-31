@@ -1,7 +1,7 @@
 import { escapeCsvCell } from '@/lib/security/sanitize';
 import type { Plan } from '@/lib/plan';
 import { formatMinor, formatMinorPlain } from '@/lib/money';
-import type { BudgetAllocation } from '@/features/budget/services';
+import type { BudgetAllocation } from '@/features/budget';
 
 /**
  * CSV export.

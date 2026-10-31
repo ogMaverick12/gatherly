@@ -9,8 +9,6 @@ import type { HealthBand, HealthInputs, HealthPart, HealthReport } from './types
  * heuristic - the app says so, and always shows its inputs.
  */
 
-export type { HealthBand, HealthInputs, HealthPart, HealthReport } from './types';
-
 /**
  * Scores the plan out of 100 and picks the first thing worth doing.
  * @param inputs the plan plus the budget, vendor and timeline results already computed for it

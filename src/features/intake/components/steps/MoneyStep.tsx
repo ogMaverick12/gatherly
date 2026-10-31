@@ -6,7 +6,7 @@
  */
 
 import { type UseFormReturn } from 'react-hook-form';
-import { useAccessibility } from '@/features/accessibility/provider';
+import { useAccessibility } from '@/features/accessibility';
 import { CURRENCIES, CURRENCY_META, type Currency } from '@/lib/plan';
 import { formatMoneyPlain } from '@/lib/money';
 import type { IntakeFormValues } from '../../schema';

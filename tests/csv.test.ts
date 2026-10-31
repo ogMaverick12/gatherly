@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { budgetCsv, milestonesCsv, toCsv, vendorsCsv, withBom } from '@/lib/csv';
-import { computeBudget } from '@/features/budget/services';
+import { budgetCsv, milestonesCsv, toCsv, vendorsCsv, withBom } from '@/features/workspace';
+import { computeBudget } from '@/features/budget';
 import { createPlan, type Intake, type Vendor } from '@/lib/plan';
 
 const BASE: Intake = {

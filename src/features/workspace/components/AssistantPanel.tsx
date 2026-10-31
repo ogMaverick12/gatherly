@@ -5,9 +5,9 @@
  * The Basic-mode notice stays visible whenever the provider route is unavailable.
  */
 
-import { useAccessibility } from '@/features/accessibility/provider';
+import { useAccessibility } from '@/features/accessibility';
 import type { ChatMessage } from '@/lib/plan';
-import type { PlanView } from '@/lib/plan-view';
+import type { PlanView } from '../plan-view';
 import { useAssistantChat } from '../hooks/use-assistant-chat';
 import { AssistantComposer } from './AssistantComposer';
 import { AssistantLog } from './AssistantLog';

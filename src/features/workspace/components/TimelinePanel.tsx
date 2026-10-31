@@ -5,10 +5,10 @@
  * Both sections read their dates and labels from the computed plan view.
  */
 
-import { useAccessibility } from '@/features/accessibility/provider';
+import { useAccessibility } from '@/features/accessibility';
 import { todayDateOnly } from '@/lib/dates';
 import type { Dictionary } from '@/lib/i18n';
-import type { PlanView } from '@/lib/plan-view';
+import type { PlanView } from '../plan-view';
 import { MilestoneItem } from './milestone-item';
 
 /** The dated milestone ladder with completion toggles. */

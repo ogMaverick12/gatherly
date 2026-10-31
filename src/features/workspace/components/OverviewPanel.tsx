@@ -5,10 +5,10 @@
  * The panel only arranges the sections; every number arrives already computed.
  */
 
-import { useAccessibility } from '@/features/accessibility/provider';
+import { useAccessibility } from '@/features/accessibility';
 import { formatDateOnly } from '@/lib/dates';
 import { formatMoney } from '@/lib/money';
-import type { PlanView } from '@/lib/plan-view';
+import type { PlanView } from '../plan-view';
 import { CateringSummary } from './overview/CateringSummary';
 import { RiskList } from './overview/RiskList';
 import { StatCard } from './overview/StatCard';

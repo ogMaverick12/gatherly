@@ -6,7 +6,7 @@
  */
 
 import { useState } from 'react';
-import { useAccessibility } from '@/features/accessibility/provider';
+import { useAccessibility } from '@/features/accessibility';
 import type { PlanTask } from '@/lib/plan';
 
 /** Phones show the first few tasks; the rest are one disclosure away. */

@@ -9,7 +9,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm, type UseFormReturn } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useAccessibility } from '@/features/accessibility/provider';
+import { useAccessibility } from '@/features/accessibility';
 import { createPlan, type Currency, type Intake } from '@/lib/plan';
 import { fromMajorUnits } from '@/lib/money';
 import { setPlan } from '@/lib/plan-store';

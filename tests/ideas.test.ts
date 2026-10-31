@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { generateIdeas, describePlanShape, type IdeaContext } from '@/features/ideas/services';
+import { generateIdeas, describePlanShape, type IdeaContext } from '@/features/ideas';
 
 const CONTEXT: IdeaContext = {
   guests: 120,

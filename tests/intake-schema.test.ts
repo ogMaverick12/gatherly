@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { DEFAULT_INTAKE_VALUES, IntakeFormSchema } from '@/features/intake/schema';
+import { DEFAULT_INTAKE_VALUES, IntakeFormSchema } from '@/features/intake';
 
 /** Parse the default form with a few fields changed. */
 function parse(patch: Record<string, unknown>) {

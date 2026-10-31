@@ -1,15 +1,18 @@
 import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { CelebrationMark, Wordmark } from '@/features/workspace/components/Wordmark';
-import { GarlandLine } from '@/features/workspace/components/GarlandLine';
-import { HealthRing, CelebrationDot } from '@/features/workspace/components/HealthRing';
-import { Tabs } from '@/features/workspace/components/Tabs';
-import { SiteFooter } from '@/features/workspace/components/SiteFooter';
-import { SiteHeader } from '@/features/workspace/components/SiteHeader';
-import { DisplaySettings } from '@/features/accessibility/components/DisplaySettings';
-import { IntakeHeading } from '@/features/intake/components/IntakeHeading';
-import { ChipGroup } from '@/features/intake/components/ChipGroup';
+import {
+  CelebrationMark,
+  Wordmark,
+  GarlandLine,
+  HealthRing,
+  CelebrationDot,
+  Tabs,
+  SiteFooter,
+  SiteHeader,
+} from '@/features/workspace';
+import { DisplaySettings } from '@/features/accessibility';
+import { IntakeHeading, ChipGroup } from '@/features/intake';
 import { renderWithProvider } from '../helpers';
 
 vi.mock('next/link', () => ({

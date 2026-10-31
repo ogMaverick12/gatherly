@@ -6,7 +6,7 @@
  */
 
 import dynamic from 'next/dynamic';
-import { useAccessibility } from '@/features/accessibility/provider';
+import { useAccessibility } from '@/features/accessibility';
 import { usePlanWorkspace } from '../hooks/use-plan-workspace';
 import { useWideLayout } from '../hooks/use-wide-layout';
 import { HealthRail, MobileHealthSummary } from './HealthRail';

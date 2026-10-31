@@ -5,14 +5,14 @@
  */
 
 import Link from 'next/link';
-import type { BudgetAllocation, CategoryAllocation } from '@/features/budget/types';
+import type { BudgetAllocation, CategoryAllocation } from '@/features/budget';
 import { GarlandLine } from '@/features/workspace/components/GarlandLine';
 import { HealthRing } from '@/features/workspace/components/HealthRing';
 import { SamplePlanCards } from '@/features/workspace/components/SamplePlanCards';
 import type { Dictionary } from '@/lib/i18n';
 import { formatMoney } from '@/lib/money';
 import { SAMPLE_PLAN_TEMPLATES, type Plan } from '@/lib/plan';
-import type { PlanView } from '@/lib/plan-view';
+import type { PlanView } from '../plan-view';
 
 const FEATURE_KEYS = ['budget', 'timeline', 'vendors', 'health', 'ideas', 'export'] as const;
 

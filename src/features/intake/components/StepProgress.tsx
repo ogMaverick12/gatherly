@@ -5,7 +5,7 @@
  * The current step is marked with aria-current, not only with colour.
  */
 
-import { useAccessibility } from '@/features/accessibility/provider';
+import { useAccessibility } from '@/features/accessibility';
 import { INTAKE_STEPS, type IntakeStep } from '../schema';
 
 /** Where the user is in the form, as an ordered list that reads as steps. */

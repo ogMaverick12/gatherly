@@ -5,7 +5,7 @@ import { generateJson } from '@/lib/ai/provider-json';
 import { PARSE_SYSTEM_PROMPT } from '@/lib/ai/prompts';
 import { jsonResponse } from '@/lib/security/http';
 import { createRoute } from '@/lib/security/route';
-import { parseFreeText } from '@/features/assistant/parse';
+import { parseFreeText } from '@/features/assistant';
 /** Node.js runtime: the provider adapters rely on Node APIs. */
 export const runtime = 'nodejs';
 /** Parse each request fresh; the result is never cached. */

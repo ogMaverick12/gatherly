@@ -1,8 +1,4 @@
-import { type Plan } from '@/lib/plan';
-import type { BudgetAllocation } from '@/features/budget/services';
-import type { VendorCoverage } from '@/features/vendors/services';
-import type { TimelineSummary } from '@/features/timeline/services';
-import type { CateringEstimate } from '@/features/catering/services';
+import type { Risk, RiskInputs, RiskSeverity } from './types';
 import { accessRisks, dietaryRisk, estimateRisk } from './guest-risks';
 
 /**
@@ -12,27 +8,6 @@ import { accessRisks, dietaryRisk, estimateRisk } from './guest-risks';
  * the rule rather than guess what the app is worried about. Nothing here
  * infers religion, community, region or identity.
  */
-
-export type RiskSeverity = 'low' | 'medium' | 'high';
-export type RiskArea =
-  'budget' | 'timeline' | 'vendors' | 'catering' | 'guest-experience' | 'planning';
-
-export interface Risk {
-  readonly id: string;
-  readonly severity: RiskSeverity;
-  readonly area: RiskArea;
-  readonly title: string;
-  readonly explanation: string;
-  readonly mitigation: string;
-}
-
-export interface RiskInputs {
-  readonly plan: Plan;
-  readonly budget: BudgetAllocation;
-  readonly coverage: VendorCoverage;
-  readonly timeline: TimelineSummary;
-  readonly catering: CateringEstimate;
-}
 
 /** Months that are wet in most places. Month only - never a region. */
 const WET_MONTHS = new Set([6, 7, 8, 9]);

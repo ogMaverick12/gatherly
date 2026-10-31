@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { computeCatering, BUFFER_PERCENT } from '@/features/catering/services';
+import { computeCatering, BUFFER_PERCENT } from '@/features/catering';
 import { createPlan, type Intake, type Vendor } from '@/lib/plan';
 
 const BASE: Intake = {

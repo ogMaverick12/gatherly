@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { parseFreeText } from '@/features/assistant/parse';
+import { parseFreeText } from '@/features/assistant';
 
 describe('parseFreeText', () => {
   it('extracts the event type', () => {

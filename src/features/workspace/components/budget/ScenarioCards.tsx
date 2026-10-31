@@ -5,8 +5,8 @@
  * Every card shows its total and the difference from the current plan.
  */
 
-import { useAccessibility } from '@/features/accessibility/provider';
-import type { BudgetScenario } from '@/features/budget/services';
+import { useAccessibility } from '@/features/accessibility';
+import type { BudgetScenario } from '@/features/budget';
 import { formatMoney } from '@/lib/money';
 import type { Currency } from '@/lib/plan';
 

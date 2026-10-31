@@ -178,16 +178,16 @@ step machine only advances when the current step parses. The plan is validated a
 
 **Built.** Eight pure services, none of which touches the network, the clock or a random source:
 
-| Engine    | File                                 | What it computes                                                    |
-| --------- | ------------------------------------ | ------------------------------------------------------------------- |
-| Budget    | `src/features/budget/services.ts`    | Category allocation, per-guest figures, what-if scenarios, warnings |
-| Timeline  | `src/features/timeline/services.ts`  | The backward milestone ladder, the run of show, state merging       |
-| Vendors   | `src/features/vendors/services.ts`   | Status, quote score, coverage percentage, the WhatsApp link         |
-| Health    | `src/features/health/services.ts`    | Five weighted, explainable parts and the next action                |
-| Risks     | `src/features/risks/services.ts`     | The risk register and its triggers                                  |
-| Catering  | `src/features/catering/services.ts`  | Food and drink quantities                                           |
-| Ideas     | `src/features/ideas/services.ts`     | Deterministic ideas from the plan's own numbers                     |
-| Assistant | `src/features/assistant/services.ts` | Intent classification and the Basic-mode answer                     |
+| Engine    | File                              | What it computes                                                    |
+| --------- | --------------------------------- | ------------------------------------------------------------------- |
+| Budget    | `src/features/budget/index.ts`    | Category allocation, per-guest figures, what-if scenarios, warnings |
+| Timeline  | `src/features/timeline/index.ts`  | The backward milestone ladder, the run of show, state merging       |
+| Vendors   | `src/features/vendors/index.ts`   | Status, quote score, coverage percentage, the WhatsApp link         |
+| Health    | `src/features/health/index.ts`    | Five weighted, explainable parts and the next action                |
+| Risks     | `src/features/risks/index.ts`     | The risk register and its triggers                                  |
+| Catering  | `src/features/catering/index.ts`  | Food and drink quantities                                           |
+| Ideas     | `src/features/ideas/index.ts`     | Deterministic ideas from the plan's own numbers                     |
+| Assistant | `src/features/assistant/index.ts` | Intent classification and the Basic-mode answer                     |
 
 Money is integer minor units throughout, and the allocation uses the largest-remainder method, so
 the parts always sum exactly to the total.

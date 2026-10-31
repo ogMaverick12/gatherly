@@ -5,7 +5,7 @@ import { generateJson } from '@/lib/ai/provider-json';
 import { IDEAS_SYSTEM_PROMPT } from '@/lib/ai/prompts';
 import { jsonResponse } from '@/lib/security/http';
 import { createRoute } from '@/lib/security/route';
-import { generateIdeas, providerIdeas } from '@/features/ideas/services';
+import { generateIdeas, providerIdeas } from '@/features/ideas';
 /** Node.js runtime: the provider adapters rely on Node APIs. */
 export const runtime = 'nodejs';
 /** Generate ideas per request; results are never cached. */

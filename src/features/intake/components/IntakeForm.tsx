@@ -6,7 +6,7 @@
  */
 
 import Link from 'next/link';
-import { useAccessibility } from '@/features/accessibility/provider';
+import { useAccessibility } from '@/features/accessibility';
 import { INTAKE_STEPS } from '../schema';
 import { useIntakeForm } from '../hooks/use-intake-form';
 import { StepProgress } from './StepProgress';

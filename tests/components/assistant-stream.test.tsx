@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { AssistantPanel } from '@/features/workspace/components/AssistantPanel';
+import { AssistantPanel } from '@/features/workspace';
 import { setPlan } from '@/lib/plan-store';
 import type { ChatMessage } from '@/lib/plan';
 import { makeView, renderWithProvider } from '../helpers';
