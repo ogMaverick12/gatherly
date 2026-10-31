@@ -16,7 +16,7 @@ import {
   LandingHero,
   SamplePlansSection,
   type LandingPreview,
-} from './landing-sections';
+} from './LandingSections';
 
 /** Compute the sample plan once for the hero preview. */
 function useSamplePreview(): LandingPreview | null {

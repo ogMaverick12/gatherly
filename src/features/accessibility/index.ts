@@ -5,7 +5,7 @@
  * and every feature reads preferences through the hook.
  */
 
-export { AccessibilityProvider, useAccessibility } from './provider';
+export { AccessibilityProvider, useAccessibility } from './AccessibilityProvider';
 export { DEFAULT_PREFERENCES, writeStoredPreferences } from './preferences';
 export { DisplaySettings } from './components/DisplaySettings';
 export { OfflineBanner } from './components/OfflineBanner';

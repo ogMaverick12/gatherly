@@ -9,7 +9,7 @@ import { useAccessibility } from '@/features/accessibility';
 import type { PlanView } from '../plan-view';
 import type { Idea } from '@/lib/plan';
 import { useIdeas } from '../hooks/use-ideas';
-import { IdeaCard } from './idea-card';
+import { IdeaCard } from './IdeaCard';
 
 /**
  * Show plan ideas with their rationale and tags, and apply one as a task.

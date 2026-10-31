@@ -6,7 +6,7 @@
  */
 
 import { useEffect, useState } from 'react';
-import { useAccessibility } from '../provider';
+import { useAccessibility } from '../AccessibilityProvider';
 
 /**
  * Offline banner.

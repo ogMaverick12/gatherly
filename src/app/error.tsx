@@ -1,6 +1,6 @@
 'use client';
 
-import { ErrorPanel } from './error-panel';
+import { ErrorPanel } from './ErrorPanel';
 
 /**
  * Route-level error fallback: the rest of the app stays usable.

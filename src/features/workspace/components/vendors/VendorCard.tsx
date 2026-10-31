@@ -18,7 +18,7 @@ import { VENDOR_CATEGORY_LABELS, type Currency, type Vendor } from '@/lib/plan';
 import type { PlanView } from '../../plan-view';
 import { VendorQuoteScore } from './VendorQuoteScore';
 import { useVendorDraft } from './use-vendor-draft';
-import { VendorIdentityFields, VendorScheduleFields } from './vendor-card-fields';
+import { VendorIdentityFields, VendorScheduleFields } from './VendorCardFields';
 
 /** The category title and quote score line. */
 function VendorCardHeader({

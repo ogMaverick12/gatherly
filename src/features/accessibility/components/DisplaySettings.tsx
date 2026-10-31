@@ -6,9 +6,9 @@
  */
 
 import { useId, useState } from 'react';
-import { useAccessibility } from '../provider';
-import { SettingsTrigger } from './display-settings-controls';
-import { SettingsPanel } from './settings-panel';
+import { useAccessibility } from '../AccessibilityProvider';
+import { SettingsTrigger } from './DisplaySettingsControls';
+import { SettingsPanel } from './SettingsPanel';
 
 /**
  * Display and access settings.

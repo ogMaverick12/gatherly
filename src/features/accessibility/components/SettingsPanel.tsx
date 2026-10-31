@@ -6,7 +6,7 @@
 
 import type { Dictionary } from '@/lib/i18n';
 import type { AccessibilityPreferences, TextSize, ThemePreference } from '../preferences';
-import { TextSizeFieldset, ThemeFieldset } from './display-settings-controls';
+import { TextSizeFieldset, ThemeFieldset } from './DisplaySettingsControls';
 
 /** The calm-mode and reduced-motion switches. */
 export function ModeToggles({

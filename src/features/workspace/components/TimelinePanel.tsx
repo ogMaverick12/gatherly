@@ -9,7 +9,7 @@ import { useAccessibility } from '@/features/accessibility';
 import { todayDateOnly } from '@/lib/dates';
 import type { Dictionary } from '@/lib/i18n';
 import type { PlanView } from '../plan-view';
-import { MilestoneItem } from './milestone-item';
+import { MilestoneItem } from './MilestoneItem';
 
 /** The dated milestone ladder with completion toggles. */
 export function MilestoneList({

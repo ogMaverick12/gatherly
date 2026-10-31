@@ -1,6 +1,6 @@
 'use client';
 
-import { ErrorPanel } from './error-panel';
+import { ErrorPanel } from './ErrorPanel';
 
 /**
  * Last-resort fallback: replaces the root layout when the layout itself fails.

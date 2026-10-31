@@ -18,7 +18,7 @@ import {
 import type { Dictionary } from '@/lib/i18n';
 import type { IntakeFormValues } from '../../schema';
 import { RadioChips } from '../RadioChips';
-import { DateGuestsFields } from './basics-date-guests';
+import { DateGuestsFields } from './DateGuestsFields';
 
 /** The event-type choice. */
 export function EventTypeField({

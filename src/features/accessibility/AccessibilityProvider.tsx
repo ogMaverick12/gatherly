@@ -11,7 +11,7 @@ import {
   useResolvedTheme,
   useSpeech,
   useSpeechSupport,
-} from './provider-hooks';
+} from './use-accessibility';
 
 export { DEFAULT_PREFERENCES, writeStoredPreferences } from './preferences';
 export type { AccessibilityPreferences, TextSize, ThemePreference } from './preferences';
