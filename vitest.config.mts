@@ -9,9 +9,13 @@ export default defineConfig({
     jsx: { runtime: 'automatic' },
   },
   resolve: {
-    alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url)),
-    },
+    alias: [
+      {
+        find: '@tests',
+        replacement: fileURLToPath(new URL('./tests', import.meta.url)),
+      },
+      { find: '@', replacement: fileURLToPath(new URL('./src', import.meta.url)) },
+    ],
   },
   test: {
     environment: 'jsdom',
@@ -20,9 +24,18 @@ export default defineConfig({
     // The budget is generous so a slow machine reports a real failure, not a
     // queue.
     testTimeout: 15_000,
-    setupFiles: ['./tests/setup.ts'],
-    include: ['tests/**/*.test.ts', 'tests/**/*.test.tsx'],
-    exclude: ['node_modules/**', '.next/**', 'e2e/**'],
+    setupFiles: ['./tests/support/setup.ts'],
+    include: [
+      'tests/app/**/*.test.ts',
+      'tests/app/**/*.test.tsx',
+      'tests/features/**/*.test.ts',
+      'tests/features/**/*.test.tsx',
+      'tests/lib/**/*.test.ts',
+      'tests/lib/**/*.test.tsx',
+      'tests/scripts/**/*.test.ts',
+      'tests/scripts/**/*.test.tsx',
+    ],
+    exclude: ['node_modules/**', '.next/**', 'tests/e2e/**'],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json-summary', 'html'],

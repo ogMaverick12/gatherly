@@ -152,7 +152,7 @@ workspace, and the server snapshot is `null`, so there is no hydration mismatch.
 Hydration is the subtle part: React has already subscribed by the time the effect runs, so
 `hydratePlan()` notifies the subscribers itself. Without that `emit()`, a page reload would show
 "no plan" even though the plan was sitting in `localStorage`. This is covered by
-`tests/components/plan-restore.test.tsx` and `tests/plan-store.test.ts`.
+`tests/features/workspace/plan-restore.test.tsx` and `tests/lib/plan-store.test.ts`.
 
 `localStorage` is treated as untrusted input: the value is parsed with `PlanSchema` on read and
 discarded if it does not match.
@@ -289,7 +289,7 @@ Accessibility is not a layer applied at the end; it is in the data model.
   `reducedMotion`), validated with Zod on read.
 - **Preferences are applied to the document element** as data attributes, so CSS reacts without
   React re-rendering the tree.
-- **Contrast is tested, not asserted.** `tests/accessibility/contrast.test.ts` computes the WCAG
+- **Contrast is tested, not asserted.** `tests/features/accessibility/contrast.test.ts` computes the WCAG
   contrast ratio for every foreground/background pair in the light, dark and calm themes.
 - **Motion is transform/opacity only**, and is disabled under `prefers-reduced-motion` and Calm mode.
 
