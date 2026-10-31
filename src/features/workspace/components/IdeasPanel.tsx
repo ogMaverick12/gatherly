@@ -5,6 +5,9 @@
  * Requests go to the ideas route, and the badge always names the answer's mode.
  */
 
+import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
+import { Chip } from '@/components/ui/Chip';
 import { useAccessibility } from '@/features/accessibility';
 import type { PlanView } from '../plan-view';
 import type { Idea } from '@/lib/plan';
@@ -41,24 +44,25 @@ export function IdeasPanel({
           <p className="mt-1 text-sm text-ink-muted">{t.workspace.ideasHelp}</p>
         </div>
         <div className="flex items-center gap-3">
-          <span className="rounded-pill bg-line/60 px-3 py-1 text-xs font-semibold text-ink">
+          <Chip tone="strong">
             {mode === 'basic' ? t.workspace.basicMode : t.workspace.providerMode}
-          </span>
-          <button
-            type="button"
+          </Chip>
+          <Button
             onClick={() => void refresh()}
             disabled={loading}
-            className="inline-flex min-h-[44px] items-center justify-center rounded-pill border border-ink px-4 py-2 text-sm font-semibold text-ink transition-colors duration-200 hover:bg-ink hover:text-paper disabled:opacity-60"
+            variant="secondary"
+            tone="ink"
+            size="compact"
           >
             {loading ? t.common.loading : t.workspace.generateIdeas}
-          </button>
+          </Button>
         </div>
       </div>
 
       {mode === 'basic' ? (
-        <p className="rounded-card border border-line bg-paper p-4 text-sm text-ink-muted">
+        <Card as="p" tone="paper" padding="md" className="text-sm text-ink-muted">
           {t.workspace.basicModeHelp}
-        </p>
+        </Card>
       ) : null}
 
       {notices.length > 0 ? (

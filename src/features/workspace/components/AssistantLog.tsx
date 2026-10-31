@@ -6,6 +6,8 @@
  */
 
 import type { RefObject } from 'react';
+import { Card, cardClasses } from '@/components/ui/Card';
+import { SectionLabel } from '@/components/ui/SectionLabel';
 import type { Dictionary } from '@/lib/i18n';
 import type { ChatMessage } from '@/lib/plan';
 import type { StreamedAnswer } from './assistant-stream';
@@ -32,7 +34,7 @@ export function AssistantLog({
   return (
     <div
       ref={scrollRef}
-      className="max-h-[28rem] space-y-3 overflow-y-auto rounded-card border border-line bg-paper p-4"
+      className={cardClasses('paper', 'md', 'max-h-[28rem] space-y-3 overflow-y-auto')}
       role="log"
       aria-live="polite"
       aria-busy={Boolean(live)}
@@ -43,26 +45,27 @@ export function AssistantLog({
       ) : null}
 
       {messages.map((message) => (
-        <div
+        <Card
           key={message.id}
-          className={`max-w-[85%] rounded-card border p-3 text-sm ${
-            message.role === 'user' ? 'ml-auto border-teal/40 bg-teal/10' : 'border-line bg-raised'
-          }`}
+          tone={message.role === 'user' ? 'user' : 'raised'}
+          padding="sm"
+          className={`max-w-[85%] text-sm ${message.role === 'user' ? 'ml-auto' : ''}`}
         >
           <p className="whitespace-pre-wrap text-ink">{message.content}</p>
           {message.mode ? (
-            <p className="mt-1.5 text-[0.65rem] font-semibold uppercase tracking-[0.12em] text-ink-muted">
+            <SectionLabel spacing="tight" size="tiny" className="mt-1.5">
               {message.mode === 'basic' ? t.workspace.basicMode : t.workspace.providerMode}
-            </p>
+            </SectionLabel>
           ) : null}
-        </div>
+        </Card>
       ))}
 
       {live ? (
-        <div
+        <Card
           data-testid="assistant-stream"
           aria-live="off"
-          className="max-w-[85%] rounded-card border border-line bg-raised p-3 text-sm"
+          padding="sm"
+          className="max-w-[85%] text-sm"
         >
           <p className="whitespace-pre-wrap text-ink">
             {live.content}
@@ -73,10 +76,10 @@ export function AssistantLog({
               className="ml-0.5 inline-block h-3 w-1 rounded-pill bg-ink-muted align-middle motion-safe:animate-pulse"
             />
           </p>
-          <p className="mt-1.5 text-[0.65rem] font-semibold uppercase tracking-[0.12em] text-ink-muted">
+          <SectionLabel spacing="tight" size="tiny" className="mt-1.5">
             {live.mode === 'basic' ? t.workspace.basicMode : t.workspace.providerMode}
-          </p>
-        </div>
+          </SectionLabel>
+        </Card>
       ) : null}
     </div>
   );

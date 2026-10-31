@@ -5,6 +5,8 @@
  * One definition drives the wide tab strip and the phone bottom bar.
  */
 
+import { Button } from '@/components/ui/Button';
+import { Chip } from '@/components/ui/Chip';
 import type { Dictionary } from '@/lib/i18n';
 import type { PlanView } from '../plan-view';
 import { Tabs, type TabDefinition } from './Tabs';
@@ -50,7 +52,7 @@ export function WorkspaceTabs({
   return (
     <>
       <div className="no-print hidden lg:block">
-        <Tabs tabs={[...tabs]} active={activeTab} onChange={onChange} idPrefix="workspace" />
+        <Tabs tabs={tabs} active={activeTab} onChange={onChange} idPrefix="workspace" />
       </div>
 
       <nav
@@ -62,21 +64,21 @@ export function WorkspaceTabs({
             const selected = tab.id === activeTab;
             return (
               <li key={tab.id} className="flex-1">
-                <button
-                  type="button"
+                <Button
                   onClick={() => onChange(tab.id)}
                   aria-current={selected ? 'page' : undefined}
-                  className={`flex min-h-[3.5rem] w-full flex-col items-center justify-center gap-0.5 px-1 py-2 text-[0.65rem] font-medium ${
-                    selected ? 'text-teal' : 'text-ink-muted'
-                  }`}
+                  variant="quiet"
+                  tone={selected ? 'teal' : 'default'}
+                  size="none"
+                  className="min-h-14 w-full flex-col gap-0.5 px-1 py-2 text-[0.65rem] font-medium"
                 >
                   <span className="truncate">{tab.label}</span>
                   {tab.badge !== undefined ? (
-                    <span className="rounded-pill bg-marigold px-1.5 text-[0.6rem] font-semibold text-on-marigold">
+                    <Chip tone="accent" size="xs">
                       {tab.badge}
-                    </span>
+                    </Chip>
                   ) : null}
-                </button>
+                </Button>
               </li>
             );
           })}

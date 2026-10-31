@@ -6,6 +6,8 @@
  */
 
 import { useState } from 'react';
+import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
 import { useAccessibility } from '@/features/accessibility';
 import type { PlanTask } from '@/lib/plan';
 
@@ -31,9 +33,9 @@ export function TaskList({
         {t.workspace.nextUp}
       </h2>
       {tasks.length === 0 ? (
-        <p className="mt-3 rounded-card border border-line bg-raised p-4 text-sm text-ink-muted">
+        <Card as="p" padding="md" className="mt-3 text-sm text-ink-muted">
           {t.workspace.noPlanCta}
-        </p>
+        </Card>
       ) : (
         <ul className="mt-3 space-y-2">
           {tasks.map((task, index) => (
@@ -41,7 +43,7 @@ export function TaskList({
               key={task.id}
               className={index < PHONE_TASK_LIMIT || expanded ? undefined : 'hidden sm:block'}
             >
-              <label className="flex min-h-[44px] cursor-pointer items-center gap-3 rounded-card border border-line bg-raised px-4 py-2.5">
+              <label className="flex min-h-11 cursor-pointer items-center gap-3 rounded-card border border-line bg-raised px-4 py-2.5">
                 <input
                   type="checkbox"
                   checked={task.done}
@@ -57,14 +59,15 @@ export function TaskList({
         </ul>
       )}
       {tasks.length > PHONE_TASK_LIMIT ? (
-        <button
-          type="button"
+        <Button
           aria-expanded={expanded}
           onClick={() => setExpanded((current) => !current)}
-          className="mt-2 inline-flex min-h-[44px] w-full items-center justify-center rounded-pill border border-line-strong px-4 py-2 text-sm font-medium text-ink transition-colors duration-200 hover:border-ink hover:bg-raised sm:hidden"
+          variant="secondary"
+          size="compact"
+          className="mt-2 w-full sm:hidden"
         >
           {expanded ? t.workspace.showFewerTasks : t.workspace.showAllTasks}
-        </button>
+        </Button>
       ) : null}
     </section>
   );

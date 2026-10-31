@@ -5,6 +5,8 @@
  * The figures are estimates, and the caveat stays with them.
  */
 
+import { Card } from '@/components/ui/Card';
+import { SectionLabel } from '@/components/ui/SectionLabel';
 import { useAccessibility } from '@/features/accessibility';
 import type { CateringEstimate } from '@/features/catering';
 import { CelebrationDot } from '../HealthRing';
@@ -25,24 +27,32 @@ export function CateringSummary({ catering }: { catering: CateringEstimate }) {
       <h2 id="catering-heading" className="font-display text-title">
         {t.workspace.vendorsChecklist}
       </h2>
-      <div className="mt-3 rounded-card border border-line bg-raised p-4 sm:p-5">
+      <Card className="mt-3 p-4 sm:p-5">
         <dl className="grid grid-cols-2 gap-3 lg:grid-cols-4">
           <div>
-            <dt className="text-xs uppercase tracking-[0.14em] text-ink-muted">Plates</dt>
+            <dt>
+              <SectionLabel spacing="wide">Plates</SectionLabel>
+            </dt>
             <dd className="mt-1 font-display text-title-lg">{catering.totalPlates}</dd>
           </div>
           <div>
-            <dt className="text-xs uppercase tracking-[0.14em] text-ink-muted">Drinks</dt>
+            <dt>
+              <SectionLabel spacing="wide">Drinks</SectionLabel>
+            </dt>
             <dd className="mt-1 font-display text-title-lg">{catering.drinks}</dd>
           </div>
           <div>
-            <dt className="text-xs uppercase tracking-[0.14em] text-ink-muted">Service staff</dt>
+            <dt>
+              <SectionLabel spacing="wide">Service staff</SectionLabel>
+            </dt>
             <dd className="mt-1 font-display text-title-lg">
               {catering.servers + catering.leadStaff}
             </dd>
           </div>
           <div>
-            <dt className="text-xs uppercase tracking-[0.14em] text-ink-muted">Hours</dt>
+            <dt>
+              <SectionLabel spacing="wide">Hours</SectionLabel>
+            </dt>
             <dd className="mt-1 font-display text-title-lg">{catering.serviceHours}</dd>
           </div>
         </dl>
@@ -60,7 +70,7 @@ export function CateringSummary({ catering }: { catering: CateringEstimate }) {
             ))}
           </ul>
         ) : null}
-      </div>
+      </Card>
     </section>
   );
 }

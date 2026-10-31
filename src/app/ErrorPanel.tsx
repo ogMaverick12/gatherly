@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import { Button } from '@/components/ui/Button';
 
 /**
  * Calm recovery panel shared by the route and global error boundaries.
@@ -39,13 +40,9 @@ export function ErrorPanel({
         {title}
       </h1>
       <p className="mt-4 text-lg text-ink-muted">{body}</p>
-      <button
-        type="button"
-        onClick={reset}
-        className="mt-8 inline-flex min-h-11 items-center rounded-pill bg-ink px-6 py-3 font-semibold text-paper focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
-      >
+      <Button onClick={reset} size="none" className="mt-8 px-6 py-3 font-semibold">
         Try again
-      </button>
+      </Button>
     </div>
   );
 }

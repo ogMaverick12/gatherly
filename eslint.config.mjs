@@ -51,7 +51,6 @@ const config = [
       'playwright-report/**',
       'test-results/**',
       'next-env.d.ts',
-      'src/components/ui/**',
     ],
   },
   ...compat.extends('next/core-web-vitals', 'next/typescript', 'plugin:jsx-a11y/recommended'),

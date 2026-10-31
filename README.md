@@ -148,6 +148,7 @@ Full detail: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 src/app/                  routes, global styles, metadata, API handlers
   api/chat|ideas|parse    the three guarded AI routes
   api/health              reads back the deployment mode, nothing else
+src/components/ui/       shared Button, ButtonLink, Card, Chip, SectionLabel, StatRow
 src/features/            domain slices: schemas, pure services, UI
   budget timeline vendors health catering risks ideas assistant
   intake workspace accessibility

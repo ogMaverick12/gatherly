@@ -39,13 +39,13 @@ export function DateGuestsFields({
           disabled={values.dateNotSet}
           aria-describedby="eventDateHelp"
           aria-invalid={Boolean(errors.eventDate) || undefined}
-          className="mt-2 min-h-[44px] w-full rounded-card border border-line-strong bg-raised px-3 py-2 text-ink disabled:opacity-50"
+          className="mt-2 min-h-11 w-full rounded-card border border-line-strong bg-raised px-3 py-2 text-ink disabled:opacity-50"
           {...register('eventDate')}
         />
         {errors.eventDate ? (
           <p className="mt-1 text-sm font-medium text-rose">{t.intake.badDate}</p>
         ) : null}
-        <label className="mt-3 flex min-h-[44px] cursor-pointer items-center gap-3 text-sm">
+        <label className="mt-3 flex min-h-11 cursor-pointer items-center gap-3 text-sm">
           <input
             type="checkbox"
             className="h-5 w-5 accent-[var(--color-teal)]"
@@ -70,13 +70,13 @@ export function DateGuestsFields({
           max={5000}
           aria-describedby="guestsHelp"
           aria-invalid={Boolean(errors.guests) || undefined}
-          className="mt-2 min-h-[44px] w-full rounded-card border border-line-strong bg-raised px-3 py-2 text-ink"
+          className="mt-2 min-h-11 w-full rounded-card border border-line-strong bg-raised px-3 py-2 text-ink"
           {...register('guests', { valueAsNumber: true })}
         />
         {errors.guests ? (
           <p className="mt-1 text-sm font-medium text-rose">{errors.guests.message}</p>
         ) : null}
-        <label className="mt-3 flex min-h-[44px] cursor-pointer items-center gap-3 text-sm">
+        <label className="mt-3 flex min-h-11 cursor-pointer items-center gap-3 text-sm">
           <input
             type="checkbox"
             className="h-5 w-5 accent-[var(--color-teal)]"

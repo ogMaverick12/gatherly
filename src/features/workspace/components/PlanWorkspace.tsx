@@ -7,8 +7,9 @@
 
 import dynamic from 'next/dynamic';
 import { useAccessibility } from '@/features/accessibility';
-import { usePlanWorkspace } from '../hooks/use-plan-workspace';
+import { usePlanWorkspace, type PlanWorkspaceController } from '../hooks/use-plan-workspace';
 import { useWideLayout } from '../hooks/use-wide-layout';
+import type { PlanView } from '../plan-view';
 import { HealthRail, MobileHealthSummary } from './HealthRail';
 import { NoPlanScreen } from './NoPlanScreen';
 import { WorkspaceHeader } from './WorkspaceHeader';
@@ -43,36 +44,75 @@ function WorkspaceSkeleton() {
   );
 }
 
+const PANEL_OPTIONS = { ssr: false, loading: PanelSkeleton };
+
 const LazyOverviewPanel = dynamic(
   () => import('./OverviewPanel').then((module) => module.OverviewPanel),
-  { ssr: false, loading: PanelSkeleton },
+  { ...PANEL_OPTIONS },
 );
 const LazyBudgetPanel = dynamic(
   () => import('./BudgetPanel').then((module) => module.BudgetPanel),
-  { ssr: false, loading: PanelSkeleton },
+  { ...PANEL_OPTIONS },
 );
 const LazyTimelinePanel = dynamic(
   () => import('./TimelinePanel').then((module) => module.TimelinePanel),
-  { ssr: false, loading: PanelSkeleton },
+  { ...PANEL_OPTIONS },
 );
 const LazyVendorsPanel = dynamic(
   () => import('./VendorsPanel').then((module) => module.VendorsPanel),
-  { ssr: false, loading: PanelSkeleton },
+  { ...PANEL_OPTIONS },
 );
 const LazyIdeasPanel = dynamic(() => import('./IdeasPanel').then((module) => module.IdeasPanel), {
-  ssr: false,
-  loading: PanelSkeleton,
+  ...PANEL_OPTIONS,
 });
 const LazyAssistantPanel = dynamic(
   () => import('./AssistantPanel').then((module) => module.AssistantPanel),
-  { ssr: false, loading: PanelSkeleton },
+  { ...PANEL_OPTIONS },
 );
 
-// long-function: one view section, kept in one block so its reading order stays visible.
+/** The active tab's panel, with the edit callbacks that panel needs. */
+function ActivePanel({
+  view,
+  activeTab,
+  controller,
+}: {
+  readonly view: PlanView;
+  readonly activeTab: WorkspaceTabId;
+  readonly controller: PlanWorkspaceController;
+}) {
+  switch (activeTab) {
+    case 'overview':
+      return <LazyOverviewPanel view={view} onToggleTask={controller.onToggleTask} />;
+    case 'budget':
+      return <LazyBudgetPanel view={view} />;
+    case 'timeline':
+      return <LazyTimelinePanel view={view} onToggleMilestone={controller.onToggleMilestone} />;
+    case 'vendors':
+      return (
+        <LazyVendorsPanel
+          view={view}
+          onUpdateVendor={controller.onUpdateVendor}
+          onAddVendor={controller.onAddVendor}
+        />
+      );
+    case 'ideas':
+      return (
+        <LazyIdeasPanel
+          view={view}
+          onApplyIdea={controller.onApplyIdea}
+          onStoreIdeas={controller.onStoreIdeas}
+        />
+      );
+    case 'assistant':
+      return <LazyAssistantPanel view={view} onSend={controller.onSend} />;
+    default:
+      return null;
+  }
+}
+
 /** The workspace: one header, six panel sections and the health rail beside them. */
 export function PlanWorkspace() {
   const { dictionary } = useAccessibility();
-  const t = dictionary;
   const controller = usePlanWorkspace();
   const wide = useWideLayout();
   const { plan, view, activeTab, hydrated } = controller;
@@ -80,52 +120,17 @@ export function PlanWorkspace() {
   if (!hydrated) return <WorkspaceSkeleton />;
   if (!plan || !view) return <NoPlanScreen onOpen={controller.replace} />;
 
-  const tabs = workspaceTabs(view, t);
-
-  const panel = (() => {
-    switch (activeTab) {
-      case 'overview':
-        return <LazyOverviewPanel view={view} onToggleTask={controller.onToggleTask} />;
-      case 'budget':
-        return <LazyBudgetPanel view={view} />;
-      case 'timeline':
-        return <LazyTimelinePanel view={view} onToggleMilestone={controller.onToggleMilestone} />;
-      case 'vendors':
-        return (
-          <LazyVendorsPanel
-            view={view}
-            onUpdateVendor={controller.onUpdateVendor}
-            onAddVendor={controller.onAddVendor}
-          />
-        );
-      case 'ideas':
-        return (
-          <LazyIdeasPanel
-            view={view}
-            onApplyIdea={controller.onApplyIdea}
-            onStoreIdeas={controller.onStoreIdeas}
-          />
-        );
-      case 'assistant':
-        return <LazyAssistantPanel view={view} onSend={controller.onSend} />;
-      default:
-        return null;
-    }
-  })();
+  const tabs = workspaceTabs(view, dictionary);
 
   return (
     <div className="mx-auto min-h-[100svh] max-w-7xl px-5 pb-24 pt-8 lg:pb-14">
       <WorkspaceHeader view={view} plan={plan} onClear={controller.clear} />
 
-      <MobileHealthSummary view={view} t={t} />
+      <MobileHealthSummary view={view} t={dictionary} />
 
       <div className="mt-4 grid gap-8 lg:mt-8 lg:grid-cols-[minmax(0,1fr)_19rem]">
         <div className="min-w-0">
-          <WorkspaceTabs
-            tabs={tabs}
-            activeTab={activeTab as WorkspaceTabId}
-            onChange={controller.setActiveTab}
-          />
+          <WorkspaceTabs tabs={tabs} activeTab={activeTab} onChange={controller.setActiveTab} />
 
           <div
             id={`workspace-panel-${activeTab}`}
@@ -134,7 +139,7 @@ export function PlanWorkspace() {
             tabIndex={0}
             className="mt-4 focus:outline-none lg:mt-6"
           >
-            {panel}
+            <ActivePanel view={view} activeTab={activeTab} controller={controller} />
           </div>
         </div>
 

@@ -5,6 +5,7 @@
  * Severity is written in words and borders as well as colour, and each warning explains itself.
  */
 
+import { Card } from '@/components/ui/Card';
 import { useAccessibility } from '@/features/accessibility';
 import type { BudgetWarning } from '@/features/budget';
 
@@ -24,23 +25,21 @@ export function BudgetWarnings({ warnings }: { warnings: readonly BudgetWarning[
         {t.workspace.warnings}
       </h2>
       {warnings.length === 0 ? (
-        <p className="mt-3 rounded-card border border-line bg-raised p-4 text-sm text-ink-muted">
+        <Card as="p" padding="md" className="mt-3 text-sm text-ink-muted">
           {t.workspace.noWarnings}
-        </p>
+        </Card>
       ) : (
         <ul className="mt-3 space-y-2">
           {warnings.map((warning) => (
-            <li
+            <Card
+              as="li"
               key={warning.id}
-              className={`rounded-card border p-4 ${
-                warning.severity === 'attention'
-                  ? 'border-marigold bg-marigold/10'
-                  : 'border-line bg-raised'
-              }`}
+              padding="md"
+              tone={warning.severity === 'attention' ? 'attention' : 'raised'}
             >
               <h3 className="font-semibold text-ink">{warning.title}</h3>
               <p className="mt-1 text-sm text-ink-muted">{warning.detail}</p>
-            </li>
+            </Card>
           ))}
         </ul>
       )}

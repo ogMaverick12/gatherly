@@ -5,6 +5,8 @@
  * The bar is backed by a written percentage and status, so colour is never the only signal.
  */
 
+import { Card } from '@/components/ui/Card';
+import { StatRow } from '@/components/ui/StatRow';
 import { useAccessibility } from '@/features/accessibility';
 import { VENDOR_STATUS_LABELS, type VendorStatus } from '@/lib/plan';
 import type { PlanView } from '../../plan-view';
@@ -30,16 +32,13 @@ export function VendorCoverage({ view }: { view: PlanView }) {
       </p>
       <ul className="mt-3 grid gap-2 sm:grid-cols-2">
         {view.coverage.categories.map((category) => (
-          <li
-            key={category.category}
-            className="rounded-card border border-line bg-raised px-4 py-3"
-          >
-            <div className="flex items-baseline justify-between gap-3">
+          <Card as="li" key={category.category} className="px-4 py-3">
+            <StatRow>
               <span className="text-sm font-medium text-ink">{category.label}</span>
               <span className="tabular-nums text-sm text-ink-muted">
                 {category.coveragePercent}%
               </span>
-            </div>
+            </StatRow>
             <div
               className="mt-1.5 h-1.5 w-full overflow-hidden rounded-pill bg-line"
               role="presentation"
@@ -54,7 +53,7 @@ export function VendorCoverage({ view }: { view: PlanView }) {
                 ? VENDOR_STATUS_LABELS[category.status as VendorStatus]
                 : t.common.none}
             </p>
-          </li>
+          </Card>
         ))}
       </ul>
     </section>

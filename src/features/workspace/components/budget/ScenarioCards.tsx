@@ -5,6 +5,9 @@
  * Every card shows its total and the difference from the current plan.
  */
 
+import { Card } from '@/components/ui/Card';
+import { Chip } from '@/components/ui/Chip';
+import { SectionLabel } from '@/components/ui/SectionLabel';
 import { useAccessibility } from '@/features/accessibility';
 import type { BudgetScenario } from '@/features/budget';
 import { formatMoney } from '@/lib/money';
@@ -35,21 +38,21 @@ export function ScenarioCards({
       <p className="mt-1 text-sm text-ink-muted">{t.workspace.scenariosHelp}</p>
       <ul className="mt-3 grid gap-3 md:grid-cols-2">
         {scenarios.map((scenario) => (
-          <li key={scenario.id} className="rounded-card border border-line bg-raised p-4">
+          <Card as="li" key={scenario.id} padding="md">
             <h3 className="font-semibold text-ink">{scenario.label}</h3>
             <p className="mt-1 text-sm text-ink-muted">{scenario.description}</p>
             <dl className="mt-3 grid grid-cols-2 gap-2 text-sm">
               <div>
-                <dt className="text-xs uppercase tracking-[0.12em] text-ink-muted">
-                  {t.workspace.amount}
+                <dt>
+                  <SectionLabel>{t.workspace.amount}</SectionLabel>
                 </dt>
                 <dd className="tabular-nums font-medium">
                   {formatMoney(scenario.committedMinor, currency)}
                 </dd>
               </div>
               <div>
-                <dt className="text-xs uppercase tracking-[0.12em] text-ink-muted">
-                  {t.workspace.difference}
+                <dt>
+                  <SectionLabel>{t.workspace.difference}</SectionLabel>
                 </dt>
                 <dd
                   className={`tabular-nums font-medium ${
@@ -62,9 +65,9 @@ export function ScenarioCards({
               </div>
             </dl>
             {scenario.exceedsCeiling ? (
-              <p className="mt-3 rounded-pill bg-rose/10 px-3 py-1 text-xs font-semibold text-rose">
+              <Chip tone="danger" className="mt-3">
                 {t.workspace.exceeds}
-              </p>
+              </Chip>
             ) : null}
             {scenario.notes.length > 0 ? (
               <ul className="mt-3 space-y-1 text-xs text-ink-muted">
@@ -73,7 +76,7 @@ export function ScenarioCards({
                 ))}
               </ul>
             ) : null}
-          </li>
+          </Card>
         ))}
       </ul>
     </section>

@@ -5,6 +5,8 @@
  * A category with no vendor shows an add button instead of an empty list.
  */
 
+import { Button } from '@/components/ui/Button';
+import { SectionLabel } from '@/components/ui/SectionLabel';
 import { useAccessibility } from '@/features/accessibility';
 import type { Vendor, VendorCategoryId } from '@/lib/plan';
 import type { PlanView } from '../../plan-view';
@@ -37,17 +39,18 @@ export function VendorChecklist({
           );
           return (
             <li key={category.category}>
-              <h3 className="text-sm font-semibold uppercase tracking-[0.12em] text-ink-muted">
-                {category.label}
+              <h3>
+                <SectionLabel size="sm">{category.label}</SectionLabel>
               </h3>
               {vendors.length === 0 ? (
-                <button
-                  type="button"
+                <Button
                   onClick={() => onAddVendor(category.category, '')}
-                  className="mt-2 inline-flex min-h-[44px] items-center justify-center rounded-pill border border-dashed border-line-strong px-4 py-2 text-sm text-ink-muted transition-colors duration-200 hover:border-ink hover:text-ink"
+                  variant="quiet"
+                  size="compact"
+                  className="mt-2 border border-dashed border-line-strong"
                 >
                   {t.workspace.addVendor}
-                </button>
+                </Button>
               ) : (
                 <ul className="mt-2 space-y-3">
                   {vendors.map((vendor) => (

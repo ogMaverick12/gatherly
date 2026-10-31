@@ -6,6 +6,8 @@
  */
 
 import { useState } from 'react';
+import { Button } from '@/components/ui/Button';
+import { SectionLabel } from '@/components/ui/SectionLabel';
 import { useAccessibility } from '@/features/accessibility';
 import { VENDOR_CATEGORY_LABELS, type VendorCategoryId } from '@/lib/plan';
 
@@ -36,17 +38,14 @@ export function AddVendorForm({
         }}
       >
         <div>
-          <label
-            htmlFor="new-vendor-category"
-            className="text-xs font-semibold uppercase tracking-[0.12em] text-ink-muted"
-          >
-            {t.workspace.vendorCategory}
+          <label htmlFor="new-vendor-category">
+            <SectionLabel>{t.workspace.vendorCategory}</SectionLabel>
           </label>
           <select
             id="new-vendor-category"
             value={newCategory}
             onChange={(event) => setNewCategory(event.target.value as VendorCategoryId)}
-            className="mt-1 min-h-[44px] rounded-card border border-line bg-paper px-3 py-2 text-sm"
+            className="mt-1 min-h-11 rounded-card border border-line bg-paper px-3 py-2 text-sm"
           >
             {(Object.keys(VENDOR_CATEGORY_LABELS) as VendorCategoryId[]).map((category) => (
               <option key={category} value={category}>
@@ -56,11 +55,8 @@ export function AddVendorForm({
           </select>
         </div>
         <div className="min-w-[12rem] flex-1">
-          <label
-            htmlFor="new-vendor-name"
-            className="text-xs font-semibold uppercase tracking-[0.12em] text-ink-muted"
-          >
-            {t.workspace.vendorName}
+          <label htmlFor="new-vendor-name">
+            <SectionLabel>{t.workspace.vendorName}</SectionLabel>
           </label>
           <input
             id="new-vendor-name"
@@ -69,15 +65,18 @@ export function AddVendorForm({
             maxLength={120}
             onChange={(event) => setNewName(event.target.value)}
             placeholder="optional"
-            className="mt-1 w-full min-h-[44px] rounded-card border border-line bg-paper px-3 py-2 text-sm"
+            className="mt-1 w-full min-h-11 rounded-card border border-line bg-paper px-3 py-2 text-sm"
           />
         </div>
-        <button
+        <Button
           type="submit"
-          className="inline-flex min-h-[44px] items-center justify-center rounded-pill border border-ink px-5 py-2 text-sm font-semibold text-ink transition-colors duration-200 hover:bg-ink hover:text-paper"
+          variant="secondary"
+          tone="ink"
+          size="none"
+          className="px-5 py-2 text-sm font-semibold"
         >
           {t.workspace.addVendor}
-        </button>
+        </Button>
       </form>
     </section>
   );

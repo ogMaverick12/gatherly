@@ -4,6 +4,7 @@
  * One milestone row in the timeline ladder.
  */
 
+import { Chip } from '@/components/ui/Chip';
 import { formatDateOnly } from '@/lib/dates';
 import type { Dictionary } from '@/lib/i18n';
 import type { PlanView } from '../plan-view';
@@ -60,23 +61,23 @@ export function MilestoneItem({
             {milestone.title}
           </span>
           <span className="col-start-2 mt-1 flex flex-wrap items-center gap-2 text-xs text-ink-muted">
-            <span className="rounded-pill bg-line/60 px-2 py-0.5 font-semibold text-ink">
+            <Chip tone="strong" size="inline">
               {relativeLabel(milestone.offsetDays)}
-            </span>
+            </Chip>
             {milestone.date ? (
               <span>{formatDateOnly(milestone.date)}</span>
             ) : (
               <span>{t.intake.dateNotSet}</span>
             )}
             {milestone.critical ? (
-              <span className="rounded-pill bg-rose/10 px-2 py-0.5 font-semibold text-rose">
+              <Chip tone="danger" size="inline">
                 critical
-              </span>
+              </Chip>
             ) : null}
             {overdue ? (
-              <span className="rounded-pill bg-marigold/25 px-2 py-0.5 font-semibold text-ink">
+              <Chip tone="warning" size="inline">
                 {t.workspace.overdue}
-              </span>
+              </Chip>
             ) : null}
           </span>
         </label>

@@ -6,11 +6,29 @@
  */
 
 import { useCallback, useRef, type KeyboardEvent } from 'react';
+import { Button } from '@/components/ui/Button';
+import { Chip } from '@/components/ui/Chip';
 
 export interface TabDefinition<T extends string> {
   readonly id: T;
   readonly label: string;
   readonly badge?: string | number;
+}
+
+const NEXT_TAB: Readonly<Record<string, (index: number, count: number) => number>> = {
+  ArrowRight: (index, count) => (index + 1) % count,
+  ArrowDown: (index, count) => (index + 1) % count,
+  ArrowLeft: (index, count) => (index - 1 + count) % count,
+  ArrowUp: (index, count) => (index - 1 + count) % count,
+  Home: () => 0,
+  End: (_index, count) => count - 1,
+};
+
+/** Return the tab index a navigation key selects, or null for another key. */
+export function nextTabIndex(key: string, index: number, count: number): number | null {
+  if (count <= 0 || index < 0 || index >= count) return null;
+  if (!Object.hasOwn(NEXT_TAB, key)) return null;
+  return NEXT_TAB[key]?.(index, count) ?? null;
 }
 
 /** One ARIA tab button, with its optional badge. */
@@ -26,25 +44,24 @@ function TabButton<T extends string>({
   onChange: (id: T) => void;
 }) {
   return (
-    <button
+    <Button
       id={`${idPrefix}-tab-${tab.id}`}
       role="tab"
-      type="button"
       aria-selected={selected}
       aria-controls={`${idPrefix}-panel-${tab.id}`}
       tabIndex={selected ? 0 : -1}
       onClick={() => onChange(tab.id)}
-      className={`min-h-[44px] shrink-0 rounded-pill px-4 py-2 text-sm font-medium transition-colors duration-200 ${
-        selected ? 'bg-ink text-paper' : 'text-ink-muted hover:bg-raised hover:text-ink'
-      }`}
+      variant={selected ? 'primary' : 'quiet'}
+      size="compact"
+      className={selected ? 'shrink-0' : 'shrink-0 hover:bg-raised'}
     >
       {tab.label}
       {tab.badge !== undefined && tab.badge !== '' ? (
-        <span className="ml-2 rounded-pill bg-marigold px-1.5 py-0.5 text-[0.65rem] font-semibold text-on-marigold">
+        <Chip tone="accent" size="sm" className="ml-2">
           {tab.badge}
-        </span>
+        </Chip>
       ) : null}
-    </button>
+    </Button>
   );
 }
 
@@ -74,17 +91,7 @@ export function Tabs<T extends string>({
       const index = tabs.findIndex((tab) => tab.id === active);
       if (index < 0) return;
 
-      let nextIndex: number | null = null;
-      if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
-        nextIndex = (index + 1) % tabs.length;
-      } else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
-        nextIndex = (index - 1 + tabs.length) % tabs.length;
-      } else if (event.key === 'Home') {
-        nextIndex = 0;
-      } else if (event.key === 'End') {
-        nextIndex = tabs.length - 1;
-      }
-
+      const nextIndex = nextTabIndex(event.key, index, tabs.length);
       if (nextIndex === null) return;
       event.preventDefault();
       const next = tabs[nextIndex];

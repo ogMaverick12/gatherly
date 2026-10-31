@@ -2,17 +2,18 @@
 
 Unit and component tests mirror `src/`. A test for a feature module lives under
 `tests/features/<feature>/`; a test for shared code lives under
-`tests/lib/<area>/`; route, boundary and app-shell tests live under `tests/app/`.
-Shared fixtures, the Vitest setup and the service-worker harness live in
-`tests/support/` and are imported through the `@tests/*` alias.
+`tests/lib/<area>/`; a test for a shared UI primitive lives under
+`tests/components/ui/`; route, boundary and app-shell tests live under
+`tests/app/`. Shared fixtures, the Vitest setup and the service-worker harness
+live in `tests/support/` and are imported through the `@tests/*` alias.
 
-| Layer      | Where                                                                       | What it proves                                                                                                                                                                     | How to run         |
-| ---------- | --------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------ |
-| Unit       | `tests/features/`, `tests/lib/`, `tests/app/`                               | The engines: money, budget, timeline, vendors, risks, ideas, health, chat, ICS, CSV, share links, AI providers and guarded routes                                                  | `npm run test`     |
-| Property   | `tests/lib/property.test.ts`                                                | The invariants that a fixed example cannot: the allocator never loses a minor unit, the calendar export never breaks the 75-octet limit, a share link always survives a round trip | `npm run test`     |
-| Component  | `tests/features/**/*.test.tsx`, `tests/features/accessibility/axe.test.tsx` | The screens: the landing page, the intake wizard, the workspace tabs, the display settings, and an automated accessibility check on each of them                                   | `npm run test`     |
-| Script     | `tests/scripts/`                                                            | The Lighthouse report formatter used by the audit tooling                                                                                                                          | `npm run test`     |
-| End to end | `tests/e2e/*.spec.ts`                                                       | The journeys: landing to a working plan, keyboard-only navigation, an offline reload, the exported files, and an accessibility check on five screens                               | `npm run test:e2e` |
+| Layer      | Where                                                              | What it proves                                                                                                                                                                     | How to run         |
+| ---------- | ------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------ |
+| Unit       | `tests/features/`, `tests/lib/`, `tests/components/`, `tests/app/` | The engines: money, budget, timeline, vendors, risks, ideas, health, chat, ICS, CSV, share links, AI providers, UI primitives and guarded routes                                   | `npm run test`     |
+| Property   | `tests/lib/property.test.ts`                                       | The invariants that a fixed example cannot: the allocator never loses a minor unit, the calendar export never breaks the 75-octet limit, a share link always survives a round trip | `npm run test`     |
+| Component  | `tests/components/**/*.test.tsx`, `tests/features/**/*.test.tsx`   | The shared primitives and screens: the landing page, the intake wizard, the workspace tabs, the display settings, and an automated accessibility check on each of them             | `npm run test`     |
+| Script     | `tests/scripts/`                                                   | The Lighthouse report formatter used by the audit tooling                                                                                                                          | `npm run test`     |
+| End to end | `tests/e2e/*.spec.ts`                                              | The journeys: landing to a working plan, keyboard-only navigation, an offline reload, the exported files, and an accessibility check on five screens                               | `npm run test:e2e` |
 
 ## The gate
 

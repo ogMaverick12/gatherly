@@ -5,6 +5,7 @@
  * It restates the answers in the order they were asked, using the same labels.
  */
 
+import { Card } from '@/components/ui/Card';
 import { useAccessibility } from '@/features/accessibility';
 import { CITY_TIER_LABELS, EVENT_TYPE_LABELS, PRIORITY_LABELS, type Currency } from '@/lib/plan';
 import { formatMoneyPlain } from '@/lib/money';
@@ -24,7 +25,7 @@ export function ReviewSummary({
   const { dictionary: t } = useAccessibility();
 
   return (
-    <div className="rounded-card border border-line bg-raised p-5">
+    <Card padding="lg">
       <h2 className="font-display text-title">{t.intake.review}</h2>
       <dl className="mt-3 grid gap-2 text-sm sm:grid-cols-2">
         <div className="flex justify-between gap-4 sm:block">
@@ -58,6 +59,6 @@ export function ReviewSummary({
           </dd>
         </div>
       </dl>
-    </div>
+    </Card>
   );
 }

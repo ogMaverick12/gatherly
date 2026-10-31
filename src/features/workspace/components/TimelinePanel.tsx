@@ -5,6 +5,7 @@
  * Both sections read their dates and labels from the computed plan view.
  */
 
+import { Card } from '@/components/ui/Card';
 import { useAccessibility } from '@/features/accessibility';
 import { todayDateOnly } from '@/lib/dates';
 import type { Dictionary } from '@/lib/i18n';
@@ -31,9 +32,9 @@ export function MilestoneList({
       <p className="mt-1 text-sm text-ink-muted">{t.workspace.milestonesHelp}</p>
 
       {view.milestones.length === 0 ? (
-        <p className="mt-3 rounded-card border border-line bg-raised p-4 text-sm text-ink-muted">
+        <Card as="p" padding="md" className="mt-3 text-sm text-ink-muted">
           {t.intake.dateNotSet}
-        </p>
+        </Card>
       ) : (
         <ol className="mt-4 space-y-0">
           {view.milestones.map((milestone, index) => (
@@ -60,7 +61,7 @@ export function RunOfShowTable({ view, t }: { readonly view: PlanView; readonly 
         {t.workspace.runOfShow}
       </h2>
       <p className="mt-1 text-sm text-ink-muted">{t.workspace.runOfShowHelp}</p>
-      <div className="mt-3 overflow-x-auto rounded-card border border-line bg-raised">
+      <Card className="mt-3 overflow-x-auto">
         <table className="w-full min-w-[40rem] border-collapse text-sm">
           <caption className="sr-only">{t.workspace.runOfShow}</caption>
           <thead>
@@ -99,7 +100,7 @@ export function RunOfShowTable({ view, t }: { readonly view: PlanView; readonly 
             ))}
           </tbody>
         </table>
-      </div>
+      </Card>
     </section>
   );
 }

@@ -4,6 +4,8 @@
  * The open display-settings panel and its lower controls.
  */
 
+import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
 import type { Dictionary } from '@/lib/i18n';
 import type { AccessibilityPreferences, TextSize, ThemePreference } from '../preferences';
 import { TextSizeFieldset, ThemeFieldset } from './DisplaySettingsControls';
@@ -26,7 +28,7 @@ export function ModeToggles({
     <div className="mt-4 space-y-2">
       <label
         htmlFor="gatherly-calm-mode"
-        className="grid min-h-[44px] cursor-pointer grid-cols-[auto_1fr] items-start gap-x-3 rounded-card border border-line px-3 py-2 text-sm"
+        className="grid min-h-11 cursor-pointer grid-cols-[auto_1fr] items-start gap-x-3 rounded-card border border-line px-3 py-2 text-sm"
       >
         <input
           id="gatherly-calm-mode"
@@ -43,7 +45,7 @@ export function ModeToggles({
 
       <label
         htmlFor="gatherly-reduced-motion"
-        className="flex min-h-[44px] cursor-pointer items-center gap-3 rounded-card border border-line px-3 text-sm"
+        className="flex min-h-11 cursor-pointer items-center gap-3 rounded-card border border-line px-3 text-sm"
       >
         <input
           id="gatherly-reduced-motion"
@@ -74,13 +76,9 @@ export function SpeechControl({
     return <p className="text-sm text-ink-muted">{dictionary.accessibility.speechUnavailable}</p>;
   }
   return (
-    <button
-      type="button"
-      onClick={onToggle}
-      className="min-h-[44px] rounded-pill border border-line px-4 text-sm text-ink hover:border-line-strong"
-    >
+    <Button onClick={onToggle} variant="secondary" tone="neutral" size="small">
       {speaking ? dictionary.accessibility.stopReading : dictionary.accessibility.readAloud}
-    </button>
+    </Button>
   );
 }
 
@@ -111,19 +109,16 @@ export function SettingsPanel({
   readonly onSpeechToggle: () => void;
 }) {
   return (
-    <div
+    <Card
       id={panelId}
-      className="absolute end-0 z-40 mt-2 w-[min(22rem,calc(100vw-2rem))] rounded-card border border-line bg-raised p-4 shadow-lift"
+      padding="md"
+      className="absolute end-0 z-40 mt-2 w-[min(22rem,calc(100vw-2rem))] shadow-lift"
     >
       <div className="flex items-start justify-between gap-3">
         <h2 className="font-display text-lg">{dictionary.accessibility.title}</h2>
-        <button
-          type="button"
-          onClick={onClose}
-          className="min-h-[44px] rounded-pill px-3 text-sm text-ink-muted hover:text-ink"
-        >
+        <Button onClick={onClose} variant="quiet" size="small">
           {dictionary.common.close}
-        </button>
+        </Button>
       </div>
 
       <TextSizeFieldset
@@ -148,6 +143,6 @@ export function SettingsPanel({
           onToggle={onSpeechToggle}
         />
       </div>
-    </div>
+    </Card>
   );
 }

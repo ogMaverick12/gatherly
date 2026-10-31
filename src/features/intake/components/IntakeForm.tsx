@@ -5,7 +5,8 @@
  * Validation and submission live in the intake hook; this file only draws the wizard.
  */
 
-import Link from 'next/link';
+import { Button } from '@/components/ui/Button';
+import { ButtonLink } from '@/components/ui/ButtonLink';
 import { useAccessibility } from '@/features/accessibility';
 import { INTAKE_STEPS } from '../schema';
 import { useIntakeForm } from '../hooks/use-intake-form';
@@ -49,39 +50,27 @@ export function IntakeForm() {
 
       <div className="flex flex-wrap items-center gap-3 border-t border-line pt-6">
         {stepIndex > 0 ? (
-          <button
-            type="button"
-            onClick={goBack}
-            className="inline-flex min-h-[44px] items-center justify-center rounded-pill border border-line-strong px-6 py-2.5 text-sm font-semibold text-ink"
-          >
+          <Button onClick={goBack} variant="secondary">
             {t.common.back}
-          </button>
+          </Button>
         ) : null}
 
         {stepIndex < INTAKE_STEPS.length - 1 ? (
-          <button
-            type="button"
-            onClick={goNext}
-            className="inline-flex min-h-[44px] items-center justify-center rounded-pill bg-ink px-6 py-2.5 text-sm font-semibold text-paper"
-          >
-            {t.common.continue}
-          </button>
+          <Button onClick={goNext}>{t.common.continue}</Button>
         ) : (
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="inline-flex min-h-[44px] items-center justify-center rounded-pill bg-teal px-6 py-2.5 text-sm font-semibold text-paper disabled:opacity-60"
-          >
+          <Button type="submit" tone="teal" disabled={isSubmitting}>
             {t.intake.submit}
-          </button>
+          </Button>
         )}
 
-        <Link
+        <ButtonLink
           href="/"
-          className="inline-flex min-h-[44px] items-center justify-center rounded-pill px-4 py-2.5 text-sm text-ink-muted underline-offset-4 hover:text-ink hover:underline"
+          variant="quiet"
+          size="none"
+          className="px-4 py-2.5 underline-offset-4 hover:underline"
         >
           {t.common.cancel}
-        </Link>
+        </ButtonLink>
       </div>
     </form>
   );

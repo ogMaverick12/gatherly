@@ -11,6 +11,7 @@ import { computePlanView, type PlanView } from '../plan-view';
 import { hydratePlan, usePlan, usePlanActions } from '@/lib/plan-store';
 import type { ChatMessage, Idea, Plan, Vendor, VendorCategoryId } from '@/lib/plan';
 import { buildMilestoneLadder } from '@/features/timeline';
+import type { WorkspaceTabId } from '../components/WorkspaceTabs';
 import {
   toStoredMilestones,
   withChatMessage,
@@ -25,9 +26,9 @@ import {
 export interface PlanWorkspaceController {
   readonly plan: Plan | null;
   readonly view: PlanView | null;
-  readonly activeTab: string;
+  readonly activeTab: WorkspaceTabId;
   readonly hydrated: boolean;
-  setActiveTab(tab: string): void;
+  setActiveTab(tab: WorkspaceTabId): void;
   onToggleTask(id: string): void;
   onToggleMilestone(id: string): void;
   onUpdateVendor(id: string, patch: Partial<Vendor>): void;
@@ -62,7 +63,7 @@ function preparePlan(plan: Plan): Plan {
 export function usePlanWorkspace(): PlanWorkspaceController {
   const plan = usePlan();
   const { update, replace, clear } = usePlanActions();
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState<WorkspaceTabId>('overview');
   const [hydrated, setHydrated] = useState(false);
   useEffect(() => {
     const stored = hydratePlan(preparePlan);

@@ -5,6 +5,7 @@
  * The Basic-mode notice stays visible whenever the provider route is unavailable.
  */
 
+import { Card } from '@/components/ui/Card';
 import { useAccessibility } from '@/features/accessibility';
 import type { ChatMessage } from '@/lib/plan';
 import type { PlanView } from '../plan-view';
@@ -42,9 +43,9 @@ export function AssistantPanel({
         </ul>
       ) : null}
 
-      <p className="rounded-card border border-line bg-paper p-3 text-xs text-ink-muted">
+      <Card as="p" tone="paper" padding="sm" className="text-xs text-ink-muted">
         {t.workspace.basicModeHelp}
-      </p>
+      </Card>
 
       <AssistantComposer
         draft={chat.draft}

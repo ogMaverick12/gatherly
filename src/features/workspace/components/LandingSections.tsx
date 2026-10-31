@@ -4,7 +4,9 @@
  * The landing page sections below the hero state.
  */
 
-import Link from 'next/link';
+import { ButtonLink } from '@/components/ui/ButtonLink';
+import { Card } from '@/components/ui/Card';
+import { SectionLabel } from '@/components/ui/SectionLabel';
 import type { BudgetAllocation, CategoryAllocation } from '@/features/budget';
 import { GarlandLine } from '@/features/workspace/components/GarlandLine';
 import { HealthRing } from '@/features/workspace/components/HealthRing';
@@ -37,24 +39,18 @@ export function LandingHero({
       <GarlandLine className="pointer-events-none absolute inset-x-0 top-0 h-24 w-full text-teal" />
       <div className="mx-auto grid max-w-6xl gap-12 px-5 pb-20 pt-24 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
         <div>
-          <p className="text-sm font-semibold uppercase tracking-[0.22em] text-teal">
+          <SectionLabel tone="teal" spacing="hero" size="sm">
             {t.landing.heroEyebrow}
-          </p>
+          </SectionLabel>
           <h1 className="mt-4 font-display text-display-lg text-ink">{t.landing.heroTitle}</h1>
           <p className="mt-6 max-w-prose text-lg text-ink-muted">{t.landing.heroBody}</p>
           <div className="mt-8 flex flex-wrap gap-3">
-            <Link
-              href="/intake"
-              className="inline-flex min-h-[44px] items-center justify-center rounded-pill bg-ink px-7 py-3 text-sm font-semibold text-paper transition-transform duration-200 ease-spring hover:-translate-y-0.5"
-            >
+            <ButtonLink href="/intake" size="large" className="ease-spring hover:-translate-y-0.5">
               {t.landing.heroPrimary}
-            </Link>
-            <a
-              href="#samples"
-              className="inline-flex min-h-[44px] items-center justify-center rounded-pill border border-line-strong px-7 py-3 text-sm font-semibold text-ink transition-colors duration-200 hover:border-ink"
-            >
+            </ButtonLink>
+            <ButtonLink href="#samples" variant="secondary" size="large">
               {t.landing.heroSecondary}
-            </a>
+            </ButtonLink>
           </div>
         </div>
 
@@ -67,7 +63,7 @@ export function LandingHero({
 /** The live sample-plan card in the hero. */
 export function SamplePreview({ preview }: { readonly preview: LandingPreview }) {
   return (
-    <div className="rounded-card border border-line bg-raised p-6 shadow-card">
+    <Card padding="xl" className="shadow-card">
       <div className="flex items-center gap-5">
         <HealthRing
           score={preview.health.score}
@@ -99,7 +95,7 @@ export function SamplePreview({ preview }: { readonly preview: LandingPreview })
       <p className="mt-5 border-t border-line pt-4 text-sm text-ink-muted">
         Every number above is calculated in your browser, with the arithmetic in plain sight.
       </p>
-    </div>
+    </Card>
   );
 }
 
@@ -127,10 +123,10 @@ export function FeaturesSection({ t }: { readonly t: Dictionary }) {
         </div>
         <ul className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {FEATURE_KEYS.map((key) => (
-            <li key={key} className="rounded-card border border-line bg-paper p-6">
+            <Card key={key} as="li" tone="paper" padding="xl">
               <h3 className="font-display text-title">{t.landing.features[key].title}</h3>
               <p className="mt-2 text-sm text-ink-muted">{t.landing.features[key].body}</p>
-            </li>
+            </Card>
           ))}
         </ul>
       </div>
@@ -146,19 +142,17 @@ export function InclusionSection({ t }: { readonly t: Dictionary }) {
         <div>
           <h2 className="font-display text-display-sm">{t.landing.inclusionTitle}</h2>
           <p className="mt-4 max-w-prose text-ink-muted">{t.landing.inclusionBody}</p>
-          <Link
+          <ButtonLink
             href="/intake"
-            className="mt-8 inline-flex min-h-[44px] items-center justify-center rounded-pill bg-ink px-7 py-3 text-sm font-semibold text-paper transition-transform duration-200 ease-spring hover:-translate-y-0.5"
+            size="large"
+            className="mt-8 ease-spring hover:-translate-y-0.5"
           >
             {t.landing.startCta}
-          </Link>
+          </ButtonLink>
         </div>
         <ul className="space-y-3">
           {SAMPLE_PLAN_TEMPLATES.map((template) => (
-            <li
-              key={template.id}
-              className="flex items-start gap-3 rounded-card border border-line bg-raised p-4"
-            >
+            <Card key={template.id} as="li" padding="md" className="flex items-start gap-3">
               <span
                 aria-hidden="true"
                 className="mt-1.5 inline-block h-2.5 w-2.5 shrink-0 rounded-full bg-marigold"
@@ -167,7 +161,7 @@ export function InclusionSection({ t }: { readonly t: Dictionary }) {
                 <p className="font-semibold">{template.name}</p>
                 <p className="text-sm text-ink-muted">{template.tagline}</p>
               </div>
-            </li>
+            </Card>
           ))}
         </ul>
       </div>

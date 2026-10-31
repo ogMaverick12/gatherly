@@ -28,6 +28,8 @@ export default defineConfig({
     include: [
       'tests/app/**/*.test.ts',
       'tests/app/**/*.test.tsx',
+      'tests/components/**/*.test.ts',
+      'tests/components/**/*.test.tsx',
       'tests/features/**/*.test.ts',
       'tests/features/**/*.test.tsx',
       'tests/lib/**/*.test.ts',

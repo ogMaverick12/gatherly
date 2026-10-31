@@ -5,6 +5,8 @@
  * Each row shows the base share, the adjusted share and the amount so the maths can be checked.
  */
 
+import { Card } from '@/components/ui/Card';
+import { Chip } from '@/components/ui/Chip';
 import { useAccessibility } from '@/features/accessibility';
 import type { BudgetAllocation, CategoryAllocation } from '@/features/budget';
 import type { Dictionary } from '@/lib/i18n';
@@ -58,15 +60,15 @@ export function BudgetTableRow({
       <th scope="row" className="px-3 py-3 sm:px-4 text-left font-medium">
         {category.label}
         {category.priorityBoost ? (
-          <span className="ml-2 rounded-pill bg-teal/15 px-2 py-0.5 text-[0.65rem] font-semibold text-teal">
+          <Chip tone="tealSoft" size="sm" className="ml-2">
             priority
-          </span>
+          </Chip>
         ) : null}
         {category.packShift !== 0 ? (
-          <span className="ml-2 rounded-pill bg-marigold/25 px-2 py-0.5 text-[0.65rem] font-semibold text-ink">
+          <Chip tone="warning" size="sm" className="ml-2">
             {category.packShift > 0 ? '+' : ''}
             {category.packShift} pack
-          </span>
+          </Chip>
         ) : null}
       </th>
       <td className="hidden px-3 py-3 text-right tabular-nums text-ink-muted sm:table-cell sm:px-4">
@@ -164,7 +166,7 @@ export function BudgetTable({ budget, plan }: { budget: BudgetAllocation; plan: 
   const currency = plan.intake.currency;
 
   return (
-    <div className="mt-3 overflow-x-auto rounded-card border border-line bg-raised">
+    <Card className="mt-3 overflow-x-auto">
       <table className="w-full min-w-0 border-collapse text-sm sm:min-w-[46rem]">
         <caption className="sr-only">
           {t.workspace.allocation}. {t.workspace.allocationHelp}
@@ -177,6 +179,6 @@ export function BudgetTable({ budget, plan }: { budget: BudgetAllocation; plan: 
         </tbody>
         <BudgetTableFoot budget={budget} guests={plan.intake.guests} currency={currency} t={t} />
       </table>
-    </div>
+    </Card>
   );
 }

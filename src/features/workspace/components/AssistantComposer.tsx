@@ -5,6 +5,7 @@
  * It renders the input, send and stop controls; the chat hook owns their state.
  */
 
+import { Button } from '@/components/ui/Button';
 import { useAccessibility } from '@/features/accessibility';
 
 // long-function: one view section, kept in one block so its reading order stays visible.
@@ -43,23 +44,27 @@ export function AssistantComposer({
         maxLength={2000}
         onChange={(event) => onDraftChange(event.target.value)}
         placeholder={t.workspace.assistantPlaceholder}
-        className="min-h-[44px] flex-1 rounded-pill border border-line bg-raised px-4 py-2 text-sm text-ink placeholder:text-ink-muted/70"
+        className="min-h-11 flex-1 rounded-pill border border-line bg-raised px-4 py-2 text-sm text-ink placeholder:text-ink-muted/70"
       />
-      <button
+      <Button
         type="submit"
+        variant="secondary"
+        tone="ink"
+        size="none"
         disabled={loading || draft.trim().length === 0}
-        className="inline-flex min-h-[44px] items-center justify-center rounded-pill border border-ink px-5 py-2 text-sm font-semibold text-ink transition-colors duration-200 hover:bg-ink hover:text-paper disabled:opacity-60"
+        className="px-5 py-2 text-sm font-semibold"
       >
         {t.workspace.send}
-      </button>
+      </Button>
       {loading ? (
-        <button
-          type="button"
+        <Button
           onClick={onStop}
-          className="inline-flex min-h-[44px] items-center justify-center rounded-pill border border-line px-5 py-2 text-sm font-semibold text-ink-muted transition-colors duration-200 hover:border-ink hover:text-ink"
+          variant="quiet"
+          size="none"
+          className="border border-line px-5 py-2 text-sm font-semibold hover:border-ink"
         >
           {t.workspace.stop}
-        </button>
+        </Button>
       ) : null}
     </form>
   );

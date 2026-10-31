@@ -40,7 +40,7 @@ export function MoneyStep({
         <select
           id="currency"
           aria-describedby="currencyHelp"
-          className="mt-2 min-h-[44px] w-full rounded-card border border-line-strong bg-raised px-3 py-2 text-ink"
+          className="mt-2 min-h-11 w-full rounded-card border border-line-strong bg-raised px-3 py-2 text-ink"
           {...register('currency')}
         >
           {CURRENCIES.map((code) => (
@@ -70,7 +70,7 @@ export function MoneyStep({
             step="any"
             aria-describedby="budgetHelp budgetPerGuest"
             aria-invalid={Boolean(errors.budget) || undefined}
-            className="min-h-[44px] w-full rounded-card border border-line-strong bg-raised px-3 py-2 text-ink"
+            className="min-h-11 w-full rounded-card border border-line-strong bg-raised px-3 py-2 text-ink"
             {...register('budget', { valueAsNumber: true })}
           />
         </div>

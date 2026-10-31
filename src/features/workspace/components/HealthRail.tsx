@@ -5,6 +5,9 @@
  * The formula is disclosed in place so the score can be checked, not just trusted.
  */
 
+import { Card } from '@/components/ui/Card';
+import { SectionLabel } from '@/components/ui/SectionLabel';
+import { StatRow } from '@/components/ui/StatRow';
 import { useAccessibility } from '@/features/accessibility';
 import type { HealthBand } from '@/features/health';
 import { formatDateOnly } from '@/lib/dates';
@@ -67,9 +70,9 @@ export function MobileHealthSummary({
   readonly t: Dictionary;
 }) {
   return (
-    <div className="mt-4 rounded-card border border-line bg-raised p-3 shadow-card lg:hidden">
+    <Card padding="sm" className="mt-4 shadow-card lg:hidden">
       <HealthSummary view={view} t={t} compact />
-    </div>
+    </Card>
   );
 }
 
@@ -83,12 +86,14 @@ export function HealthNextAction({
 }) {
   if (!nextAction) return null;
   return (
-    <div className="mt-5 rounded-card border border-line bg-paper p-4">
-      <h3 className="text-xs font-semibold uppercase tracking-[0.16em] text-teal">
-        {t.workspace.nextUp}
+    <Card tone="paper" padding="md" className="mt-5">
+      <h3>
+        <SectionLabel tone="teal" spacing="wider">
+          {t.workspace.nextUp}
+        </SectionLabel>
       </h3>
       <p className="mt-1.5 text-sm text-ink">{nextAction}</p>
-    </div>
+    </Card>
   );
 }
 
@@ -98,17 +103,17 @@ export function HealthFigures({ view, t }: { readonly view: PlanView; readonly t
   const currency = plan.intake.currency;
   return (
     <dl className="mt-5 space-y-2.5 text-sm">
-      <div className="flex items-baseline justify-between gap-3">
+      <StatRow>
         <dt className="text-ink-muted">{t.workspace.guests}</dt>
         <dd className="font-medium">{plan.intake.guests}</dd>
-      </div>
-      <div className="flex items-baseline justify-between gap-3">
+      </StatRow>
+      <StatRow>
         <dt className="text-ink-muted">{t.workspace.date}</dt>
         <dd className="font-medium">
           {plan.intake.eventDate ? formatDateOnly(plan.intake.eventDate) : t.common.unknown}
         </dd>
-      </div>
-      <div className="flex items-baseline justify-between gap-3">
+      </StatRow>
+      <StatRow>
         <dt className="text-ink-muted">{t.workspace.perGuest}</dt>
         <dd className="font-medium">
           {formatMoney(
@@ -116,21 +121,21 @@ export function HealthFigures({ view, t }: { readonly view: PlanView; readonly t
             currency,
           )}
         </dd>
-      </div>
-      <div className="flex items-baseline justify-between gap-3">
+      </StatRow>
+      <StatRow>
         <dt className="text-ink-muted">{t.workspace.contingency}</dt>
         <dd className="font-medium">{formatMoney(budget.contingencyMinor, currency)}</dd>
-      </div>
-      <div className="flex items-baseline justify-between gap-3">
+      </StatRow>
+      <StatRow>
         <dt className="text-ink-muted">{t.workspace.coverage}</dt>
         <dd className="font-medium">{view.coverage.overallPercent}%</dd>
-      </div>
-      <div className="flex items-baseline justify-between gap-3">
+      </StatRow>
+      <StatRow>
         <dt className="text-ink-muted">{t.workspace.milestones}</dt>
         <dd className="font-medium">
           {timeline.done}/{timeline.total}
         </dd>
-      </div>
+      </StatRow>
     </dl>
   );
 }
@@ -144,7 +149,7 @@ export function HealthFormula({
   readonly t: Dictionary;
 }) {
   return (
-    <details className="mt-5 rounded-card border border-line bg-paper p-4">
+    <Card as="details" tone="paper" padding="md" className="mt-5">
       <summary className="cursor-pointer text-sm font-semibold text-ink">
         {t.workspace.healthFormula}
       </summary>
@@ -152,12 +157,12 @@ export function HealthFormula({
       <ul className="mt-3 space-y-2">
         {health.parts.map((part) => (
           <li key={part.id} className="text-sm">
-            <div className="flex items-baseline justify-between gap-3">
+            <StatRow>
               <span className="font-medium text-ink">{part.label}</span>
               <span className="tabular-nums text-ink-muted">
                 {part.score}/100 &middot; {part.weight}%
               </span>
-            </div>
+            </StatRow>
             <div
               className="mt-1 h-1.5 w-full overflow-hidden rounded-pill bg-line"
               role="presentation"
@@ -171,7 +176,7 @@ export function HealthFormula({
           </li>
         ))}
       </ul>
-    </details>
+    </Card>
   );
 }
 
@@ -183,11 +188,11 @@ export function HealthRail({ view }: { view: PlanView }) {
   const { dictionary } = useAccessibility();
   const t = dictionary;
   return (
-    <div className="rounded-card border border-line bg-raised p-5 shadow-card">
+    <Card padding="lg" className="shadow-card">
       <HealthSummary view={view} t={t} />
       <HealthNextAction nextAction={view.health.nextAction} t={t} />
       <HealthFigures view={view} t={t} />
       <HealthFormula health={view.health} t={t} />
-    </div>
+    </Card>
   );
 }

@@ -5,6 +5,7 @@
  * It offers the intake wizard and the prompt for a plan shared through a link.
  */
 
+import { ButtonLink } from '@/components/ui/ButtonLink';
 import { useAccessibility } from '@/features/accessibility';
 import type { Plan } from '@/lib/plan';
 import { SharedPlanPrompt } from './ExportBar';
@@ -19,12 +20,9 @@ export function NoPlanScreen({ onOpen }: { onOpen: (plan: Plan) => void }) {
       <h1 className="font-display text-title-lg">{t.workspace.noPlan}</h1>
       <p className="mt-2 text-ink-muted">{t.workspace.noPlanCta}</p>
       <div className="mt-6 flex justify-center">
-        <a
-          href="/intake"
-          className="inline-flex min-h-[44px] items-center justify-center rounded-pill border border-ink px-6 py-2.5 text-sm font-semibold text-ink transition-colors duration-200 hover:bg-ink hover:text-paper"
-        >
+        <ButtonLink href="/intake" variant="secondary" tone="ink">
           {t.workspace.noPlanCta}
-        </a>
+        </ButtonLink>
       </div>
       <div className="mt-8 flex justify-center">
         <SharedPlanPrompt onOpen={onOpen} />

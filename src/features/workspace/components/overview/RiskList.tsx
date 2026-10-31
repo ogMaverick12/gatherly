@@ -5,6 +5,7 @@
  * Severity is repeated in text and dot colour, and every risk carries a mitigation.
  */
 
+import { Card } from '@/components/ui/Card';
 import { useAccessibility } from '@/features/accessibility';
 import type { Risk } from '@/features/risks';
 
@@ -21,7 +22,7 @@ function RiskRow({ risk, areaLabel }: { risk: Risk; areaLabel: string }) {
         : 'var(--color-line-strong)';
 
   return (
-    <li className="rounded-card border border-line bg-raised p-3 sm:p-4">
+    <Card as="li" className="p-3 sm:p-4">
       <div className="flex items-start gap-2.5 sm:gap-3">
         <span
           aria-hidden="true"
@@ -36,7 +37,7 @@ function RiskRow({ risk, areaLabel }: { risk: Risk; areaLabel: string }) {
           </p>
         </div>
       </div>
-    </li>
+    </Card>
   );
 }
 
@@ -51,9 +52,9 @@ export function RiskList({ risks }: { risks: readonly Risk[] }) {
         {t.workspace.risks}
       </h2>
       {risks.length === 0 ? (
-        <p className="mt-3 rounded-card border border-line bg-raised p-4 text-sm text-ink-muted">
+        <Card as="p" padding="md" className="mt-3 text-sm text-ink-muted">
           {t.workspace.noRisks}
-        </p>
+        </Card>
       ) : (
         <ul className="mt-3 grid gap-3 lg:grid-cols-2">
           {risks.map((risk) => (

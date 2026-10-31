@@ -54,7 +54,7 @@ export function SiteHeader() {
             id="header-language"
             value={preferences.language}
             onChange={(event) => setLanguage(event.target.value as typeof preferences.language)}
-            className="min-h-[44px] rounded-pill border border-line bg-raised px-3 text-sm text-ink"
+            className="min-h-11 rounded-pill border border-line bg-raised px-3 text-sm text-ink"
           >
             <option value="en">English</option>
             <option value="hi">हिन्दी</option>

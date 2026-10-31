@@ -4,6 +4,7 @@
  * The trigger and choice groups inside the display-settings disclosure.
  */
 
+import { Button } from '@/components/ui/Button';
 import type { Dictionary } from '@/lib/i18n';
 import type { TextSize, ThemePreference } from '../preferences';
 
@@ -35,12 +36,14 @@ export function SettingsTrigger({
   readonly onToggle: () => void;
 }) {
   return (
-    <button
-      type="button"
+    <Button
       onClick={onToggle}
       aria-expanded={open}
       aria-controls={panelId}
-      className="inline-flex min-h-[44px] items-center gap-2 rounded-pill border border-line bg-raised px-3 text-sm text-ink transition-colors hover:border-line-strong"
+      variant="secondary"
+      tone="neutral"
+      size="small"
+      className="gap-2"
     >
       <svg
         viewBox="0 0 24 24"
@@ -55,7 +58,7 @@ export function SettingsTrigger({
       </svg>
       <span className="hidden sm:inline">{dictionary.accessibility.title}</span>
       <span className="sm:hidden">Aa</span>
-    </button>
+    </Button>
   );
 }
 
@@ -78,7 +81,7 @@ export function TextSizeFieldset({
         {TEXT_SIZES.map((size) => (
           <label
             key={size.value}
-            className={`inline-flex min-h-[44px] cursor-pointer items-center rounded-pill border px-3 text-sm ${
+            className={`inline-flex min-h-11 cursor-pointer items-center rounded-pill border px-3 text-sm ${
               textSize === size.value ? 'border-ink bg-ink text-paper' : 'border-line text-ink'
             }`}
           >
@@ -115,7 +118,7 @@ export function ThemeFieldset({
         {THEMES.map((option) => (
           <label
             key={option.value}
-            className={`inline-flex min-h-[44px] cursor-pointer items-center rounded-pill border px-3 text-sm ${
+            className={`inline-flex min-h-11 cursor-pointer items-center rounded-pill border px-3 text-sm ${
               theme === option.value ? 'border-ink bg-ink text-paper' : 'border-line text-ink'
             }`}
           >

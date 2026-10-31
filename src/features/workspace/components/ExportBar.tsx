@@ -6,6 +6,9 @@
  */
 
 import { useRef, useState } from 'react';
+import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
+import { SectionLabel } from '@/components/ui/SectionLabel';
 import { useAccessibility } from '@/features/accessibility';
 import { copyToClipboard, downloadFile } from '@/lib/download';
 import { budgetCsv, withBom } from '../csv';
@@ -14,9 +17,6 @@ import { buildShareUrl, decodeShareFragment, encodeShareFragment } from '@/lib/s
 import { PlanSchema, type Plan } from '@/lib/plan';
 import type { PlanView } from '../plan-view';
 import type { Dictionary } from '@/lib/i18n';
-
-const BUTTON_CLASS =
-  'inline-flex min-h-[44px] items-center justify-center rounded-pill border border-line-strong px-4 py-2 text-sm font-medium text-ink transition-colors duration-200 hover:border-ink hover:bg-raised';
 
 /** Build the print, calendar, CSV and JSON download actions. */
 function useExportActions(view: PlanView) {
@@ -80,40 +80,41 @@ export function ExportBar({ view }: { view: PlanView }) {
 
   return (
     <div className="no-print">
-      <h2 className="text-xs font-semibold uppercase tracking-[0.16em] text-ink-muted">
-        {t.workspace.exports}
+      <h2>
+        <SectionLabel spacing="wider">{t.workspace.exports}</SectionLabel>
       </h2>
-      <button
-        type="button"
+      <Button
         aria-expanded={open}
         aria-controls="plan-export-actions"
         onClick={() => setOpen((current) => !current)}
-        className={`${BUTTON_CLASS} mt-2 w-full min-[641px]:hidden`}
+        variant="secondary"
+        size="compact"
+        className="mt-2 w-full min-[641px]:hidden"
       >
         {t.workspace.exportToggle}
-      </button>
+      </Button>
       <div
         id="plan-export-actions"
         className={`${open ? 'flex' : 'hidden'} mt-2 flex-wrap gap-2 min-[641px]:mt-0 min-[641px]:flex`}
       >
-        <button type="button" onClick={onPrint} className={BUTTON_CLASS}>
+        <Button onClick={onPrint} variant="secondary" size="compact">
           {t.workspace.exportPrint}
-        </button>
-        <button type="button" onClick={onCalendar} className={BUTTON_CLASS}>
+        </Button>
+        <Button onClick={onCalendar} variant="secondary" size="compact">
           {t.workspace.exportCalendar}
-        </button>
-        <button type="button" onClick={onCsv} className={BUTTON_CLASS}>
+        </Button>
+        <Button onClick={onCsv} variant="secondary" size="compact">
           {t.workspace.exportCsv}
-        </button>
-        <button type="button" onClick={onShare} className={BUTTON_CLASS}>
+        </Button>
+        <Button onClick={onShare} variant="secondary" size="compact">
           {t.workspace.exportShare}
-        </button>
-        <button type="button" onClick={onJson} className={BUTTON_CLASS}>
+        </Button>
+        <Button onClick={onJson} variant="secondary" size="compact">
           {t.workspace.exportJson}
-        </button>
-        <button type="button" className={BUTTON_CLASS} onClick={() => fileInput.current?.click()}>
+        </Button>
+        <Button variant="secondary" size="compact" onClick={() => fileInput.current?.click()}>
           {t.workspace.importPlan}
-        </button>
+        </Button>
         <input
           ref={fileInput}
           type="file"
@@ -156,29 +157,30 @@ export function SharedPlanPrompt({ onOpen }: { onOpen: (plan: Plan) => void }) {
 
   if (!pending) {
     return (
-      <button
-        type="button"
+      <Button
         onClick={() => void read()}
-        className="no-print text-sm text-ink-muted underline-offset-4 hover:text-ink hover:underline"
+        variant="quiet"
+        size="none"
+        className="no-print underline-offset-4 hover:underline"
       >
         Open a shared plan from this link
-      </button>
+      </Button>
     );
   }
 
   return (
-    <div className="no-print rounded-card border border-teal bg-teal/5 p-4">
+    <Card tone="teal" padding="md" className="no-print">
       <p className="text-sm">
         A shared plan was found in this link. Opening it replaces the plan on this device.
       </p>
       <div className="mt-3 flex gap-2">
-        <button type="button" onClick={() => onOpen(pending)} className={BUTTON_CLASS}>
+        <Button onClick={() => onOpen(pending)} variant="secondary" size="compact">
           Open the shared plan
-        </button>
-        <button type="button" onClick={() => setPending(null)} className={BUTTON_CLASS}>
+        </Button>
+        <Button onClick={() => setPending(null)} variant="secondary" size="compact">
           {dictionary.common.cancel}
-        </button>
+        </Button>
       </div>
-    </div>
+    </Card>
   );
 }

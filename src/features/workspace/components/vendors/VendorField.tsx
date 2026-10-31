@@ -6,10 +6,11 @@
  */
 
 import type { ReactNode } from 'react';
+import { SectionLabel } from '@/components/ui/SectionLabel';
 
 /** The input styling every vendor field shares. */
 export const FIELD_CLASS =
-  'mt-1 w-full min-h-[44px] rounded-card border border-line bg-paper px-3 py-2 text-sm text-ink placeholder:text-ink-muted/70';
+  'mt-1 w-full min-h-11 rounded-card border border-line bg-paper px-3 py-2 text-sm text-ink placeholder:text-ink-muted/70';
 
 /**
  * A labelled field.
@@ -28,11 +29,8 @@ export function VendorField({
 }) {
   return (
     <div>
-      <label
-        htmlFor={id}
-        className="text-xs font-semibold uppercase tracking-[0.12em] text-ink-muted"
-      >
-        {label}
+      <label htmlFor={id}>
+        <SectionLabel>{label}</SectionLabel>
       </label>
       {children}
     </div>
