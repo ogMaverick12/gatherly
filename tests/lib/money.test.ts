@@ -86,6 +86,11 @@ describe('formatting', () => {
     expect(formatMinorPlain(123_456, 'INR')).toBe('1,234.56');
   });
 
+  it('can shorten currency and plain amounts for a compact summary', () => {
+    expect(formatMinor(1_500_000, 'USD', 'en', { compact: true })).toMatch(/\$15K/);
+    expect(formatMinorPlain(1_500_000, 'USD', 'en', { compact: true })).toBe('15K');
+  });
+
   it('groups INR in the Indian style with whole rupees', () => {
     expect(formatMoney(150_000_000, 'INR')).toBe('₹15,00,000');
     expect(formatMoney(833_333, 'INR')).toBe('₹8,333');

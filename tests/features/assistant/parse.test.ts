@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { parseFreeText } from '@/features/assistant';
+import { parseBudget } from '@/features/assistant/parse-budget';
+import { parseEventDate } from '@/features/assistant/parse-dates';
 
 describe('parseFreeText', () => {
   it('extracts the event type', () => {
@@ -74,5 +76,27 @@ describe('parseFreeText', () => {
 
   it('keeps the original text as the note', () => {
     expect(parseFreeText('  A small wedding  ').notes).toBe('A small wedding');
+  });
+});
+
+describe('date and budget readers', () => {
+  it.each(['2026-02-30', '31/02/2026', '31 February 2026', '31 Flux 2026'])(
+    'rejects the impossible date %s',
+    (text) => {
+      expect(parseEventDate(text)).toBeNull();
+    },
+  );
+
+  it('reads a currency amount written after the word budget', () => {
+    expect(parseBudget('budget 20,000 usd')).toEqual({
+      currency: 'USD',
+      amountMinor: 2_000_000,
+    });
+  });
+
+  it('returns nothing when there is no currency or no positive amount', () => {
+    expect(parseBudget('forty people')).toBeNull();
+    expect(parseBudget('we have dollars but no number')).toBeNull();
+    expect(parseBudget('usd 0')).toBeNull();
   });
 });

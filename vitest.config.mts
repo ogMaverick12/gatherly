@@ -50,26 +50,14 @@ export default defineConfig({
         '**/*.config.*',
         '**/types.ts',
       ],
-      // The gates are per-area. The services and the shared library carry the
-      // logic, so they are held to a higher bar than the whole project.
+      // One gate covers every source area, so a gap cannot hide behind a weaker
+      // per-feature threshold. The values are the passing coverage rounded down.
       thresholds: {
-        'src/lib/**': {
-          statements: 92,
-          branches: 85,
-          functions: 92,
-          lines: 92,
-        },
-        'src/features/**/services.ts': {
-          statements: 92,
-          branches: 85,
-          functions: 92,
-          lines: 92,
-        },
         'src/**': {
-          statements: 92,
-          branches: 85,
-          functions: 92,
-          lines: 92,
+          statements: 96,
+          branches: 92,
+          functions: 96,
+          lines: 96,
         },
       },
     },

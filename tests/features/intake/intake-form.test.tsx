@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { screen, waitFor, within } from '@testing-library/react';
+import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { IntakeForm } from '@/features/intake';
 import { getPlan, setPlan } from '@/lib/plan-store';
@@ -94,6 +94,27 @@ describe('the intake form', () => {
     });
     expect(getPlan()?.intake.guests).toBe(80);
     expect(push).toHaveBeenCalledWith('/plan');
+  });
+
+  it('stores the event date when the user chooses one', async () => {
+    const user = userEvent.setup();
+    setPlan(null);
+    renderWithProvider(<IntakeForm />);
+
+    await user.click(screen.getByRole('checkbox', { name: 'Not decided yet' }));
+    fireEvent.change(screen.getByLabelText('Date'), { target: { value: '2027-05-01' } });
+    await fillBasics(user);
+
+    await screen.findByLabelText('The money');
+    await user.click(screen.getByRole('button', { name: 'Continue' }));
+    await screen.findByRole('group', { name: 'What matters most?' });
+    await user.click(screen.getByRole('button', { name: 'Continue' }));
+    await screen.findByLabelText('Packs and preferences');
+    await user.click(screen.getByRole('button', { name: 'Create the plan' }));
+
+    await waitFor(() => {
+      expect(getPlan()?.intake.eventDate).toBe('2027-05-01');
+    });
   });
 
   it('shows the review of the answers', async () => {
