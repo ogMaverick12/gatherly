@@ -1,5 +1,7 @@
 # Gatherly
 
+[![CI](https://github.com/ogMaverick12/gatherly/actions/workflows/ci.yml/badge.svg)](https://github.com/ogMaverick12/gatherly/actions/workflows/ci.yml)
+
 Gatherly is a calm, global event-planning companion for weddings, birthdays and community
 gatherings. It turns budgets, dates, vendor questions, contingencies and the "what should we do
 next?" feeling into one warm workspace.

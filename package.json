@@ -3,6 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "description": "Gatherly - a calm, global event-planning companion for weddings, birthdays and community gatherings.",
+  "repository": "https://github.com/ogMaverick12/gatherly",
+  "license": "MIT",
   "engines": {
     "node": ">=20.9.0"
   },
