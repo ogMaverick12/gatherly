@@ -11,7 +11,6 @@ import { CITY_TIER_LABELS, EVENT_TYPE_LABELS, PRIORITY_LABELS, type Currency } f
 import { formatMoneyPlain } from '@/lib/money';
 import type { IntakeFormValues } from '../schema';
 
-// long-function: one view section, kept in one block so its reading order stays visible.
 /** The answers so far, so the user can check them before submitting. */
 export function ReviewSummary({
   values,

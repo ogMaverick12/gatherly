@@ -9,7 +9,6 @@ import { DisplaySettings, useAccessibility } from '@/features/accessibility';
 import { Wordmark } from './Wordmark';
 import Link from 'next/link';
 
-// long-function: one view section, kept in one block so its reading order stays visible.
 /** Render the shared header with navigation, language selection and display settings. */
 export function SiteHeader() {
   const { dictionary, preferences, setLanguage } = useAccessibility();
@@ -22,10 +21,13 @@ export function SiteHeader() {
           className="rounded-sm text-ink hover:text-teal"
           aria-label={dictionary.common.appName}
         >
-          <Wordmark />
+          <Wordmark markLabel={dictionary.common.gatherlyMark} />
         </Link>
 
-        <nav aria-label="Main" className="order-3 w-full sm:order-none sm:w-auto">
+        <nav
+          aria-label={dictionary.common.mainNavigation}
+          className="order-3 w-full sm:order-none sm:w-auto"
+        >
           <ul className="flex items-center gap-5 text-sm">
             <li>
               <Link

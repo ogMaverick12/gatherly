@@ -13,6 +13,7 @@ export default function ErrorPage({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  // Error boundaries render outside the accessibility provider, so these stay English.
   return (
     <ErrorPanel
       title="That part of the plan hit a snag."

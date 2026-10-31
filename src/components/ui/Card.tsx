@@ -1,9 +1,12 @@
 import type { HTMLAttributes, ReactNode } from 'react';
 
+/** The surface colour of a card. */
 export type CardTone = 'raised' | 'paper' | 'teal' | 'attention' | 'user';
+/** The internal spacing of a card. */
 export type CardPadding = 'none' | 'sm' | 'md' | 'lg' | 'xl';
-export type CardElement = 'div' | 'li' | 'section' | 'article' | 'p' | 'details';
+type CardElement = 'div' | 'li' | 'section' | 'article' | 'p' | 'details';
 
+/** Props accepted by the card component. */
 export interface CardProps extends HTMLAttributes<HTMLElement> {
   as?: CardElement;
   children: ReactNode;

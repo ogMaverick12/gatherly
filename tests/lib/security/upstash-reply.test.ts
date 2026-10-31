@@ -19,7 +19,12 @@ describe('the shared limiter reply', () => {
         'fetch',
         vi.fn(async () => new Response(JSON.stringify(body), { status: 200 })),
       );
-      const limiter = new UpstashRateLimiter('https://redis.test', 'token', 20, 60_000);
+      const limiter = new UpstashRateLimiter({
+        url: 'https://redis.test',
+        token: 'token',
+        capacity: 20,
+        windowMs: 60_000,
+      });
 
       await expect(limiter.check('chat:1')).resolves.toMatchObject({
         allowed: true,

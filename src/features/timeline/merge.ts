@@ -32,6 +32,7 @@ export function mergeMilestoneState(
   });
 }
 
+/** The counts and next milestone shown for the timeline. */
 export interface TimelineSummary {
   readonly milestones: readonly TimelineMilestone[];
   readonly total: number;

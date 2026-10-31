@@ -22,6 +22,7 @@ export interface HealthPart {
   readonly nextActions: readonly string[];
 }
 
+/** The plan's health score and the reasons behind it. */
 export interface HealthReport {
   readonly score: number;
   readonly band: HealthBand;
@@ -30,6 +31,7 @@ export interface HealthReport {
   readonly nextAction: string | null;
 }
 
+/** The plan values the health score is calculated from. */
 export interface HealthInputs {
   readonly plan: Plan;
   readonly budget: BudgetAllocation;

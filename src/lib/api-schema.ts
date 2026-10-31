@@ -16,7 +16,7 @@ import type { PlanSnapshot } from './plan-snapshot';
  * uses the numbers to write an answer.
  */
 
-export const PlanSummarySchema = z
+const PlanSummarySchema = z
   .string()
   .min(1)
   .max(8000)
@@ -30,7 +30,7 @@ export const PlanSummarySchema = z
 /**
  * The plan snapshot the client may send: numbers only, strictly shaped.
  */
-export const SnapshotSchema: z.ZodType<PlanSnapshot> = z
+const SnapshotSchema: z.ZodType<PlanSnapshot> = z
   .object({
     eventType: EventTypeSchema,
     eventDate: z.string().max(10).nullable(),
@@ -68,8 +68,6 @@ export const SnapshotSchema: z.ZodType<PlanSnapshot> = z
     topRisks: z.array(z.string().max(200)).max(12),
   })
   .strict();
-
-export type ApiSnapshot = z.infer<typeof SnapshotSchema>;
 
 /**
  * Request body for the chat route: message, summary and snapshot.
@@ -116,7 +114,7 @@ export const ParseRequestSchema = z
 /**
  * One idea as a provider must return it, before it becomes a stored idea.
  */
-export const ProviderIdeaSchema = z
+const ProviderIdeaSchema = z
   .object({
     title: z.string().min(1).max(160),
     body: z.string().min(1).max(1200),
@@ -134,6 +132,7 @@ export const ProviderIdeasSchema = z
   })
   .strict();
 
+/** One idea returned by a provider and validated at the boundary. */
 export type ProviderIdea = z.infer<typeof ProviderIdeaSchema>;
 
 /**
@@ -154,4 +153,5 @@ export const ParsedFieldsSchema = z
   })
   .strict();
 
+/** The fields parsed from a free-text request. */
 export type ParsedFields = z.infer<typeof ParsedFieldsSchema>;

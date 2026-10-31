@@ -11,7 +11,7 @@ import type { AccessibilityPreferences, TextSize, ThemePreference } from '../pre
 import { TextSizeFieldset, ThemeFieldset } from './DisplaySettingsControls';
 
 /** The calm-mode and reduced-motion switches. */
-export function ModeToggles({
+function ModeToggles({
   dictionary,
   calmMode,
   reducedMotion,
@@ -61,7 +61,7 @@ export function ModeToggles({
 }
 
 /** The speech control, or its unsupported fallback. */
-export function SpeechControl({
+function SpeechControl({
   dictionary,
   speechSupported,
   speaking,

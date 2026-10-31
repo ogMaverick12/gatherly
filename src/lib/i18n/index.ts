@@ -8,9 +8,6 @@ import { hi } from './hi';
 import { bn } from './bn';
 
 export type { Dictionary } from './en';
-export { en } from './en';
-export { hi } from './hi';
-export { bn } from './bn';
 
 /**
  * Every supported language's dictionary, keyed by language code.

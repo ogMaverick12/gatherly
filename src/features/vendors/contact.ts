@@ -24,6 +24,7 @@ export function normalisePhone(raw: string): string | null {
   return hasPlus ? `+${digits}` : digits;
 }
 
+/** A safe WhatsApp contact link and its display text. */
 export interface WhatsAppLink {
   readonly href: string | null;
   readonly message: string;

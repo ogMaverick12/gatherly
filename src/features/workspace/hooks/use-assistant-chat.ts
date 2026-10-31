@@ -12,8 +12,7 @@ import type { PlanView } from '../plan-view';
 import type { StreamedAnswer } from '../components/assistant-stream';
 import { useChatAsk, useChatState, useChatStop } from './assistant-chat-controller';
 
-export { newMessage } from './assistant-chat-message';
-
+/** The assistant conversation and actions exposed to the panel. */
 export interface AssistantChat {
   readonly draft: string;
   readonly loading: boolean;

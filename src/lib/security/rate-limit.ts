@@ -16,6 +16,7 @@ import type { RateLimiter, RateLimitResult } from './rate-limit-types';
 
 export type { RateLimiter, RateLimitResult } from './rate-limit-types';
 
+/** A per-process token-bucket limiter with a bounded key map. */
 export class InMemoryRateLimiter implements RateLimiter {
   readonly kind = 'memory' as const;
 
@@ -61,6 +62,7 @@ export class InMemoryRateLimiter implements RateLimiter {
 
 export { UpstashRateLimiter };
 
+/** Whether limits use process memory or the shared store. */
 export type RateLimitMode = 'shared' | 'per-instance';
 
 /**
@@ -108,7 +110,7 @@ export function getRateLimiter(): RateLimiter {
   const config = readConfig();
 
   if (config.upstashUrl && config.upstashToken) {
-    limiter = new UpstashRateLimiter(config.upstashUrl, config.upstashToken);
+    limiter = new UpstashRateLimiter({ url: config.upstashUrl, token: config.upstashToken });
   } else {
     limiter = new InMemoryRateLimiter();
   }

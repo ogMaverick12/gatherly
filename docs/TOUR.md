@@ -1,7 +1,7 @@
-# Judge's tour
+# Product tour
 
-A ninety-second walkthrough, in the order the brief describes it. Every label below is the actual
-label in the app, so you can follow along with search.
+A ninety-second walkthrough of the app's main flows. Every label below is the actual label in the
+app, so you can follow along with search.
 
 ---
 
@@ -165,7 +165,7 @@ the arrow keys. Every action target is at least 44px.
 ## 11. If you want to check the engineering
 
 ```bash
-npm run check     # lint + typecheck + format + tests with coverage
+npm run check     # lint + typecheck + format + coverage + Knip + stats
 npm run build     # production build
 npm run test:e2e  # the Playwright journeys
 npm audit --omit=dev

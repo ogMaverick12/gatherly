@@ -3,7 +3,6 @@
  *
  * A single uneven curve with a few beads on it, drawn as one path so it
  * scales cleanly and never costs a layout shift.
- * long-function: one SVG figure: the curve, the beads and the animation are one drawn path.
  */
 export function GarlandLine({ className = '' }: { className?: string }) {
   return (

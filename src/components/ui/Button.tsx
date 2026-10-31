@@ -1,9 +1,13 @@
 import type { ButtonHTMLAttributes } from 'react';
 
+/** The visual role of a button. */
 export type ButtonVariant = 'primary' | 'secondary' | 'quiet';
+/** The semantic colour a button uses. */
 export type ButtonTone = 'default' | 'neutral' | 'ink' | 'teal' | 'danger';
+/** The padding scale of a button. */
 export type ButtonSize = 'default' | 'compact' | 'small' | 'large' | 'none';
 
+/** Props accepted by the button component. */
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;
   tone?: ButtonTone;

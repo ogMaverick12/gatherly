@@ -11,6 +11,7 @@ import { COMMUNITY_RUN_OF_SHOW } from './run-of-show/community';
 import type { RunOfShowTemplate } from './run-of-show/template';
 import { WEDDING_RUN_OF_SHOW } from './run-of-show/wedding';
 
+/** One step in the printable run of show. */
 export interface RunOfShowStep {
   readonly id: string;
   readonly time: string;

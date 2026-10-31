@@ -8,7 +8,6 @@
 import { Button } from '@/components/ui/Button';
 import { useAccessibility } from '@/features/accessibility';
 
-// long-function: one view section, kept in one block so its reading order stays visible.
 /** The question box, its send button, and Stop while an answer is arriving. */
 export function AssistantComposer({
   draft,

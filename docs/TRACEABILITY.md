@@ -1,40 +1,32 @@
 # Traceability
 
-Every requirement in the supplied briefs, mapped to the code that implements it and the test that
-proves it.
+Each delivered requirement, mapped to the code that implements it and the test that proves it.
 
-The three briefs are kept verbatim in [`brief/`](brief/):
-
-- [`brief/Gatherly.md`](brief/Gatherly.md) - the product brief
-- [`brief/Gatherly implementation plan.md`](brief/Gatherly%20implementation%20plan.md) - the locked
-  architecture and design decisions
-- [`brief/Gatherly delivery outcomes.md`](brief/Gatherly%20delivery%20outcomes.md) - the eleven
-  acceptance outcomes
-
-The measured counts for this working tree live in
-[`DELIVERY_OUTCOMES.md`](DELIVERY_OUTCOMES.md#verification-summary).
+Run `npm run stats` for the code-shape counts, `npm run test:coverage` for the unit and component
+test counts and coverage, and `npx playwright test --list` for the Playwright inventory. The
+commands print the current values; this document does not copy them.
 
 ---
 
 ## 1. Delivery outcomes
 
-| #   | Outcome                                                                                                                                                                        | Implementation                                                                                                                                                                                     | Evidence                                                                                                                                                                                                                                               |
-| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 1   | Global landing with the product, inclusive event types, feature value and one-click sample plans for weddings, birthdays and community events                                  | `src/app/page.tsx`, `src/features/workspace/components/LandingContent.tsx`, `src/features/workspace/components/SamplePlanCards.tsx`, `SAMPLE_PLAN_TEMPLATES` in `src/lib/plan/samples.ts`          | `tests/features/workspace/landing-page.test.tsx`, `tests/lib/plan/plan.test.ts`                                                                                                                                                                        |
-| 2   | Intake accepts event type, date, guests, city tier, budget, priorities, culture, dietary/access needs, language and optional packs; all inputs schema-validated                | `src/features/intake/schema.ts` (`IntakeFormSchema`), `src/features/intake/components/IntakeForm.tsx`, `IntakeSchema` in `src/lib/plan/schemas.ts`                                                 | `tests/features/intake/intake-form.test.tsx`, `tests/lib/plan/plan.test.ts`                                                                                                                                                                            |
-| 3   | Browser-only engines: budget, what-if scenarios, backward milestones, vendor coverage, health score, risks, run-of-show and catering, with no network                          | `src/features/budget/index.ts`, `src/features/timeline/index.ts`, `src/features/vendors/index.ts`, `src/features/health/index.ts`, `src/features/risks/index.ts`, `src/features/catering/index.ts` | `tests/features/budget/budget.test.ts`, `tests/features/timeline/timeline.test.ts`, `tests/features/vendors/vendors.test.ts`, `tests/features/health/health.test.ts`, `tests/features/risks/risks.test.ts`, `tests/features/catering/catering.test.ts` |
-| 4   | Workspace with Overview, Budget, Timeline, Vendors, Ideas and Assistant tabs; responsive; visible estimates; no silent AI edits                                                | `src/features/workspace/components/PlanWorkspace.tsx`, `Tabs.tsx`, the six panel components, `src/features/accessibility/components/DisplaySettings.tsx`                                           | `tests/features/workspace/plan-workspace.test.tsx`, `tests/features/workspace/workspace-panels.test.tsx`, `tests/features/workspace/ideas-assistant-export.test.tsx`, `tests/e2e/journey.spec.ts`                                                      |
-| 5   | Tradition/festival packs are explicitly selected and never infer identity, religion, community or region                                                                       | `PACKS` in `src/lib/plan/packs.ts` (explicit ids only), `PACK_DISCLAIMER`, `src/features/intake/components/IntakeForm.tsx` (no pack is pre-selected), `SYSTEM_RULES` in `src/lib/ai/prompts.ts`    | `tests/lib/plan/plan.test.ts`, `tests/features/intake/intake-form.test.tsx`, `tests/features/assistant/parse.test.ts`                                                                                                                                  |
-| 6   | AI routes are stateless, guarded, schema-validated, prompt-injection aware, and visibly fall back to Basic mode                                                                | `src/app/api/chat/route.ts`, `src/app/api/ideas/route.ts`, `src/app/api/parse/route.ts`, `src/lib/security/guards.ts`, `src/lib/security/sanitize.ts`, `src/lib/ai/index.ts` (`selectProvider`)    | `tests/app/api/routes.test.ts`, `tests/lib/security/guards.test.ts`, `tests/lib/security/sanitize.test.ts`, `tests/lib/security/provider-retry-and-guards.test.ts`, `tests/lib/ai/adapters.test.ts`                                                    |
-| 7   | Exports: print-to-PDF, calendar, budget CSV and shareable URL fragments; `/api/*` is never cached by the service worker                                                        | `src/features/workspace/components/ExportBar.tsx`, `src/lib/download.ts`, `src/features/workspace/csv.ts`, `src/lib/ics.ts`, `src/lib/share.ts`, `public/sw.js`                                    | `tests/features/workspace/csv.test.ts`, `tests/lib/ics.test.ts`, `tests/lib/share.test.ts`, `tests/features/workspace/ideas-assistant-export.test.tsx`, `tests/e2e/journey.spec.ts`                                                                    |
-| 8   | Accessibility: skip link, text sizing, contrast, language selection, speech feature detection, Calm mode, reduced motion, keyboard-friendly targets, translated visible labels | `src/features/accessibility/AccessibilityProvider.tsx`, `src/features/accessibility/components/DisplaySettings.tsx`, `src/app/layout.tsx`, `src/app/globals.css`, `src/lib/i18n/`                  | `tests/features/accessibility/contrast.test.ts`, `tests/features/accessibility/display-settings.test.tsx`, `tests/lib/i18n/i18n.test.ts`                                                                                                               |
-| 9   | Documentation explains architecture, security model, limitations, Judge's tour, setup and traceability to the supplied build plan                                              | `README.md`, `SECURITY.md`, `docs/ARCHITECTURE.md`, `docs/TRACEABILITY.md`, `docs/JUDGES_TOUR.md`, `docs/LIMITATIONS.md`, `docs/DELIVERY_OUTCOMES.md`, `docs/brief/`                               | This document; verified by reading the files against the brief                                                                                                                                                                                         |
+| #   | Outcome                                                                                                                                                                        | Implementation                                                                                                                                                                                                               | Evidence                                                                                                                                                                                                                                               |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1   | Global landing with the product, inclusive event types, feature value and one-click sample plans for weddings, birthdays and community events                                  | `src/app/page.tsx`, `src/features/workspace/components/LandingContent.tsx`, `src/features/workspace/components/SamplePlanCards.tsx`, `SAMPLE_PLAN_TEMPLATES` in `src/lib/plan/samples.ts`                                    | `tests/features/workspace/landing-page.test.tsx`, `tests/lib/plan/plan.test.ts`                                                                                                                                                                        |
+| 2   | Intake accepts event type, date, guests, city tier, budget, priorities, culture, dietary/access needs, language and optional packs; all inputs schema-validated                | `src/features/intake/schema.ts` (`IntakeFormSchema`), `src/features/intake/components/IntakeForm.tsx`, `IntakeSchema` in `src/lib/plan/schemas.ts`                                                                           | `tests/features/intake/intake-form.test.tsx`, `tests/lib/plan/plan.test.ts`                                                                                                                                                                            |
+| 3   | Browser-only engines: budget, what-if scenarios, backward milestones, vendor coverage, health score, risks, run-of-show and catering, with no network                          | `src/features/budget/index.ts`, `src/features/timeline/index.ts`, `src/features/vendors/index.ts`, `src/features/health/index.ts`, `src/features/risks/index.ts`, `src/features/catering/index.ts`                           | `tests/features/budget/budget.test.ts`, `tests/features/timeline/timeline.test.ts`, `tests/features/vendors/vendors.test.ts`, `tests/features/health/health.test.ts`, `tests/features/risks/risks.test.ts`, `tests/features/catering/catering.test.ts` |
+| 4   | Workspace with Overview, Budget, Timeline, Vendors, Ideas and Assistant tabs; responsive; visible estimates; no silent AI edits                                                | `src/features/workspace/components/PlanWorkspace.tsx`, `Tabs.tsx`, the six panel components, `src/features/accessibility/components/DisplaySettings.tsx`                                                                     | `tests/features/workspace/plan-workspace.test.tsx`, `tests/features/workspace/workspace-panels.test.tsx`, `tests/features/workspace/ideas-assistant-export.test.tsx`, `tests/e2e/journey.spec.ts`                                                      |
+| 5   | Tradition/festival packs are explicitly selected and never infer identity, religion, community or region                                                                       | `PACKS` in `src/lib/plan/packs.ts` (explicit ids only), `PACK_DISCLAIMER`, `src/features/intake/components/IntakeForm.tsx` (no pack is pre-selected), `SYSTEM_RULES` in `src/lib/ai/prompts.ts`                              | `tests/lib/plan/plan.test.ts`, `tests/features/intake/intake-form.test.tsx`, `tests/features/assistant/parse.test.ts`                                                                                                                                  |
+| 6   | AI routes are stateless, guarded, schema-validated, prompt-injection aware, and visibly fall back to Basic mode                                                                | `src/app/api/chat/route.ts`, `src/app/api/ideas/route.ts`, `src/app/api/parse/route.ts`, `src/lib/security/route.ts`, `src/lib/security/guards.ts`, `src/lib/security/sanitize.ts`, `src/lib/ai/index.ts` (`selectProvider`) | `tests/app/api/routes.test.ts`, `tests/lib/security/guards.test.ts`, `tests/lib/security/sanitize.test.ts`, `tests/lib/security/provider-retry-and-guards.test.ts`, `tests/lib/ai/adapters.test.ts`                                                    |
+| 7   | Exports: print-to-PDF, calendar, budget CSV and shareable URL fragments; `/api/*` is never cached by the service worker                                                        | `src/features/workspace/components/ExportBar.tsx`, `src/lib/download.ts`, `src/features/workspace/csv.ts`, `src/lib/ics.ts`, `src/lib/share.ts`, `public/sw.js`                                                              | `tests/features/workspace/csv.test.ts`, `tests/lib/ics.test.ts`, `tests/lib/share.test.ts`, `tests/features/workspace/ideas-assistant-export.test.tsx`, `tests/e2e/journey.spec.ts`                                                                    |
+| 8   | Accessibility: skip link, text sizing, contrast, language selection, speech feature detection, Calm mode, reduced motion, keyboard-friendly targets, translated visible labels | `src/features/accessibility/AccessibilityProvider.tsx`, `src/features/accessibility/components/DisplaySettings.tsx`, `src/app/layout.tsx`, `src/app/globals.css`, `src/lib/i18n/`                                            | `tests/features/accessibility/contrast.test.ts`, `tests/features/accessibility/display-settings.test.tsx`, `tests/lib/i18n/i18n.test.ts`                                                                                                               |
+| 9   | Documentation explains the architecture, security model, limitations, product tour, setup and traceability from requirements to code and tests                                 | `README.md`, `SECURITY.md`, `docs/ARCHITECTURE.md`, `docs/TRACEABILITY.md`, `docs/TOUR.md`, `docs/LIMITATIONS.md`, `docs/DELIVERY_OUTCOMES.md`, `docs/LIVE_VERIFICATION.md`                                                  | This document; verified by reading the files against the implemented routes and tests                                                                                                                                                                  |
 
 ---
 
-## 2. Brief area to code
+## 2. Requirement area to code
 
-| Brief area                    | Source                                                                            | Evidence                                                                                                           |
+| Requirement area              | Source                                                                            | Evidence                                                                                                           |
 | ----------------------------- | --------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
 | Intake and sample plans       | `src/lib/plan/schemas.ts`, `src/features/intake/schema.ts`                        | `tests/lib/plan/plan.test.ts`, `tests/features/intake/intake-form.test.tsx`                                        |
 | Budget and scenarios          | `src/features/budget/index.ts`, `src/lib/money.ts`                                | `tests/features/budget/budget.test.ts`, `tests/lib/money.test.ts`                                                  |
@@ -49,9 +41,9 @@ The measured counts for this working tree live in
 
 ---
 
-## 3. Implementation plan to code
+## 3. Design decisions to code
 
-| Plan decision                                                                               | Where it lives                                                                                                |
+| Decision                                                                                    | Where it lives                                                                                                |
 | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
 | Next.js App Router, strict TypeScript                                                       | `tsconfig.json` (`strict: true`), `src/app/`                                                                  |
 | Server components for shells, client components for the workspace                           | `src/app/layout.tsx`, `src/app/page.tsx` are server components; `src/features/workspace/**` is `'use client'` |
@@ -71,9 +63,8 @@ The measured counts for this working tree live in
 
 ## 4. Test inventory
 
-The number of tests in each file, and the totals, live in
-[`DELIVERY_OUTCOMES.md`](DELIVERY_OUTCOMES.md#4-measured-numbers). This table maps each test file
-to what it proves.
+Run `npm run test:coverage` for current test counts and coverage. `npx playwright test --list` lists
+the Playwright inventory without running it. This table maps each test file to what it proves.
 
 | File                                                       | What it proves                                                                                                                                 |
 | ---------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -113,44 +104,32 @@ to what it proves.
 | `tests/features/workspace/shared-chrome.test.tsx`          | The site chrome, shared marks, tabs, display settings and intake heading                                                                       |
 | `tests/features/workspace/plan-restore.test.tsx`           | A stored plan is restored on reload with no user action                                                                                        |
 
-The end-to-end journeys live in `tests/e2e/` and are listed in
-[`DELIVERY_OUTCOMES.md`](DELIVERY_OUTCOMES.md#4-measured-numbers).
+The end-to-end journeys live in `tests/e2e/`; run `npx playwright test --list` to enumerate them.
 
 ---
 
-## 5. Deviations from the supplied plan
+## 5. Implementation notes
 
-Recorded honestly rather than quietly:
-
-1. **`src/lib/motion` was not created.** The implementation plan names it as the home for the
-   spring-like transitions. The motion was built as CSS instead - transform/opacity only, with
-   `prefers-reduced-motion` and the `[data-calm='true']` attribute rules in `src/app/globals.css`
-   switching it off. The behaviour in the plan is delivered; only the file layout differs, and a
-   JavaScript animation module would have been the weaker choice for a reduced-motion guarantee
-   because it can be defeated by a missed media query.
-2. **The verification numbers in `brief/Gatherly.md` are from an earlier checkpoint.** That
-   document records "309 tests ... 95.27% statement coverage, 64.28% branch coverage, 95.55%
-   function coverage, and 100% line coverage". The measured state of this working tree is in
-   [`DELIVERY_OUTCOMES.md`](DELIVERY_OUTCOMES.md#verification-summary). The suite grew, the branch
-   coverage improved, and the statement and line figures moved down slightly because the newly
-   added UI and route code is not fully exercised by unit tests. The thresholds in
-   `vitest.config.mts` (90 / 70 / 90 / 90) are met.
-3. **The production dependency audit is clean.** Run `npm audit --omit=dev`. Last result:
-   0 vulnerabilities on 2026-10-29. The brief's earlier prediction is now the measured result.
+- **Motion is CSS.** There is no separate Motion module. Motion uses transform and opacity only,
+  with `prefers-reduced-motion` and `[data-calm='true']` rules in `src/app/globals.css`. CSS keeps
+  the reduced-motion guarantee in one place.
+- **Dependency audit.** Run `npm audit --omit=dev` for the current result. It is not copied here
+  because the value changes with the dependency tree.
 
 ---
 
 ## 6. Manual verification
 
-| Check                       | How                                                    | Result                                                                  |
-| --------------------------- | ------------------------------------------------------ | ----------------------------------------------------------------------- |
-| Landing to a working plan   | `npm run dev`, open `/`, click a sample plan           | Pass                                                                    |
-| Persistence across a reload | Complete a milestone, reload `/plan`                   | Pass - the milestone is still ticked                                    |
-| Keyboard-only navigation    | Tab to the tab strip, use the arrow keys               | Pass - the tabs move focus                                              |
-| Offline                     | Load the plan, switch the network off, reload          | Pass - the plan renders, the engines still calculate                    |
-| Exports                     | CSV download, calendar file, print preview, share link | Pass                                                                    |
-| Contrast                    | `tests/features/accessibility/contrast.test.ts`        | Pass - 19 contrast checks across the light, dark and calm palettes      |
-| Production build            | `npm run build`                                        | Pass                                                                    |
-| Dependency audit            | `npm audit --omit=dev`                                 | Run npm audit --omit=dev. Last result: 0 vulnerabilities on 2026-10-29. |
+| Check                       | How                                                    | Result                                                           |
+| --------------------------- | ------------------------------------------------------ | ---------------------------------------------------------------- |
+| Landing to a working plan   | `npm run dev`, open `/`, click a sample plan           | Pass                                                             |
+| Persistence across a reload | Complete a milestone, reload `/plan`                   | Pass - the milestone is still ticked                             |
+| Keyboard-only navigation    | Tab to the tab strip, use the arrow keys               | Pass - the tabs move focus                                       |
+| Offline                     | Load the plan, switch the network off, reload          | Pass - the plan renders, the engines still calculate             |
+| Exports                     | CSV download, calendar file, print preview, share link | Pass                                                             |
+| Contrast                    | `tests/features/accessibility/contrast.test.ts`        | Pass - automated checks across the light, dark and calm palettes |
+| Production build            | `npm run build`                                        | Pass                                                             |
+| Dependency audit            | `npm audit --omit=dev`                                 | Run the command for the current result                           |
 
-The end-to-end journey is automated in `tests/e2e/journey.spec.ts` and runs with `npm run e2e`.
+The end-to-end journey is automated in `tests/e2e/journey.spec.ts` and runs with
+`npm run test:e2e`.

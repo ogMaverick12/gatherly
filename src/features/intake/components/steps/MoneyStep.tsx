@@ -11,7 +11,6 @@ import { CURRENCIES, CURRENCY_META, type Currency } from '@/lib/plan';
 import { formatMoneyPlain } from '@/lib/money';
 import type { IntakeFormValues } from '../../schema';
 
-// long-function: one view section, kept in one block so its reading order stays visible.
 /** The currency, the budget and what that works out to per guest. */
 export function MoneyStep({
   form,

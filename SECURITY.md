@@ -1,6 +1,7 @@
 # Security
 
-Gatherly is a browser-first application with a small, stateless server surface. This document
+Gatherly is a browser-first application with a small server surface that stores no plan or user
+data. This document
 describes the threat model, the controls that are actually implemented, and the honest gaps.
 
 ---
@@ -9,13 +10,13 @@ describes the threat model, the controls that are actually implemented, and the 
 
 ### What the system holds
 
-| Data                                                       | Where it lives                                  | Sent to a server?                              |
-| ---------------------------------------------------------- | ----------------------------------------------- | ---------------------------------------------- |
-| The plan (intake, tasks, vendors, milestones, ideas, chat) | Browser `localStorage`, key `gatherly:plan:v1`  | No                                             |
-| Display preferences                                        | Browser `localStorage`, key `gatherly:prefs:v1` | No                                             |
-| Share links                                                | URL **fragment**                                | No - fragments are never sent in HTTP requests |
-| API keys                                                   | Server environment only                         | Never to the browser                           |
-| Free text the user types                                   | Browser, then a request body                    | Yes, only to the AI route the user called      |
+| Data                                                            | Where it lives                                  | Sent to a server?                                             |
+| --------------------------------------------------------------- | ----------------------------------------------- | ------------------------------------------------------------- |
+| The full plan (intake, tasks, vendors, milestones, ideas, chat) | Browser `localStorage`, key `gatherly:plan:v1`  | A bounded summary is sent on AI requests; never the full plan |
+| Display preferences                                             | Browser `localStorage`, key `gatherly:prefs:v1` | No                                                            |
+| Share links                                                     | URL **fragment**                                | No - fragments are never sent in HTTP requests                |
+| API keys                                                        | Server environment only                         | Never to the browser                                          |
+| Free text the user types                                        | Browser, then a request body                    | Yes, only to the AI route the user called                     |
 
 There is **no account system, no database, no payment, no upload and no server-side session**. The
 server keeps nothing between requests.
@@ -39,17 +40,20 @@ server keeps nothing between requests.
 
 ## 2. Controls
 
-### 2.1 Request handling (`src/lib/security/guards.ts`)
+### 2.1 Request handling (`src/lib/security/route.ts`)
 
-Every route is wrapped in `withGuards`, which applies, in order:
+The POST routes (`/api/chat`, `/api/ideas`, `/api/parse`) are wrapped by `createRoute`, and
+`/api/health` is wrapped by `createGetRoute`. The factories apply, in order:
 
-1. **Method check** - anything other than `POST` gets `405`.
+1. **Method check** - `createRoute` accepts `POST` only; `createGetRoute` accepts `GET`. Anything
+   else gets `405`.
 2. **Rate limit** - 20 requests per minute per route per client key, with `Retry-After` on refusal.
-3. **Body size cap** - `MAX_BODY_BYTES` is 16 KiB. The cap is enforced _while streaming_ (the
-   reader is cancelled as soon as the total exceeds the limit), so a large body is never fully
-   buffered. A declared `content-length` over the cap is rejected with `413` before reading.
-4. **JSON parse** - a malformed body is a `400`, not a `500`.
-5. **Zod validation** - the body is parsed against a strict schema. Unknown keys are rejected.
+3. **Body size cap** - `MAX_BODY_BYTES` is 16 KiB for the POST routes. The cap is enforced _while
+   streaming_ (the reader is cancelled as soon as the total exceeds the limit), so a large body is
+   never fully buffered. A declared `content-length` over the cap is rejected with `413` before
+   reading.
+4. **JSON parse** - a malformed POST body is a `400`, not a `500`.
+5. **Zod validation** - a POST body is parsed against a strict schema. Unknown keys are rejected.
    On failure the response lists the offending fields, never the raw body.
 6. **Response headers** - every response is `Cache-Control: no-store, no-cache, must-revalidate`
    with `X-Content-Type-Options: nosniff`.
@@ -118,7 +122,7 @@ configuration is reported rather than assumed.
 - The mode is always visible: the SSE stream emits a `mode` event before the `delta`, so the badge
   is on screen before the answer arrives.
 
-### 2.5 Browser-side storage (`src/lib/plan-store.ts`, `src/features/accessibility/provider.tsx`)
+### 2.5 Browser-side storage (`src/lib/plan-store.ts`, `src/features/accessibility/preferences.ts`)
 
 - `localStorage` is read as **untrusted input**: both the plan and the preferences are parsed with
   a strict Zod schema on read. A value that does not match is discarded (and removed), never
@@ -137,7 +141,7 @@ configuration is reported rather than assumed.
 - Only the parts worth sharing are included: intake, tasks, vendors, milestones. **Chat history and
   saved ideas are deliberately dropped**, so a share link cannot leak a conversation.
 
-### 2.7 Output handling (`src/lib/security/sanitize.ts`, `src/lib/csv.ts`)
+### 2.7 Output handling (`src/lib/security/sanitize.ts`, `src/features/workspace/csv.ts`)
 
 - CSV cells are quoted, embedded quotes are doubled, and a cell that starts with `=`, `+`, `-` or
   `@` is prefixed with `'` to defuse spreadsheet formula injection.
@@ -189,7 +193,7 @@ nonce-only with `strict-dynamic`, so no inline or external script can run.
 ### 2.9 Service worker (`public/sw.js`)
 
 - It caches the app shell and static assets only.
-- **`/api/*` is never cached.** AI routes are per-request, stateless and rate limited; a cached
+- **`/api/*` is never cached.** AI routes are per-request, store no user data and are rate limited; a cached
   answer would be both wrong and a leak.
 - The cache name is versioned (`gatherly-shell-v1`) so a new shell replaces the old one.
 
@@ -197,7 +201,7 @@ nonce-only with `strict-dynamic`, so no inline or external script can run.
 
 ## 3. Dependency posture
 
-Run `npm audit --omit=dev`. Last result: 0 vulnerabilities on 2026-10-29.
+Run `npm audit --omit=dev` for the current result.
 
 `npm audit fix --force` was not used. The lockfile is the evidence; run the command above in this
 working tree to confirm the current result.
@@ -208,14 +212,16 @@ working tree to confirm the current result.
 
 - **No analytics, no telemetry, no third-party scripts.** The only outbound request the app can
   make is to its own `/api/*` routes.
-- The plan, the preferences and any share fragment stay in the browser.
+- The full plan, the preferences and any share fragment stay in the browser. AI requests carry only
+  a bounded plan summary.
 - The server logs route, status, duration and correlation id. It does not log bodies, prompts,
   plan contents or the user's words.
 - When a live AI provider is configured, the text the user typed and a bounded plan summary are
   sent to that provider. The mode badge always tells the user which provider answered.
 - **Basic mode sends nothing to a third party.** No provider is contacted and no key is needed.
   The ideas, chat and parse requests still reach this app's own server, which answers them from
-  deterministic rules over the plan that was sent. The plan itself never leaves the browser.
+  deterministic rules over the plan that was sent. The full plan never leaves the browser; only the
+  bounded summary in the request does.
 
 ---
 

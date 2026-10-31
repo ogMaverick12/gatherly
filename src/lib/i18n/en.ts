@@ -7,30 +7,24 @@ export const en = {
   common: {
     appName: 'Gatherly',
     tagline: 'Plan a celebration without losing the day',
-    skipToContent: 'Skip to main content',
+    mainNavigation: 'Main',
+    gatherlyMark: 'Gatherly mark',
     close: 'Close',
     back: 'Back',
     next: 'Next',
     continue: 'Continue',
-    save: 'Save',
     cancel: 'Cancel',
-    copy: 'Copy',
-    copied: 'Copied',
     download: 'Download',
     print: 'Print',
     share: 'Share',
     reset: 'Reset',
     loading: 'Loading',
     error: 'Something went wrong',
-    retry: 'Try again',
-    optional: 'optional',
     estimate: 'estimate',
     minutes: 'minutes',
     days: 'days',
     none: 'None',
     unknown: 'Not set',
-    yes: 'Yes',
-    no: 'No',
   },
   landing: {
     heroEyebrow: 'A calm planning companion',
@@ -75,13 +69,11 @@ export const en = {
     inclusionBody:
       'Weddings, birthdays, community gatherings and everything in between. Tradition and festival packs are there when you want them, chosen by you - Gatherly never guesses who you are.',
     startCta: 'Start your plan',
-    footerNote: 'Your plan stays on this device. No account, no upload, no tracking.',
   },
   intake: {
     title: 'Tell us about the celebration',
     subtitle: 'Enough to make a real plan. You can change any of it later.',
     step: 'Step',
-    of: 'of',
     basics: 'The basics',
     money: 'The money',
     needs: 'What matters',
@@ -116,13 +108,13 @@ export const en = {
     packsHelp: 'Starting points you can add. Choose only what fits.',
     notes: 'Anything else about the day?',
     submit: 'Create the plan',
-    fixErrors: 'Some answers need attention.',
-    required: 'This one is needed',
-    outOfRange: 'That number is outside the range we can plan for',
     badDate: 'Use the date picker, or pick a date inside the next five years',
   },
   workspace: {
     planTitle: 'Your plan',
+    planSections: 'Plan sections',
+    loadingSection: 'Loading plan section',
+    loadingPlan: 'Loading your plan',
     health: 'Plan health',
     healthExplainer: 'A planning heuristic, not a measurement of anything real.',
     healthFormula: 'How it is calculated',
@@ -177,7 +169,6 @@ export const en = {
     clearConfirm: 'This removes the plan from this device. Continue?',
     milestones: 'Milestones',
     milestonesHelp: 'Built backwards from the event date.',
-    markDone: 'Mark as done',
     done: 'Done',
     overdue: 'Overdue',
     runOfShow: 'Run of show',
@@ -207,9 +198,7 @@ export const en = {
     basicModeHelp:
       'No AI provider is configured, so answers come from deterministic rules over your plan. They are honest, not intelligent.',
     providerMode: 'AI assisted',
-    proposal: 'Suggested change',
     applyProposal: 'Apply to the plan',
-    discardProposal: 'Discard',
     applied: 'Applied',
     offline: 'You are offline. The plan still works.',
     noPlan: 'There is no plan yet.',
@@ -243,7 +232,8 @@ export const en = {
   },
 } as const;
 
-export type EnglishDictionary = typeof en;
+type EnglishDictionary = typeof en;
+/** The locale-independent dictionary shape, with every string widened. */
 export type Dictionary = {
   [K in keyof EnglishDictionary]: EnglishDictionary[K] extends string
     ? string

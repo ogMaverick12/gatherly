@@ -20,6 +20,17 @@ if c == 1 then redis.call('PEXPIRE', KEYS[1], ARGV[1]) end
 return {c, redis.call('PTTL', KEYS[1])}`;
 
 const FAIL_OPEN_WARN_INTERVAL_MS = 60_000;
+const DEFAULT_CAPACITY = 20;
+const DEFAULT_WINDOW_MS = 60_000;
+
+/** The store endpoint and policy for one shared limiter. */
+export interface UpstashRateLimiterOptions {
+  readonly url: string;
+  readonly token: string;
+  readonly capacity?: number;
+  readonly windowMs?: number;
+  readonly now?: () => number;
+}
 
 interface UpstashResponse {
   result?: unknown;
@@ -61,18 +72,30 @@ function readCountAndTtl(reply: unknown[]): [number, number] {
   return [Number(pair[0] ?? 0), Number(pair[1] ?? -1)];
 }
 
+/** A fixed-window limiter backed by the shared Upstash store. */
 export class UpstashRateLimiter implements RateLimiter {
   readonly kind = 'upstash' as const;
 
+  private readonly url: string;
+  private readonly token: string;
+  private readonly capacity: number;
+  private readonly windowMs: number;
+  private readonly now: () => number;
   private lastFailOpenWarnAt = Number.NEGATIVE_INFINITY;
 
-  constructor(
-    private readonly url: string,
-    private readonly token: string,
-    private readonly capacity = 20,
-    private readonly windowMs = 60_000,
-    private readonly now: () => number = () => Date.now(),
-  ) {}
+  constructor({
+    url,
+    token,
+    capacity = DEFAULT_CAPACITY,
+    windowMs = DEFAULT_WINDOW_MS,
+    now = () => Date.now(),
+  }: UpstashRateLimiterOptions) {
+    this.url = url;
+    this.token = token;
+    this.capacity = capacity;
+    this.windowMs = windowMs;
+    this.now = now;
+  }
 
   /**
    * Count one request in the current fixed window.

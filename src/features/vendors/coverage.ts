@@ -9,7 +9,7 @@ import type { BudgetCategoryId, Plan, Vendor, VendorCategoryId, VendorStatus } f
 import { VENDOR_CATEGORY_LABELS } from '@/lib/plan';
 import { VENDOR_CATEGORY_BUDGET_LINE, vendorChecklist } from './checklist';
 
-export interface CategoryCoverage {
+interface CategoryCoverage {
   readonly category: VendorCategoryId;
   readonly label: string;
   readonly allocatedMinor: number;
@@ -20,6 +20,7 @@ export interface CategoryCoverage {
   readonly hasVendor: boolean;
 }
 
+/** Booked and outstanding counts for one vendor category. */
 export interface VendorCoverage {
   readonly categories: readonly CategoryCoverage[];
   readonly overallPercent: number;

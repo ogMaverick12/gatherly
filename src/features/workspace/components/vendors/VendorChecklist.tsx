@@ -12,7 +12,6 @@ import type { Vendor, VendorCategoryId } from '@/lib/plan';
 import type { PlanView } from '../../plan-view';
 import { VendorCard } from './VendorCard';
 
-// long-function: one view section, kept in one block so its reading order stays visible.
 /** Every category the event needs, with the vendors recorded against it. */
 export function VendorChecklist({
   view,

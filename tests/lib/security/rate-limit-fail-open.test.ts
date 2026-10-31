@@ -6,7 +6,13 @@ import { UpstashRateLimiter } from '@/lib/security/rate-limit';
 const WINDOW_MS = 60_000;
 
 function limiterOn(clock: { now: number }): UpstashRateLimiter {
-  return new UpstashRateLimiter('https://redis.test', 'token', 20, WINDOW_MS, () => clock.now);
+  return new UpstashRateLimiter({
+    url: 'https://redis.test',
+    token: 'token',
+    capacity: 20,
+    windowMs: WINDOW_MS,
+    now: () => clock.now,
+  });
 }
 
 beforeEach(() => {

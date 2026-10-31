@@ -9,6 +9,7 @@ import { useCallback, useRef, type KeyboardEvent } from 'react';
 import { Button } from '@/components/ui/Button';
 import { Chip } from '@/components/ui/Chip';
 
+/** The id, label and optional badge for one tab. */
 export interface TabDefinition<T extends string> {
   readonly id: T;
   readonly label: string;
@@ -76,12 +77,14 @@ export function Tabs<T extends string>({
   active,
   onChange,
   idPrefix,
+  ariaLabel,
   className = '',
 }: {
   tabs: readonly TabDefinition<T>[];
   active: T;
   onChange: (id: T) => void;
   idPrefix: string;
+  ariaLabel: string;
   className?: string;
 }) {
   const listRef = useRef<HTMLDivElement>(null);
@@ -109,7 +112,7 @@ export function Tabs<T extends string>({
     <div
       ref={listRef}
       role="tablist"
-      aria-label="Plan sections"
+      aria-label={ariaLabel}
       // The tabs themselves are the focus stops; the strip is only
       // programmatically focusable so the arrow-key handler can find it.
       tabIndex={-1}

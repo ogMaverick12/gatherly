@@ -71,7 +71,7 @@ The WhatsApp message is **pre-written but not sent** - you press it, you review 
 
 ---
 
-## 5. The health score is a rubric, not an oracle
+## 5. The health score is a heuristic, not an oracle
 
 Five weighted parts - budget, timeline, vendors, tasks and guest experience - that sum to 100 per
 cent. It is a **checklist with weights**, and it is only as good as that checklist. The weights are
@@ -125,9 +125,10 @@ Treat a 92 as "this plan looks internally consistent", not "this plan is good".
 - Contrast is **measured** for the light, dark and calm themes in the test suite, and the app
   follows keyboard, focus, target-size and reduced-motion guidance.
 - **Three languages** are translated: English, Hindi and Bengali. The test suite asserts that all
-  three dictionaries carry exactly the same keys, so no label can fall back to English by accident.
-  The translations are working translations, not native review - if you speak one of these
-  languages and something reads awkwardly, that is worth reporting.
+  three dictionaries carry exactly the same keys, so no dictionary label can fall back to English
+  by accident. Engine-generated health band labels and explanations are still English-only. The
+  translations are working translations, not native review - if you speak one of these languages
+  and something reads awkwardly, that is worth reporting.
 - **Read aloud** uses the browser's speech synthesis. It depends on the operating system having a
   voice for the selected language, and it is unavailable in some browsers - the app says so rather
   than showing a dead button.
@@ -142,19 +143,16 @@ Treat a 92 as "this plan looks internally consistent", not "this plan is good".
   `UPSTASH_REDIS_REST_TOKEN` in production, or every instance keeps its own bucket.
 - **The AI routes are open.** There are no accounts, so there is nothing to authenticate. They are
   body-capped and rate limited, and a live provider key behind them is a cost the operator carries.
-- **Coverage is measured, and the thresholds are enforced.** The current figures are in
-  [`DELIVERY_OUTCOMES.md`](DELIVERY_OUTCOMES.md#verification-summary). The uncovered lines are
-  concentrated in UI branches and in the fallback paths of the provider adapters.
-- **A small number of files are longer than the 200-line house rule.** `npm run stats` measures
-  them and fails if the count grows past what [`quality-allowance.json`](quality-allowance.json)
-  records: the three locale dictionaries (kept whole so they stay comparable) and two development
-  scripts. Every function over 40 lines carries a written reason; the undocumented exports are
-  mostly Zod schemas and label maps.
-- **The browser suite is the evidence for the plan.** The unit, component and end-to-end suites
-  are counted in
-  [`DELIVERY_OUTCOMES.md`](DELIVERY_OUTCOMES.md#verification-summary). There is no load test and
-  no cross-browser matrix beyond Chromium.
-- **Dependency audit.** Run `npm audit --omit=dev`. Last result: 0 vulnerabilities on 2026-10-29.
+- **Coverage is measured, and the thresholds are enforced.** Run `npm run test:coverage` for the
+  current figures. The uncovered lines are concentrated in UI branches and in the fallback paths of
+  the provider adapters.
+- **A few files are longer than the 200-line house rule.** `npm run stats` measures them and
+  compares the count with [`quality-allowance.json`](quality-allowance.json). The notes in that file
+  say why each remaining entry is there; lower an allowance when its count drops.
+- **The browser suite is the evidence for the plan.** `npm run check` runs the unit and component
+  suites; `npm run test:e2e` runs the Playwright journeys. There is no load test and no
+  cross-browser matrix beyond Chromium.
+- **Dependency audit.** Run `npm audit --omit=dev` for the current result.
   See [`../SECURITY.md`](../SECURITY.md#3-dependency-posture).
 
 ---

@@ -57,7 +57,7 @@ export const BASE_WEIGHTS: Record<EventType, Record<BudgetCategoryId, number>> =
  * These are planning heuristics, not prices, and are published in
  * `docs/ARCHITECTURE.md`.
  */
-export const BENCHMARK_SHARES: Record<EventType, Record<BudgetCategoryId, number>> = {
+const BENCHMARK_SHARES: Record<EventType, Record<BudgetCategoryId, number>> = {
   wedding: {
     venue: 26,
     catering: 25,

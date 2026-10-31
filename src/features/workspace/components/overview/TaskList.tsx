@@ -14,7 +14,6 @@ import type { PlanTask } from '@/lib/plan';
 /** Phones show the first few tasks; the rest are one disclosure away. */
 const PHONE_TASK_LIMIT = 3;
 
-// long-function: one view section, kept in one block so its reading order stays visible.
 /** The checklist, with the tick that moves the health score. */
 export function TaskList({
   tasks,

@@ -98,26 +98,24 @@ function riskFields(risks: readonly Risk[]): Pick<PlanSnapshot, 'topRisks'> {
   return { topRisks: risks.slice(0, 3).map((risk) => risk.title) };
 }
 
+/** The engine results one snapshot is built from. */
+export interface SnapshotInputs {
+  readonly plan: Plan;
+  readonly budget: BudgetAllocation;
+  readonly coverage: VendorCoverage;
+  readonly timeline: TimelineSummary;
+  readonly health: HealthReport;
+  readonly catering: CateringEstimate;
+  readonly risks: readonly Risk[];
+}
+
 /**
  * Collects the numbers the other engines produced into one read-only object.
- * @param plan the stored plan, for intake, tasks and vendors
- * @param budget the allocation, in integer minor units (paise)
- * @param coverage the vendor coverage percentages
- * @param timeline the ladder summary with its counts and next step
- * @param health the plan health report
- * @param catering the plate and drink estimate
- * @param risks the risk register, most serious first
+ * @param inputs the plan and the results of the budget, vendor, timeline, health, catering and risk engines
  * @returns the snapshot the assistant and overview read from
  */
-export function buildSnapshot(
-  plan: Plan,
-  budget: BudgetAllocation,
-  coverage: VendorCoverage,
-  timeline: TimelineSummary,
-  health: HealthReport,
-  catering: CateringEstimate,
-  risks: readonly Risk[],
-): PlanSnapshot {
+export function buildSnapshot(inputs: SnapshotInputs): PlanSnapshot {
+  const { plan, budget, coverage, timeline, health, catering, risks } = inputs;
   return {
     ...planFields(plan),
     ...budgetFields(plan, budget),

@@ -9,7 +9,7 @@ import { chromium } from '@playwright/test';
  *
  * The npm script builds first, so these always show the current code. The
  * sample plan is opened through the real landing page, so the screenshots show
- * the same state a judge sees.
+ * the same state a reviewer sees.
  */
 
 const PORT = process.env.SHOTS_PORT ?? '3212';

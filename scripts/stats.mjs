@@ -8,7 +8,7 @@
  *
  * It also measures the shape rules in AGENTS.md - files under 200 lines,
  * logic functions under 40 lines, components under 80 lines, and JSDoc on
- * every exported function and constant - against docs/quality-allowance.json.
+ * every exported declaration - against docs/quality-allowance.json.
  * A logic function may be excused only by the exact line
  * `// long-ok: data table` or `// long-ok: closed switch` above it.
  *
@@ -85,7 +85,7 @@ function buildReport(unit, endToEnd, coverage, lists, allowance) {
       allowance?.componentsOver80Lines ?? 0,
     ),
     ...listBlock(
-      'Exported functions and constants without JSDoc',
+      'Exported symbols without JSDoc',
       lists.undocumented,
       allowance?.exportsWithoutJsDoc ?? 0,
     ),
@@ -113,7 +113,7 @@ const over = [
   ['files over 200 lines', lists.longFiles.length, allowance.filesOver200Lines],
   ['logic functions over 40 lines', lists.longLogic.length, allowance.logicFunctionsOver40Lines],
   ['components over 80 lines', lists.longComponents.length, allowance.componentsOver80Lines],
-  ['exports without JSDoc', lists.undocumented.length, allowance.exportsWithoutJsDoc],
+  ['exported symbols without JSDoc', lists.undocumented.length, allowance.exportsWithoutJsDoc],
 ].filter(([, count, allowed]) => count > allowed);
 
 if (over.length > 0) {

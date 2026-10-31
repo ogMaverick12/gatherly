@@ -14,7 +14,7 @@ const LINE_BREAKS = /\r\n|\r|\n/g;
 /**
  * The default cap on user text, in characters, before it reaches a model.
  */
-export const MAX_USER_TEXT = 2000;
+const MAX_USER_TEXT = 2000;
 
 /**
  * Replace control characters with spaces and drop zero-width characters.

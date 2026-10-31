@@ -58,25 +58,25 @@ export function errorResponse(error: unknown): Response {
   );
 }
 
-async function readBodyWithLimit(request: Request, maxBytes: number): Promise<string> {
+/** Check the declared length before reading any bytes. */
+function declaredLengthExceeds(request: Request, maxBytes: number): boolean {
   const contentLength = request.headers.get('content-length');
-  if (contentLength) {
-    const declared = Number(contentLength);
-    if (Number.isFinite(declared) && declared > maxBytes) {
-      throw new HttpError(413, 'That request is too large.');
-    }
-  }
+  if (!contentLength) return false;
+  const declared = Number(contentLength);
+  return Number.isFinite(declared) && declared > maxBytes;
+}
 
-  const body = request.body;
-  if (!body) return '';
-
-  const reader = body.getReader();
+/** Read all chunks, stopping as soon as the body is over the cap. */
+async function readChunks(
+  reader: ReadableStreamDefaultReader<Uint8Array>,
+  maxBytes: number,
+): Promise<{ chunks: Uint8Array[]; total: number }> {
   const chunks: Uint8Array[] = [];
   let total = 0;
 
-  while (true) {
+  for (;;) {
     const { done, value } = await reader.read();
-    if (done) break;
+    if (done) return { chunks, total };
     if (!value) continue;
     total += value.byteLength;
     if (total > maxBytes) {
@@ -85,7 +85,10 @@ async function readBodyWithLimit(request: Request, maxBytes: number): Promise<st
     }
     chunks.push(value);
   }
+}
 
+/** Decode the chunks into one UTF-8 string. */
+function decodeChunks(chunks: readonly Uint8Array[], total: number): string {
   const combined = new Uint8Array(total);
   let offset = 0;
   for (const chunk of chunks) {
@@ -93,6 +96,15 @@ async function readBodyWithLimit(request: Request, maxBytes: number): Promise<st
     offset += chunk.byteLength;
   }
   return new TextDecoder().decode(combined);
+}
+
+async function readBodyWithLimit(request: Request, maxBytes: number): Promise<string> {
+  if (declaredLengthExceeds(request, maxBytes)) {
+    throw new HttpError(413, 'That request is too large.');
+  }
+  if (!request.body) return '';
+  const { chunks, total } = await readChunks(request.body.getReader(), maxBytes);
+  return decodeChunks(chunks, total);
 }
 
 /**

@@ -31,11 +31,12 @@ const EnvSchema = z.object({
   UPSTASH_REDIS_REST_TOKEN: z.string().trim().catch(''),
 });
 
-export type AiProviderName = 'basic' | 'gemini' | 'openrouter';
+type AiProviderName = 'basic' | 'gemini' | 'openrouter';
 
 /** The shape this module reads: any record of string values, like `process.env`. */
 export type Env = Readonly<Record<string, string | undefined>>;
 
+/** The validated AI and rate-limit configuration. */
 export interface AppConfig {
   readonly aiProvider: AiProviderName;
   readonly geminiApiKey: string;

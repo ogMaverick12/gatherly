@@ -4,10 +4,10 @@
  */
 
 /** Render the Gatherly name beside the celebration mark. */
-export function Wordmark({ className = '' }: { className?: string }) {
+export function Wordmark({ className = '', markLabel }: { className?: string; markLabel: string }) {
   return (
     <span className={`inline-flex items-center gap-2 ${className}`}>
-      <CelebrationMark className="h-5 w-5 shrink-0" />
+      <CelebrationMark className="h-5 w-5 shrink-0" label={markLabel} />
       <span className="font-display text-xl font-semibold tracking-tight">Gatherly</span>
     </span>
   );
@@ -18,12 +18,12 @@ export function Wordmark({ className = '' }: { className?: string }) {
  * Four petals around a small centre, drawn rather than typed so it stays
  * crisp at any size and inherits the current colour.
  */
-export function CelebrationMark({ className = '' }: { className?: string }) {
+export function CelebrationMark({ className = '', label }: { className?: string; label: string }) {
   return (
     <svg
       viewBox="0 0 24 24"
       role="img"
-      aria-label="Gatherly mark"
+      aria-label={label}
       className={className}
       fill="none"
       xmlns="http://www.w3.org/2000/svg"

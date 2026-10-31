@@ -39,6 +39,7 @@ export function useChatState() {
   };
 }
 
+/** The assistant conversation state held by the workspace controller. */
 export type ChatState = ReturnType<typeof useChatState>;
 
 /** Scroll the message list to its end after the next paint. */
@@ -131,14 +132,17 @@ function finishAsk(
   scrollToEnd(chat.listRef);
 }
 
+/** Everything one ask needs from the conversation. */
+interface AskRun {
+  readonly text: string;
+  readonly view: PlanView;
+  readonly onSend: (message: ChatMessage) => void;
+  readonly t: Dictionary;
+  readonly chat: ChatState;
+}
+
 /** Run one ask to completion, choosing the stopped or offline answer on failure. */
-async function runAsk(
-  text: string,
-  view: PlanView,
-  onSend: (message: ChatMessage) => void,
-  t: Dictionary,
-  chat: ChatState,
-): Promise<void> {
+async function runAsk({ text, view, onSend, t, chat }: AskRun): Promise<void> {
   const trimmed = text.trim();
   if (!trimmed || chat.loading) return;
   const started = beginAsk(trimmed, onSend, chat);
@@ -165,7 +169,7 @@ export function useChatAsk(
   t: Dictionary,
   chat: ChatState,
 ) {
-  return (text: string) => runAsk(text, view, onSend, t, chat);
+  return (text: string) => runAsk({ text, view, onSend, t, chat });
 }
 
 /** Build the stop action for one conversation. */

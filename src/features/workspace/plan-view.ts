@@ -76,7 +76,7 @@ export function computePlanView(plan: Plan, today: DateOnly = todayDateOnly(new 
   const catering = computeCatering(plan);
   const health = computeHealth({ plan, budget, coverage, timeline });
   const risks = computeRisks({ plan, budget, coverage, timeline, catering });
-  const snapshot = buildSnapshot(plan, budget, coverage, timeline, health, catering, risks);
+  const snapshot = buildSnapshot({ plan, budget, coverage, timeline, health, catering, risks });
   return {
     plan,
     budget,

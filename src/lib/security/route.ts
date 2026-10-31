@@ -21,7 +21,7 @@ import { errorResponse, jsonResponse, NO_STORE, readJsonBody } from './http';
  */
 const DEADLINE_GRACE_MS = 2_000;
 
-export interface RouteContext {
+interface RouteContext {
   readonly request: Request;
   /** Aborted when the route's budget ends; pass it to provider calls. */
   readonly signal: AbortSignal;
@@ -68,83 +68,94 @@ interface RouteState {
   rateHeaders: Record<string, string>;
 }
 
+/** Everything one request needs to answer, log and clean up. */
+interface RouteRun {
+  readonly request: Request;
+  readonly name: string;
+  readonly method: 'GET' | 'POST';
+  readonly startedAt: number;
+  readonly deadline: AbortController;
+  readonly state: RouteState;
+}
+
+/** Start one route run with a fresh deadline and log state. */
+function createRouteRun(request: Request, name: string, method: 'GET' | 'POST'): RouteRun {
+  return {
+    request,
+    name,
+    method,
+    startedAt: Date.now(),
+    deadline: new AbortController(),
+    state: { status: 200, deferred: false, logged: false, rateHeaders: {} },
+  };
+}
+
 /** Write the one log line for a request, at most once. */
-function completeRoute(
-  state: RouteState,
-  name: string,
-  request: Request,
-  startedAt: number,
-  providerError?: ProviderErrorKind,
-): void {
-  if (state.logged) return;
-  state.logged = true;
-  logRequest(name, state.status, Date.now() - startedAt, request, providerError);
+function completeRoute(run: RouteRun, providerError?: ProviderErrorKind): void {
+  if (run.state.logged) return;
+  run.state.logged = true;
+  logRequest({
+    route: run.name,
+    status: run.state.status,
+    durationMs: Date.now() - run.startedAt,
+    request: run.request,
+    providerError,
+  });
 }
 
 /** Build the context handed to a route handler. */
-function createRouteContext(
-  request: Request,
-  name: string,
-  startedAt: number,
-  deadline: AbortController,
-  state: RouteState,
-): RouteContext {
+function createRouteContext(run: RouteRun): RouteContext {
   return {
-    request,
-    signal: deadline.signal,
-    complete: (providerError) => completeRoute(state, name, request, startedAt, providerError),
+    request: run.request,
+    signal: run.deadline.signal,
+    complete: (providerError) => completeRoute(run, providerError),
     deferLog: () => {
-      state.deferred = true;
+      run.state.deferred = true;
     },
   };
 }
 
 /** The method-mismatch response, with the allowed method advertised. */
-function methodNotAllowed(method: 'GET' | 'POST', state: RouteState): Response {
-  state.status = 405;
-  const response = jsonResponse({ error: 'Method not allowed.' }, { status: state.status });
-  response.headers.set('Allow', method);
+function methodNotAllowed(run: RouteRun): Response {
+  run.state.status = 405;
+  const response = jsonResponse({ error: 'Method not allowed.' }, { status: run.state.status });
+  response.headers.set('Allow', run.method);
   return response;
 }
 
 /** Apply the response status and shared headers to a successful handler. */
-function acceptResponse(response: Response, state: RouteState): Response {
-  state.status = response.status;
-  mergeHeaders(response, state.rateHeaders);
+function acceptResponse(response: Response, run: RouteRun): Response {
+  run.state.status = response.status;
+  mergeHeaders(response, run.state.rateHeaders);
   return response;
 }
 
 /** Apply the response status and shared headers to a failed handler. */
-function rejectResponse(error: unknown, state: RouteState): Response {
+function rejectResponse(error: unknown, run: RouteRun): Response {
   // A failed handler is logged now, even if it had asked to defer.
-  state.deferred = false;
+  run.state.deferred = false;
   const response = errorResponse(error);
-  state.status = response.status;
-  mergeHeaders(response, state.rateHeaders);
+  run.state.status = response.status;
+  mergeHeaders(response, run.state.rateHeaders);
   return response;
 }
 
 /** Run one route through the shared method, rate-limit and deadline guards. */
 async function runRoute(
-  request: Request,
-  name: string,
-  method: 'GET' | 'POST',
+  run: RouteRun,
   execute: (context: RouteContext) => Promise<Response>,
 ): Promise<Response> {
-  const startedAt = Date.now();
-  const deadline = new AbortController();
-  const state: RouteState = { status: 200, deferred: false, logged: false, rateHeaders: {} };
-  const context = createRouteContext(request, name, startedAt, deadline, state);
+  const context = createRouteContext(run);
 
   try {
-    if (request.method !== method) return methodNotAllowed(method, state);
-    const rate = await enforceRateLimit(request, name);
-    state.rateHeaders = rate.headers;
-    return acceptResponse(await withinBudget(execute(context), deadline), state);
+    if (run.request.method !== run.method) return methodNotAllowed(run);
+    const rate = await enforceRateLimit(run.request, run.name);
+    run.state.rateHeaders = rate.headers;
+    return acceptResponse(await withinBudget(execute(context), run.deadline), run);
   } catch (error) {
-    return rejectResponse(error, state);
+    return rejectResponse(error, run);
   } finally {
-    if (!state.deferred) completeRoute(state, name, request, startedAt);
+    if (!run.state.deferred) completeRoute(run);
   }
 }
 
@@ -162,7 +173,7 @@ export function createRoute<TSchema extends z.ZodType>(
   options: RouteOptions<TSchema>,
 ): (request: Request) => Promise<Response> {
   return (request) =>
-    runRoute(request, options.name, 'POST', async (context) => {
+    runRoute(createRouteRun(request, options.name, 'POST'), async (context) => {
       const body = await readJsonBody(request, options.schema);
       return options.handler(body, context);
     });
@@ -176,5 +187,7 @@ export function createRoute<TSchema extends z.ZodType>(
  */
 export function createGetRoute(options: GetRouteOptions): (request: Request) => Promise<Response> {
   return (request) =>
-    runRoute(request, options.name, 'GET', (context) => Promise.resolve(options.handler(context)));
+    runRoute(createRouteRun(request, options.name, 'GET'), (context) =>
+      Promise.resolve(options.handler(context)),
+    );
 }

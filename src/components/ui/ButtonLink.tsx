@@ -2,6 +2,7 @@ import Link from 'next/link';
 import type { AnchorHTMLAttributes, ReactNode } from 'react';
 import { buttonClasses, type ButtonSize, type ButtonTone, type ButtonVariant } from './Button';
 
+/** Props accepted by the link styled as a button. */
 export interface ButtonLinkProps extends AnchorHTMLAttributes<HTMLAnchorElement> {
   href: string;
   children: ReactNode;

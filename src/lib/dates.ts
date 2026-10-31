@@ -143,20 +143,3 @@ export function formatDateOnly(
   const date = parseDateOnly(value);
   return new Intl.DateTimeFormat(locale, { ...options, timeZone: 'UTC' }).format(date);
 }
-
-/**
- * Format a start and end date as one readable range.
- * The year is shown once, at the end, which suits multi-day events.
- *
- * @param start the first ISO date string (YYYY-MM-DD)
- * @param end the last ISO date string (YYYY-MM-DD)
- * @param locale BCP-47 locale tag used for month names
- * @returns the formatted range, e.g. "29 Oct – 2 Nov 2026"
- * @example
- * formatDateTimeRange('2026-10-29', '2026-11-02', 'en-GB'); // '29 Oct – 2 Nov 2026'
- */
-export function formatDateTimeRange(start: DateOnly, end: DateOnly, locale = 'en'): string {
-  const startText = formatDateOnly(start, locale, { day: 'numeric', month: 'short' });
-  const endText = formatDateOnly(end, locale, { day: 'numeric', month: 'short', year: 'numeric' });
-  return `${startText} – ${endText}`;
-}

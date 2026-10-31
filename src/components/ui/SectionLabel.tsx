@@ -1,9 +1,10 @@
 import type { HTMLAttributes, ReactNode } from 'react';
 
-export type SectionLabelTone = 'muted' | 'teal' | 'rose';
-export type SectionLabelSpacing = 'tight' | 'wide' | 'wider' | 'widest' | 'page' | 'hero';
-export type SectionLabelSize = 'xs' | 'sm' | 'tiny';
+type SectionLabelTone = 'muted' | 'teal' | 'rose';
+type SectionLabelSpacing = 'tight' | 'wide' | 'wider' | 'widest' | 'page' | 'hero';
+type SectionLabelSize = 'xs' | 'sm' | 'tiny';
 
+/** Props accepted by the section label component. */
 export interface SectionLabelProps extends HTMLAttributes<HTMLSpanElement> {
   children: ReactNode;
   tone?: SectionLabelTone;

@@ -80,7 +80,7 @@ function addFunctionMeasurement(node, sourceFile, shown, lines, lists) {
   if (length > 40 && !hasLongOkTag(lines, start)) lists.longLogic.push(where);
 }
 
-/** True for an exported function or constant, the two things that need a JSDoc block. */
+/** True for an exported declaration that needs a JSDoc block. */
 function isDocumentedExport(node) {
   const exported = node.modifiers?.some(
     (modifier) => modifier.kind === ts.SyntaxKind.ExportKeyword,
@@ -88,10 +88,13 @@ function isDocumentedExport(node) {
   if (!exported) return false;
   if (ts.isFunctionDeclaration(node)) return true;
   if (ts.isVariableStatement(node)) return true;
+  if (ts.isClassDeclaration(node)) return true;
+  if (ts.isInterfaceDeclaration(node)) return true;
+  if (ts.isTypeAliasDeclaration(node)) return true;
   return false;
 }
 
-/** Record an exported function or constant whose doc block is missing. */
+/** Record an exported declaration whose doc block is missing. */
 function addUndocumented(node, sourceFile, shown, lists) {
   if (!isDocumentedExport(node)) return;
   const before = sourceFile.text.slice(node.getFullStart(), node.getStart(sourceFile, false));

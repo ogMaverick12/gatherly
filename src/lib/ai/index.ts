@@ -6,16 +6,9 @@ import { readConfig } from './config';
 import { BasicProvider } from './basic';
 import { GeminiProvider } from './gemini';
 import { OpenRouterProvider } from './openrouter';
-import type { Provider, ProviderId } from './provider';
+import type { Provider } from './provider';
 
-export * from './provider';
-export { BasicProvider } from './basic';
-export { GeminiProvider } from './gemini';
-export { OpenRouterProvider } from './openrouter';
-export { buildUserMessage, SYSTEM_RULES } from './prompts';
-export { DEFAULT_GEMINI_MODEL, DEFAULT_OPENROUTER_MODEL, readConfig } from './config';
-export { extractJson } from './json';
-
+/** The provider chosen for one request and the mode shown to the user. */
 export interface ProviderSelection {
   readonly provider: Provider;
   /** True when a live provider is configured and its key is present. */
@@ -69,14 +62,4 @@ export function selectProvider(): ProviderSelection {
     live: false,
     notice: 'GATHERLY_AI_PROVIDER is set to basic, so answers come from Basic mode.',
   };
-}
-
-/**
- * The provider id of a selection, for logging and the mode badge.
- *
- * @param selection the provider chosen for this request
- * @returns the provider's stable id
- */
-export function providerIdFor(selection: ProviderSelection): ProviderId {
-  return selection.provider.id;
 }

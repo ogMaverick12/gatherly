@@ -7,8 +7,10 @@ import type { Language } from '@/lib/plan';
  */
 
 export type ThemePreference = 'light' | 'dark' | 'system';
+/** The user's preferred text size. */
 export type TextSize = 'standard' | 'large' | 'xlarge';
 
+/** The display and language preferences stored on this device. */
 export interface AccessibilityPreferences {
   readonly language: Language;
   readonly theme: ThemePreference;

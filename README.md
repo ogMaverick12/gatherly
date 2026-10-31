@@ -13,14 +13,13 @@ in use. Without a network, or without an API key, the plan still works.
 
 ---
 
-## How Gatherly answers the challenge
+## How Gatherly meets the product promise
 
-The brief asks for _"a GenAI-powered planning assistant that helps users organize weddings,
-birthdays and community events with budgets, timelines, vendor checklists and personalized
-ideas"_. Each part of that sentence has a feature, a place in the code and a test that holds it
-up.
+The product promise is _"a GenAI-powered planning assistant that helps users organize weddings,
+birthdays and community events with budgets, timelines, vendor checklists and personalized ideas"_.
+Each part of that sentence has a feature, a place in the code and a test that holds it up.
 
-| The brief says          | Gatherly does it here                                                                                                                                              | The code                                                                                        | The tests                                                                                                                                                                                                    |
+| The requirement         | Gatherly does it here                                                                                                                                              | The code                                                                                        | The tests                                                                                                                                                                                                    |
 | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | GenAI-powered assistant | A question box that answers from your plan, streamed, with a badge that says whether a model wrote it; a deterministic Basic mode when no key is set               | `src/lib/ai/`, `src/app/api/chat/route.ts`, `src/features/assistant/index.ts`                   | `tests/lib/ai/ai.test.ts`, `tests/app/api/chat-stream.test.ts`, `tests/features/workspace/assistant-stream.test.tsx`, `tests/lib/security/provider-retry-and-guards.test.ts`, `tests/app/api/routes.test.ts` |
 | Weddings                | Wedding benchmarks, wedding idea set, wedding ceremony flow in the run-of-show                                                                                     | `src/features/budget/index.ts`, `src/features/ideas/index.ts`, `src/features/timeline/index.ts` | `tests/features/budget/budget.test.ts`, `tests/features/ideas/ideas.test.ts`, `tests/features/timeline/timeline.test.ts`                                                                                     |
@@ -46,19 +45,20 @@ birthday and a community gathering - so you can see the workspace in under a min
 
 ### Scripts
 
-| Script                  | What it does                                                      |
-| ----------------------- | ----------------------------------------------------------------- |
-| `npm run dev`           | Next.js dev server                                                |
-| `npm run build`         | Production build                                                  |
-| `npm start`             | Serve the production build                                        |
-| `npm run lint`          | ESLint 9, flat config, `--max-warnings=0`                         |
-| `npm run typecheck`     | `tsc --noEmit`, strict mode                                       |
-| `npm run format:check`  | Prettier, check only                                              |
-| `npm test`              | Vitest, the unit and component suites                             |
-| `npm run test:coverage` | Vitest with the v8 coverage report and thresholds                 |
-| `npm run check`         | `lint` + `typecheck` + `format:check` + `test:coverage` + `stats` |
-| `npm run test:e2e`      | Playwright journeys (`npm run e2e:install` first, once)           |
-| `npm run stats`         | Prints the counts this README quotes and the three quality lists  |
+| Script                  | What it does                                              |
+| ----------------------- | --------------------------------------------------------- |
+| `npm run dev`           | Next.js dev server                                        |
+| `npm run build`         | Production build                                          |
+| `npm start`             | Serve the production build                                |
+| `npm run lint`          | ESLint 9, flat config, `--max-warnings=0`                 |
+| `npm run typecheck`     | `tsc --noEmit`, strict mode                               |
+| `npm run format:check`  | Prettier, check only                                      |
+| `npm test`              | Vitest, the unit and component suites                     |
+| `npm run test:coverage` | Vitest with the v8 coverage report and thresholds         |
+| `npm run knip`          | Finds unused files, exports and dependencies              |
+| `npm run check`         | lint + typecheck + format check + coverage + Knip + stats |
+| `npm run test:e2e`      | Playwright journeys (`npm run e2e:install` first, once)   |
+| `npm run stats`         | Prints the shape lists and allowance checks               |
 
 ### Environment
 
@@ -91,7 +91,8 @@ what was actually verified, is recorded in
 
 In Basic mode **nothing goes to a third party**: no provider is contacted and no key is needed.
 The ideas, chat and parse requests still reach this app's own server, which answers them from
-deterministic rules over the plan that was sent. The plan itself never leaves the browser.
+deterministic rules over the plan that was sent. The full plan stays in the browser; the route
+receives only the summary needed to answer.
 
 ---
 
@@ -118,7 +119,7 @@ with Zod; the review step shows exactly what will be used.
 **Exports** - print-to-PDF, an `.ics` calendar file, a budget CSV, and a shareable URL fragment.
 
 **Accessibility and display** - skip link, visible focus rings, 44px targets, three text sizes,
-light/dark/system themes, Calm mode, reduced motion, and English, Hindi and Bengali labels.
+light/dark/system themes, Calm mode, reduced motion, and English, Hindi and Bengali app labels.
 
 ---
 
@@ -128,43 +129,42 @@ light/dark/system themes, Calm mode, reduced motion, and English, Hindi and Beng
 flowchart LR
   UI[Next App Router UI] --> Store[Versioned localStorage plan]
   UI --> Engines[Pure browser engines]
-  UI --> API[Stateless guarded API routes]
+  UI --> API[Guarded API routes with no user data]
   API --> Providers[Gemini / OpenRouter / Basic fallback]
   UI --> SW[Service worker shell cache]
 ```
 
-The server is stateless by design. The plan belongs to the browser; share links use a URL
-_fragment_, which browsers do not send in HTTP requests, so nothing about a plan passes through the
-network. The deterministic engines are pure functions with no network access, so the product keeps
-working with the network switched off.
+The server stores no plan or user data. The plan belongs to the browser; share links use a URL
+_fragment_, which browsers do not send in HTTP requests, so a share creates no server state. AI
+requests send only the bounded summary the route needs; a configured provider receives that summary
+and the user's prompt. The deterministic engines are pure functions with no network access, so the
+product keeps working with the network switched off.
 
 Full detail: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 
 ---
 
-## Source layout
+## Project layout
 
 ```text
-src/app/                  routes, global styles, metadata, API handlers
-  api/chat|ideas|parse    the three guarded AI routes
-  api/health              reads back the deployment mode, nothing else
-src/components/ui/       shared Button, ButtonLink, Card, Chip, SectionLabel, StatRow
-src/features/            domain slices: schemas, pure services, UI
-  budget timeline vendors health catering risks ideas assistant
-  intake workspace accessibility
-src/lib/                 shared utilities
-  plan.ts plan-store.ts  versioned plan schema and the browser store
-  money.ts dates.ts      integer minor units, ISO date-only helpers
-  share.ts ics.ts download.ts
-  ai/                    Provider interface, config, Basic, Gemini, OpenRouter, prompts
-  security/              guards, rate limiting, sanitising
-  i18n/                  en, hi, bn
-src/instrumentation.ts   startup hook: one warning if the shared limiter is off
-tests/                   service, component, security and accessibility tests
-  e2e/                   the Playwright journeys
-scripts/                 stats.mjs prints the counts the docs quote
-docs/                    architecture, traceability, tour, limitations, outcomes
-public/sw.js             service worker: shell cache only, never /api/*
+src/app/                  App Router pages, error boundaries and API routes
+  api/chat|ideas|parse     guarded AI handlers
+  api/health              deployment mode and rate-limit mode
+src/components/ui/        shared primitives: Button, ButtonLink, Card, Chip, SectionLabel, StatRow
+src/features/             domain slices, each public through index.ts
+                          budget, timeline, vendors, health, catering, risks, ideas,
+                          assistant, intake, workspace, accessibility
+src/lib/                  shared plan schema and store, money, dates, exports and utilities
+  plan/                   schemas, samples, packs, currencies and taxonomy
+  ai/                     provider selection, Basic/Gemini/OpenRouter adapters and prompts
+  security/               route factory, guards, rate limiting, sanitising and the redacting logger
+  i18n/                   en, hi and bn dictionaries
+src/instrumentation.ts    startup hook: one warning if the shared rate limiter is unconfigured
+tests/                    Vitest suites, shared support and fixtures
+  e2e/                    Playwright journeys and accessibility sweeps
+scripts/                  stats, bundle checks, screenshots, live smoke and service-worker stamping
+docs/                     architecture, traceability, tour, limitations, outcomes and live verification
+public/                   manifest, icons and the shell-cache service worker
 ```
 
 ---
@@ -178,7 +178,7 @@ without a row is a dependency that should not be in `package.json`.
 | ----------------------------------- | ------- | -------------------------------------------------------------------------------------------------- |
 | `@google/genai`                     | runtime | SDK behind the optional Gemini provider (`src/lib/ai/gemini.ts`).                                  |
 | `@hookform/resolvers`               | runtime | `zodResolver` so the intake form validates with the same Zod schema the plan uses.                 |
-| `next`                              | runtime | App Router framework: pages, metadata, the streaming API handlers, the service worker route.       |
+| `next`                              | runtime | App Router framework: pages, metadata, streaming API handlers and static serving.                  |
 | `react`                             | runtime | UI runtime for the client workspace components.                                                    |
 | `react-dom`                         | runtime | The DOM renderer React needs in the browser.                                                       |
 | `react-hook-form`                   | runtime | Intake form state, field errors and per-step validation.                                           |
@@ -203,6 +203,7 @@ without a row is a dependency that should not be in `package.json`.
 | `fast-check`                        | dev     | Property tests for money rounding and allocator invariants.                                        |
 | `jest-axe`                          | dev     | axe assertions inside the component accessibility tests.                                           |
 | `jsdom`                             | dev     | The browser environment the Vitest component suite runs in.                                        |
+| `knip`                              | dev     | Finds unused files, exports and dependencies; `npm run check` fails when it finds dead code.       |
 | `postcss`                           | dev     | The CSS plugin host named by `postcss.config.mjs`; the `overrides.postcss` entry pins it.          |
 | `prettier`                          | dev     | The `format:check` gate and formatting that matches editors.                                       |
 | `tailwindcss`                       | dev     | Utility CSS loaded by `postcss.config.mjs` and themed in `tailwind.config.ts`.                     |
@@ -213,22 +214,24 @@ without a row is a dependency that should not be in `package.json`.
 
 ## Verification
 
-Every measured number lives in one place:
-[`docs/DELIVERY_OUTCOMES.md`](docs/DELIVERY_OUTCOMES.md). Run
-`node scripts/stats.mjs` to print the current counts, and `npm run check` to prove them.
+Run these commands for the current measurements. Counts are printed by the command, not copied
+here.
 
-| Check                   | What it proves                                                          |
-| ----------------------- | ----------------------------------------------------------------------- |
-| `npm run lint`          | Clean, 0 warnings (`--max-warnings=0`)                                  |
-| `npm run typecheck`     | Clean, strict TypeScript                                                |
-| `npm run format:check`  | Clean, Prettier                                                         |
-| `npm run test:coverage` | The unit and component suites pass and the coverage thresholds hold     |
-| `npm run build`         | `/`, `/intake`, `/plan` and the API routes compile                      |
-| `npm run test:e2e`      | The Playwright journeys pass, including the accessibility sweeps        |
-| `npm audit --omit=dev`  | Run npm audit --omit=dev. Last result: 0 vulnerabilities on 2026-10-29. |
+| Check                        | What it proves                                               |
+| ---------------------------- | ------------------------------------------------------------ |
+| `npm run lint`               | ESLint 9 flat config passes with `--max-warnings=0`          |
+| `npm run typecheck`          | Strict TypeScript passes                                     |
+| `npm run format:check`       | Prettier passes                                              |
+| `npm run test:coverage`      | Unit and component suites pass; coverage thresholds hold     |
+| `npm run knip`               | No unused files, exports, types or dependencies              |
+| `npm run stats`              | Shape lists are within `docs/quality-allowance.json`         |
+| `npm run build`              | The pages and API routes compile                             |
+| `npm run test:e2e`           | Playwright journeys pass, including the accessibility sweeps |
+| `npx playwright test --list` | Lists every Playwright test without running it               |
+| `npm audit --omit=dev`       | Prints the current production dependency audit               |
 
-Coverage thresholds are enforced in `vitest.config.mts` (90 / 70 / 90 / 90), so a regression below
-those numbers fails the test run rather than being reported after the fact.
+Coverage thresholds are enforced in `vitest.config.mts`, so a regression fails the test run rather
+than being reported after the fact.
 
 ---
 
@@ -249,11 +252,11 @@ headers itself. The full threat model is in [`SECURITY.md`](SECURITY.md).
 | -------------------------------------------------------- | ------------------------------------------------------------------ |
 | [`SECURITY.md`](SECURITY.md)                             | Threat model, controls, headers, rate limiting, dependency posture |
 | [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)           | Layers, data flow, module map, design decisions                    |
-| [`docs/TRACEABILITY.md`](docs/TRACEABILITY.md)           | Brief requirement to code to test mapping                          |
-| [`docs/JUDGES_TOUR.md`](docs/JUDGES_TOUR.md)             | A ninety-second walkthrough                                        |
+| [`docs/TRACEABILITY.md`](docs/TRACEABILITY.md)           | Requirement to code to test mapping                                |
+| [`docs/TOUR.md`](docs/TOUR.md)                           | A ninety-second product walkthrough                                |
 | [`docs/LIMITATIONS.md`](docs/LIMITATIONS.md)             | What this is not, and what to check before relying on it           |
-| [`docs/DELIVERY_OUTCOMES.md`](docs/DELIVERY_OUTCOMES.md) | The eleven acceptance outcomes, with evidence                      |
-| [`docs/brief/`](docs/brief/)                             | The three supplied briefs, kept verbatim                           |
+| [`docs/LIVE_VERIFICATION.md`](docs/LIVE_VERIFICATION.md) | What was observed when the live AI path and rate-limit modes ran   |
+| [`docs/DELIVERY_OUTCOMES.md`](docs/DELIVERY_OUTCOMES.md) | The acceptance outcomes, with evidence                             |
 
 ---
 
@@ -265,6 +268,11 @@ instructions - confirm them with family, elders, officiants or local organisers.
 infers your identity, religion, community or region from what you type; the packs are only ever
 applied when you choose them.
 
+## Contributing
+
+Read [AGENTS.md](AGENTS.md) before changing code. The [CI badge](https://github.com/ogMaverick12/gatherly/actions/workflows/ci.yml)
+at the top links to the workflow that runs `npm run check`, `npm run build` and the Playwright suite.
+
 ## Licence
 
-Private project. All rights reserved.
+MIT - see [LICENSE](LICENSE).

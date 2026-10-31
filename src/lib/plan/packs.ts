@@ -22,8 +22,10 @@ export const PACK_IDS = [
  * The pack id enum, derived from `PACK_IDS`.
  */
 export const PackIdSchema = z.enum(PACK_IDS);
+/** The stable id of a tradition pack. */
 export type PackId = z.infer<typeof PackIdSchema>;
 
+/** The data for one selectable tradition pack. */
 export interface PackDefinition {
   readonly id: PackId;
   readonly name: string;

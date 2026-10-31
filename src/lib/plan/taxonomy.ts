@@ -12,6 +12,7 @@ export const EVENT_TYPES = ['wedding', 'birthday', 'community'] as const;
  * The event type enum, derived from `EVENT_TYPES`.
  */
 export const EventTypeSchema = z.enum(EVENT_TYPES);
+/** A celebration type the planner supports. */
 export type EventType = z.infer<typeof EventTypeSchema>;
 
 /**
@@ -31,6 +32,7 @@ export const CITY_TIERS = ['tier1', 'tier2', 'tier3'] as const;
  * The city tier enum, derived from `CITY_TIERS`.
  */
 export const CityTierSchema = z.enum(CITY_TIERS);
+/** The cost tier of the event city. */
 export type CityTier = z.infer<typeof CityTierSchema>;
 
 /**
@@ -50,6 +52,7 @@ export const LANGUAGES = ['en', 'hi', 'bn'] as const;
  * The language enum, derived from `LANGUAGES`.
  */
 export const LanguageSchema = z.enum(LANGUAGES);
+/** A supported interface language. */
 export type Language = z.infer<typeof LanguageSchema>;
 
 /**
@@ -80,6 +83,7 @@ export const PRIORITIES = [
  * The priority enum, derived from `PRIORITIES`.
  */
 export const PrioritySchema = z.enum(PRIORITIES);
+/** How much a planning item matters to the user. */
 export type Priority = z.infer<typeof PrioritySchema>;
 
 /**
@@ -117,6 +121,7 @@ export const DIETARY_NEEDS = [
  * The dietary need enum, derived from `DIETARY_NEEDS`.
  */
 export const DietaryNeedSchema = z.enum(DIETARY_NEEDS);
+/** A dietary requirement a guest may have. */
 export type DietaryNeed = z.infer<typeof DietaryNeedSchema>;
 
 /**
@@ -152,6 +157,7 @@ export const ACCESS_NEEDS = [
  * The access need enum, derived from `ACCESS_NEEDS`.
  */
 export const AccessNeedSchema = z.enum(ACCESS_NEEDS);
+/** An accessibility need a guest may have. */
 export type AccessNeed = z.infer<typeof AccessNeedSchema>;
 
 /**
@@ -176,6 +182,7 @@ export const VENUE_TYPES = ['indoor', 'outdoor', 'mixed', 'unset'] as const;
  * The venue type enum, derived from `VENUE_TYPES`.
  */
 export const VenueTypeSchema = z.enum(VENUE_TYPES);
+/** The kind of venue the event uses. */
 export type VenueType = z.infer<typeof VenueTypeSchema>;
 
 /**

@@ -13,6 +13,7 @@ export default function GlobalError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  // The root boundary replaces the layout, so it cannot read the accessibility provider.
   return (
     <html lang="en">
       <body className="min-h-screen bg-paper text-ink antialiased">

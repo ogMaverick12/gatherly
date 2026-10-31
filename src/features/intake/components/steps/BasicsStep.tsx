@@ -21,7 +21,7 @@ import { RadioChips } from '../RadioChips';
 import { DateGuestsFields } from './DateGuestsFields';
 
 /** The event-type choice. */
-export function EventTypeField({
+function EventTypeField({
   form,
   t,
 }: {
@@ -51,7 +51,7 @@ export function EventTypeField({
 }
 
 /** The city-tier choice. */
-export function CityTierField({
+function CityTierField({
   form,
   t,
 }: {
@@ -80,7 +80,7 @@ export function CityTierField({
 }
 
 /** The venue-type choice. */
-export function VenueTypeField({
+function VenueTypeField({
   form,
   t,
 }: {

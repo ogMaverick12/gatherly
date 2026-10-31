@@ -15,7 +15,6 @@ const BAND_COLOR: Record<HealthBand, string> = {
  * Draw the plan health score as a ring with the number in the middle.
  * The band only colours the arc; the label and value carry the meaning.
  */
-// long-function: one view section, kept in one block so its reading order stays visible.
 export function HealthRing({
   score,
   band,

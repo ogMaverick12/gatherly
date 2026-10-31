@@ -31,6 +31,20 @@ function parseBlock(block: string): SseEvent | null {
   return data.length > 0 ? { event, data: data.join('\n') } : null;
 }
 
+/** Split every complete block out of the buffer. */
+function drainBlocks(buffer: string): { events: SseEvent[]; rest: string } {
+  const events: SseEvent[] = [];
+  let rest = buffer;
+  let boundary = rest.indexOf('\n\n');
+  while (boundary !== -1) {
+    const event = parseBlock(rest.slice(0, boundary));
+    rest = rest.slice(boundary + 2);
+    if (event) events.push(event);
+    boundary = rest.indexOf('\n\n');
+  }
+  return { events, rest };
+}
+
 /**
  * Read events from a stream as they arrive.
  *
@@ -47,14 +61,9 @@ export async function* readSse(body: ReadableStream<Uint8Array>): AsyncGenerator
       const { done, value } = await reader.read();
       if (done) break;
       buffer += decoder.decode(value, { stream: true }).replace(/\r\n/g, '\n');
-
-      let boundary = buffer.indexOf('\n\n');
-      while (boundary !== -1) {
-        const event = parseBlock(buffer.slice(0, boundary));
-        buffer = buffer.slice(boundary + 2);
-        if (event) yield event;
-        boundary = buffer.indexOf('\n\n');
-      }
+      const drained = drainBlocks(buffer);
+      buffer = drained.rest;
+      for (const event of drained.events) yield event;
     }
 
     // A last block without its closing blank line still counts.

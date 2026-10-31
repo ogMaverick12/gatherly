@@ -1,7 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
 
 /**
- * The Judge's journey.
+ * The end-to-end journey.
  *
  * One pass through the whole product: landing, sample plan, health ring,
  * budget scenario, a milestone completed, a vendor status changed, a CSV

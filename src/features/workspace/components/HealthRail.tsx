@@ -23,7 +23,7 @@ const BAND_LABEL: Record<HealthBand, string> = {
 };
 
 /** The score ring, band and one-line explanation. */
-export function HealthSummary({
+function HealthSummary({
   view,
   t,
   compact = false,
@@ -77,7 +77,7 @@ export function MobileHealthSummary({
 }
 
 /** The next action callout, when there is one. */
-export function HealthNextAction({
+function HealthNextAction({
   nextAction,
   t,
 }: {
@@ -98,7 +98,7 @@ export function HealthNextAction({
 }
 
 /** The headline guest, date, budget and coverage figures. */
-export function HealthFigures({ view, t }: { readonly view: PlanView; readonly t: Dictionary }) {
+function HealthFigures({ view, t }: { readonly view: PlanView; readonly t: Dictionary }) {
   const { plan, budget, timeline } = view;
   const currency = plan.intake.currency;
   return (
@@ -141,7 +141,7 @@ export function HealthFigures({ view, t }: { readonly view: PlanView; readonly t
 }
 
 /** The disclosed weighted parts behind the health score. */
-export function HealthFormula({
+function HealthFormula({
   health,
   t,
 }: {

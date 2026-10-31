@@ -2,7 +2,7 @@
 /**
  * Prove the live AI path.
  *
- * The Basic mode is deterministic and always works, but a judge with a key
+ * The Basic mode is deterministic and always works, but a reviewer with a key
  * will press the live path, so it has to be proven rather than assumed. This
  * script starts a production build with one provider at a time and calls the
  * three AI routes against it.

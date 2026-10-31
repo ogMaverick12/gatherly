@@ -77,6 +77,6 @@ export function kindOfFailure(error: unknown): ProviderErrorKind {
  * @param error the thrown value
  * @returns its message, or a neutral fallback
  */
-export function messageOf(error: unknown): string {
+function messageOf(error: unknown): string {
   return error instanceof Error ? error.message : 'unknown provider error';
 }

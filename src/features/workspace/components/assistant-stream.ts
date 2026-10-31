@@ -9,11 +9,13 @@
 
 export type Mode = 'basic' | 'provider';
 
+/** One parsed event from the assistant's streamed response. */
 export interface StreamEvent {
   readonly event: string;
   readonly data: unknown;
 }
 
+/** The text assembled from one assistant stream. */
 export interface StreamedAnswer {
   readonly mode: Mode;
   readonly content: string;
@@ -32,6 +34,47 @@ export function emptyAnswer(mode: Mode = 'basic'): StreamedAnswer {
   return { mode, content: '', notices: [], interrupted: false };
 }
 
+/** Apply the stream's mode frame. */
+function applyMode(answer: StreamedAnswer, frame: StreamEvent): StreamedAnswer {
+  const data = frame.data as { live?: boolean };
+  return { ...answer, mode: data.live === false ? 'basic' : 'provider' };
+}
+
+/** Append one text delta. */
+function applyDelta(answer: StreamedAnswer, frame: StreamEvent): StreamedAnswer {
+  const data = frame.data as { text?: string };
+  if (typeof data.text !== 'string') return answer;
+  return { ...answer, content: answer.content + data.text };
+}
+
+/** Add a notice and mark the answer interrupted. */
+function applyError(answer: StreamedAnswer, frame: StreamEvent): StreamedAnswer {
+  const data = frame.data as { message?: string };
+  if (typeof data.message !== 'string') return answer;
+  return { ...answer, notices: [...answer.notices, data.message], interrupted: true };
+}
+
+/** Apply the final status carried by the done frame. */
+function applyDone(answer: StreamedAnswer, frame: StreamEvent): StreamedAnswer {
+  const data = frame.data as { mode?: Mode; notices?: string[]; interrupted?: boolean };
+  return {
+    ...answer,
+    mode: data.mode ?? answer.mode,
+    notices: data.notices ?? answer.notices,
+    interrupted: data.interrupted ?? answer.interrupted,
+  };
+}
+
+/** One handler per event the route can send. */
+const FRAME_HANDLERS: Readonly<
+  Record<string, (answer: StreamedAnswer, frame: StreamEvent) => StreamedAnswer>
+> = {
+  mode: applyMode,
+  delta: applyDelta,
+  error: applyError,
+  done: applyDone,
+};
+
 /**
  * Apply one frame to the answer shown so far.
  *
@@ -40,34 +83,8 @@ export function emptyAnswer(mode: Mode = 'basic'): StreamedAnswer {
  * @returns the next state, unchanged for a frame it does not recognise
  */
 export function applyFrame(answer: StreamedAnswer, frame: StreamEvent): StreamedAnswer {
-  if (frame.event === 'mode') {
-    const data = frame.data as { live?: boolean };
-    return { ...answer, mode: data.live === false ? 'basic' : 'provider' };
-  }
-
-  if (frame.event === 'delta') {
-    const data = frame.data as { text?: string };
-    if (typeof data.text !== 'string') return answer;
-    return { ...answer, content: answer.content + data.text };
-  }
-
-  if (frame.event === 'error') {
-    const data = frame.data as { message?: string };
-    if (typeof data.message !== 'string') return answer;
-    return { ...answer, notices: [...answer.notices, data.message], interrupted: true };
-  }
-
-  if (frame.event === 'done') {
-    const data = frame.data as { mode?: Mode; notices?: string[]; interrupted?: boolean };
-    return {
-      ...answer,
-      mode: data.mode ?? answer.mode,
-      notices: data.notices ?? answer.notices,
-      interrupted: data.interrupted ?? answer.interrupted,
-    };
-  }
-
-  return answer;
+  const handler = FRAME_HANDLERS[frame.event];
+  return Object.hasOwn(FRAME_HANDLERS, frame.event) && handler ? handler(answer, frame) : answer;
 }
 
 /** One block of the stream, or null when it carries no readable data. */

@@ -69,15 +69,25 @@ function effectiveWeightsFor(
   });
 }
 
+/** The inputs needed to turn weighted shares into display rows. */
+interface CategoryRowInputs {
+  readonly weights: readonly EffectiveWeight[];
+  readonly amounts: readonly number[];
+  readonly spendableMinor: number;
+  readonly guests: number;
+  readonly shiftByCategory: Readonly<Record<string, number>>;
+  readonly benchmarks: ReturnType<typeof benchmarkSharesFor>;
+}
+
 /** Turn the weighted shares into the display rows, including rounding variance. */
-function buildCategoryRows(
-  weights: readonly EffectiveWeight[],
-  amounts: readonly number[],
-  spendableMinor: number,
-  guests: number,
-  shiftByCategory: Readonly<Record<string, number>>,
-  benchmarks: ReturnType<typeof benchmarkSharesFor>,
-): CategoryAllocation[] {
+function buildCategoryRows({
+  weights,
+  amounts,
+  spendableMinor,
+  guests,
+  shiftByCategory,
+  benchmarks,
+}: CategoryRowInputs): CategoryAllocation[] {
   return weights.map((item, index) => {
     const amountMinor = amounts[index] ?? 0;
     const share = sharePercent(amountMinor, spendableMinor);
@@ -123,14 +133,14 @@ function allocateCategories(
     weights.map((item) => item.shifted),
   );
   const benchmarks = benchmarkSharesFor(intake.eventType, intake.guests);
-  const categories = buildCategoryRows(
+  const categories = buildCategoryRows({
     weights,
     amounts,
     spendableMinor,
-    intake.guests,
+    guests: intake.guests,
     shiftByCategory,
     benchmarks,
-  );
+  });
   return { categories, packShifts, weightTotal };
 }
 

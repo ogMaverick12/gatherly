@@ -11,15 +11,16 @@ import { DIETARY_LABELS, type DietaryNeed, type Intake, type Plan } from '@/lib/
 /** Extra plates added for late arrivals, percent 0-100. */
 export const BUFFER_PERCENT = 8;
 /** How many guests one server can plate for. */
-export const PLATES_PER_SERVER = 25;
+const PLATES_PER_SERVER = 25;
 
-export interface DietaryRequirement {
+interface DietaryRequirement {
   readonly need: DietaryNeed;
   readonly label: string;
   readonly action: string;
   readonly confirmed: boolean;
 }
 
+/** The estimated plates, servers and dietary portions for the guest list. */
 export interface CateringEstimate {
   readonly guests: number;
   readonly mainPlates: number;

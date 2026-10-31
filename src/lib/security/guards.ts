@@ -137,6 +137,15 @@ export async function withTimeout<T>(work: Promise<T>, ms: number = ROUTE_TIMEOU
   }
 }
 
+/** The fields written for one request. */
+export interface RequestLogEvent {
+  readonly route: string;
+  readonly status: number;
+  readonly durationMs: number;
+  readonly request: Request;
+  readonly providerError?: ProviderErrorKind;
+}
+
 /**
  * Log one line per request.
  *
@@ -144,19 +153,10 @@ export async function withTimeout<T>(work: Promise<T>, ms: number = ROUTE_TIMEOU
  * provider failed - its failure kind are written. Bodies, prompts, keys,
  * provider messages and the user's own words never reach the log.
  *
- * @param route the route name
- * @param status the response status
- * @param durationMs how long the request took
- * @param request the incoming request, read for its correlation id
- * @param providerError the failure kind, never the provider's message
+ * @param event the request fields to log
  */
-export function logRequest(
-  route: string,
-  status: number,
-  durationMs: number,
-  request: Request,
-  providerError?: ProviderErrorKind,
-): void {
+export function logRequest(event: RequestLogEvent): void {
+  const { route, status, durationMs, request, providerError } = event;
   logWarn({
     app: 'gatherly',
     route,

@@ -1,5 +1,6 @@
 import type { HTMLAttributes, ReactNode } from 'react';
 
+/** Props accepted by the stat row component. */
 export interface StatRowProps extends HTMLAttributes<HTMLDivElement> {
   children: ReactNode;
 }

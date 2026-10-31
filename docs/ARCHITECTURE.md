@@ -274,7 +274,7 @@ whether it is live, and a notice the UI shows when the answer is _not_ from a li
 badge in the UI always says so. The provider itself makes no outbound call, but the request still
 reaches this app's own server, which computes the answer from the plan it was sent.
 
-Prompt-injection defence is described in [`SECURITY.md`](../SECURITY.md#23-prompt-injection-awareness-srclibaipromptstssrclibsecuritysanitizets).
+Prompt-injection defence is described in [`SECURITY.md`](../SECURITY.md#23-prompt-injection-awareness-srclibaipromptsts-srclibsecuritysanitizets).
 
 ---
 
@@ -282,9 +282,10 @@ Prompt-injection defence is described in [`SECURITY.md`](../SECURITY.md#23-promp
 
 Accessibility is not a layer applied at the end; it is in the data model.
 
-- **Language is data.** The chosen language is part of the intake, stored in the plan, and every
-  visible label comes from the dictionary (`src/lib/i18n/`). Switching language does not reload the
-  page.
+- **Language is data.** The chosen language is part of the intake, stored in the plan, and the
+  app shell, intake and workspace controls read labels from the dictionary (`src/lib/i18n/`).
+  Engine-generated health band labels and explanations are English-only. Switching language does
+  not reload the page.
 - **Display preferences are part of the plan settings** (`theme`, `textSize`, `calmMode`,
   `reducedMotion`), validated with Zod on read.
 - **Preferences are applied to the document element** as data attributes, so CSS reacts without
@@ -340,8 +341,7 @@ variants and the contrast tests operate on a single source of truth.
 | Accessibility    | Vitest                   | WCAG contrast across the light, dark and calm themes                                                   |
 | End to end       | Playwright               | Landing to plan, persistence across a reload, CSV and share, keyboard-only navigation                  |
 
-Coverage thresholds (90 / 70 / 90 / 90) are enforced by `vitest.config.mts`, so a drop below them
-fails the run.
+Coverage thresholds are enforced by `vitest.config.mts`, so a drop below them fails the run.
 
 ---
 

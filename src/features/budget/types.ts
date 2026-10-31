@@ -22,8 +22,9 @@ export interface CategoryAllocation {
   readonly varianceFromBenchmark: number;
 }
 
-export type WarningSeverity = 'info' | 'attention';
+type WarningSeverity = 'info' | 'attention';
 
+/** One warning about a budget allocation. */
 export interface BudgetWarning {
   readonly id: string;
   readonly severity: WarningSeverity;
@@ -32,6 +33,7 @@ export interface BudgetWarning {
   readonly category?: BudgetCategoryId;
 }
 
+/** The computed allocation for every budget category. */
 export interface BudgetAllocation {
   readonly totalMinor: number;
   readonly contingencyMinor: number;
@@ -46,6 +48,7 @@ export interface BudgetAllocation {
   };
 }
 
+/** The kind of what-if scenario. */
 export type ScenarioKind =
   | 'guests-up'
   | 'guests-down'
@@ -55,6 +58,7 @@ export type ScenarioKind =
   | 'venue-indoor'
   | 'priority-add';
 
+/** One named budget scenario with its computed allocation. */
 export interface BudgetScenario {
   readonly id: string;
   readonly kind: ScenarioKind;

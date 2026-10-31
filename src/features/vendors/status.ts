@@ -10,12 +10,7 @@ import { sharePercent } from '@/lib/money';
 import type { VendorCoverage } from './coverage';
 
 /** The order vendors move through, and how far each category has got. */
-export const STATUS_ORDER: readonly VendorStatus[] = [
-  'to_contact',
-  'contacted',
-  'quoted',
-  'booked',
-];
+const STATUS_ORDER: readonly VendorStatus[] = ['to_contact', 'contacted', 'quoted', 'booked'];
 
 /**
  * Returns the next step in the vendor workflow.

@@ -11,7 +11,6 @@ import { SectionLabel } from '@/components/ui/SectionLabel';
 import { useAccessibility } from '@/features/accessibility';
 import { VENDOR_CATEGORY_LABELS, type VendorCategoryId } from '@/lib/plan';
 
-// long-function: one view section, kept in one block so its reading order stays visible.
 /** Adding a vendor by hand, for a category the plan did not list. */
 export function AddVendorForm({
   onAddVendor,

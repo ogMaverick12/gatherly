@@ -16,7 +16,6 @@ import { CelebrationDot } from '../HealthRing';
  *
  * These are estimates from the guest count and the diet mix, and the section
  * says so rather than reading as a quote.
- * long-function: one section: the estimate, the diet split and the caveat are read as a single statement.
  */
 export function CateringSummary({ catering }: { catering: CateringEstimate }) {
   const { dictionary } = useAccessibility();

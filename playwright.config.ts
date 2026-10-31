@@ -13,7 +13,7 @@ const baseURL = `http://localhost:${PORT}`;
  * End-to-end configuration.
  *
  * The journey runs against a production build so it exercises the same
- * bundle a judge would run. `npm run e2e` builds and starts the app, waits
+ * bundle a deployment serves. `npm run e2e` builds and starts the app, waits
  * for it to answer, and then drives the browser.
  */
 export default defineConfig({

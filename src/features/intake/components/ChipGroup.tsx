@@ -7,6 +7,7 @@
 
 import { useId } from 'react';
 
+/** One selectable chip option. */
 export interface ChipOption<T extends string> {
   readonly value: T;
   readonly label: string;
@@ -44,6 +45,52 @@ function ChipLabel<T extends string>({
   );
 }
 
+/** Toggle one chip, respecting the selection cap. */
+function useChipToggle<T>(
+  value: readonly T[],
+  onChange: (next: T[]) => void,
+  max?: number,
+): (option: T) => void {
+  return (option: T): void => {
+    if (value.includes(option)) {
+      onChange(value.filter((item) => item !== option));
+      return;
+    }
+    if (max !== undefined && value.length >= max) return;
+    onChange([...value, option]);
+  };
+}
+
+/** The chip row itself. */
+function ChipList<T extends string>({
+  options,
+  value,
+  atLimit,
+  onToggle,
+}: {
+  options: readonly ChipOption<T>[];
+  value: readonly T[];
+  atLimit: boolean;
+  onToggle: (value: T) => void;
+}) {
+  return (
+    <div className="mt-3 flex flex-wrap gap-2">
+      {options.map((option) => {
+        const checked = value.includes(option.value);
+        return (
+          <ChipLabel
+            key={option.value}
+            option={option}
+            checked={checked}
+            muted={atLimit && !checked}
+            onToggle={onToggle}
+          />
+        );
+      })}
+    </div>
+  );
+}
+
 /**
  * A group of checkboxes styled as chips.
  *
@@ -71,17 +118,8 @@ export function ChipGroup<T extends string>({
 }) {
   const helpId = useId();
   const errorId = useId();
-
-  const toggle = (option: T) => {
-    if (value.includes(option)) {
-      onChange(value.filter((item) => item !== option));
-      return;
-    }
-    if (max !== undefined && value.length >= max) return;
-    onChange([...value, option]);
-  };
-
   const atLimit = max !== undefined && value.length >= max;
+  const toggle = useChipToggle(value, onChange, max);
 
   return (
     <fieldset
@@ -96,20 +134,7 @@ export function ChipGroup<T extends string>({
         </p>
       ) : null}
 
-      <div className="mt-3 flex flex-wrap gap-2">
-        {options.map((option) => {
-          const checked = value.includes(option.value);
-          return (
-            <ChipLabel
-              key={option.value}
-              option={option}
-              checked={checked}
-              muted={atLimit && !checked}
-              onToggle={toggle}
-            />
-          );
-        })}
-      </div>
+      <ChipList options={options} value={value} atLimit={atLimit} onToggle={toggle} />
 
       {atLimit ? (
         <p className="mt-2 text-sm text-ink-muted">{max} chosen. Remove one to change it.</p>

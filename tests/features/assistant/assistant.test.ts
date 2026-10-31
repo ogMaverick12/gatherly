@@ -46,7 +46,7 @@ function snapshot() {
   const catering = computeCatering(plan);
   const health = computeHealth({ plan, budget, coverage, timeline });
   const risks = computeRisks({ plan, budget, coverage, timeline, catering });
-  return buildSnapshot(plan, budget, coverage, timeline, health, catering, risks);
+  return buildSnapshot({ plan, budget, coverage, timeline, health, catering, risks });
 }
 
 describe('classifyIntent', () => {

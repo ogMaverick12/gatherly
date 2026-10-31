@@ -70,11 +70,13 @@ export const IntakeFormSchema = z
     }
   });
 
+/** The form values collected across intake steps. */
 export type IntakeFormValues = z.infer<typeof IntakeFormSchema>;
 
 /** The four form steps, in the order they are shown. */
 export const INTAKE_STEPS = ['basics', 'money', 'needs', 'extras'] as const;
 
+/** The stable id of one intake step. */
 export type IntakeStep = (typeof INTAKE_STEPS)[number];
 
 /**

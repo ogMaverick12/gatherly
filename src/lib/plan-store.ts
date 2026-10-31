@@ -1,7 +1,8 @@
 'use client';
 
 import { useCallback, useSyncExternalStore } from 'react';
-import { PlanSchema, type Plan } from './plan';
+import type { Plan } from './plan';
+import { readStoredPlan, writeStoredPlan } from './plan-storage';
 
 /**
  * The plan store.
@@ -10,64 +11,16 @@ import { PlanSchema, type Plan } from './plan';
  * database. The store is a small external store (not a context) so that a
  * change to one vendor row does not re-render the whole workspace.
  *
- * Local storage is treated as untrusted: it is parsed with the plan schema
- * and discarded if it does not match, so a corrupted or outdated entry can
- * never crash the app.
+ * Storage is a separate module; this file only owns the in-memory plan,
+ * notifications and the React hooks.
  */
-
-export const PLAN_STORAGE_KEY = 'gatherly:plan:v1';
 
 let currentPlan: Plan | null = null;
 let hydrated = false;
-let lastRaw: string | null = null;
-let lastStored: Plan | null = null;
 const listeners = new Set<() => void>();
 
 function emit(): void {
   for (const listener of listeners) listener();
-}
-
-function readStoredPlan(): Plan | null {
-  if (typeof window === 'undefined') return null;
-  try {
-    const raw = window.localStorage.getItem(PLAN_STORAGE_KEY);
-    if (raw === lastRaw) return lastStored;
-    if (!raw) {
-      lastRaw = null;
-      lastStored = null;
-      return null;
-    }
-    const parsed = PlanSchema.safeParse(JSON.parse(raw));
-    if (!parsed.success) {
-      window.localStorage.removeItem(PLAN_STORAGE_KEY);
-      lastRaw = null;
-      lastStored = null;
-      return null;
-    }
-    lastRaw = raw;
-    lastStored = parsed.data;
-    return lastStored;
-  } catch {
-    return null;
-  }
-}
-
-function writeStoredPlan(plan: Plan | null): void {
-  if (typeof window === 'undefined') return;
-  try {
-    if (plan === null) {
-      window.localStorage.removeItem(PLAN_STORAGE_KEY);
-      lastRaw = null;
-      lastStored = null;
-      return;
-    }
-    const raw = JSON.stringify(plan);
-    window.localStorage.setItem(PLAN_STORAGE_KEY, raw);
-    lastRaw = raw;
-    lastStored = plan;
-  } catch {
-    // Storage may be full or unavailable. The in-memory plan still works.
-  }
 }
 
 function subscribe(listener: () => void): () => void {
@@ -85,6 +38,34 @@ function getServerSnapshot(): Plan | null {
   return null;
 }
 
+/** Apply the optional preparation transform to one plan. */
+function preparePlan(plan: Plan, prepare?: (plan: Plan) => Plan): Plan {
+  return prepare ? prepare(plan) : plan;
+}
+
+/** Prepare a plan that is already in memory. */
+function prepareCurrentPlan(prepare?: (plan: Plan) => Plan): void {
+  if (!prepare || !currentPlan) return;
+  const next = prepare(currentPlan);
+  if (next === currentPlan) return;
+  currentPlan = next;
+  writeStoredPlan(next);
+  emit();
+}
+
+/** Adopt a plan read from storage, or prepare the current one if there is none. */
+function hydrateOnce(prepare?: (plan: Plan) => Plan): void {
+  const stored = readStoredPlan();
+  if (!stored) {
+    prepareCurrentPlan(prepare);
+    return;
+  }
+  const next = preparePlan(stored, prepare);
+  currentPlan = next;
+  if (next !== stored) writeStoredPlan(next);
+  emit();
+}
+
 /**
  * Read the stored plan once, on the client. Safe to call repeatedly.
  *
@@ -97,29 +78,11 @@ function getServerSnapshot(): Plan | null {
  * @returns the current plan after hydration and preparation
  */
 export function hydratePlan(prepare?: (plan: Plan) => Plan): Plan | null {
-  const prepareCurrent = (): void => {
-    if (!prepare || !currentPlan) return;
-    const next = prepare(currentPlan);
-    if (next === currentPlan) return;
-    currentPlan = next;
-    writeStoredPlan(next);
-    emit();
-  };
-
   if (hydrated) {
-    prepareCurrent();
-    return currentPlan;
-  }
-
-  hydrated = true;
-  const stored = readStoredPlan();
-  if (stored) {
-    const next = prepare ? prepare(stored) : stored;
-    currentPlan = next;
-    if (next !== stored) writeStoredPlan(next);
-    emit();
+    prepareCurrentPlan(prepare);
   } else {
-    prepareCurrent();
+    hydrated = true;
+    hydrateOnce(prepare);
   }
   return currentPlan;
 }
@@ -150,7 +113,7 @@ export function setPlan(plan: Plan | null): void {
  *
  * @param updater pure function from the current plan to the next one
  */
-export function updatePlan(updater: (plan: Plan) => Plan): void {
+function updatePlan(updater: (plan: Plan) => Plan): void {
   if (!currentPlan) return;
   const next = updater(currentPlan);
   currentPlan = { ...next, updatedAt: new Date().toISOString() };
@@ -161,7 +124,7 @@ export function updatePlan(updater: (plan: Plan) => Plan): void {
 /**
  * Remove the plan from memory and from local storage.
  */
-export function clearPlan(): void {
+function clearPlan(): void {
   setPlan(null);
 }
 

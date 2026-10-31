@@ -61,6 +61,7 @@ export const IntakeSchema = z
   })
   .strict();
 
+/** The answers collected during intake. */
 export type Intake = z.infer<typeof IntakeSchema>;
 
 /**
@@ -75,6 +76,7 @@ export const PlanTaskSchema = z
   })
   .strict();
 
+/** One task in the plan. */
 export type PlanTask = z.infer<typeof PlanTaskSchema>;
 
 /**
@@ -94,6 +96,7 @@ export const VendorSchema = z
   })
   .strict();
 
+/** One vendor in the plan. */
 export type Vendor = z.infer<typeof VendorSchema>;
 
 /**
@@ -111,6 +114,7 @@ export const MilestoneSchema = z
   })
   .strict();
 
+/** One milestone in the plan. */
 export type Milestone = z.infer<typeof MilestoneSchema>;
 
 /**
@@ -128,6 +132,7 @@ export const IdeaSchema = z
   })
   .strict();
 
+/** One saved planning idea. */
 export type Idea = z.infer<typeof IdeaSchema>;
 
 /**
@@ -143,6 +148,7 @@ export const ChatMessageSchema = z
   })
   .strict();
 
+/** One message in the assistant conversation. */
 export type ChatMessage = z.infer<typeof ChatMessageSchema>;
 
 /**
@@ -157,6 +163,7 @@ export const PlanSettingsSchema = z
   })
   .strict();
 
+/** The plan's display and language settings. */
 export type PlanSettings = z.infer<typeof PlanSettingsSchema>;
 
 /**
@@ -183,4 +190,5 @@ export const PlanSchema = z
   })
   .strict();
 
+/** The complete plan stored on this device. */
 export type Plan = z.infer<typeof PlanSchema>;

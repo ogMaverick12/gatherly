@@ -22,6 +22,7 @@ import {
   type IntakeStep,
 } from '../schema';
 
+/** The state and actions the intake form binds to. */
 export interface IntakeFormController {
   readonly form: UseFormReturn<IntakeFormValues>;
   readonly values: IntakeFormValues;

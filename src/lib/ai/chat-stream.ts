@@ -15,6 +15,7 @@ import { combineSignals } from './signal';
  */
 const STREAM_BUDGET_MS = 20_000;
 
+/** Options for streaming a provider answer. */
 export interface ChatStreamOptions {
   readonly provider: Provider;
   readonly live: boolean;

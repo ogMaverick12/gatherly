@@ -11,6 +11,7 @@ import type { Dictionary } from '@/lib/i18n';
 import type { PlanView } from '../plan-view';
 import { Tabs, type TabDefinition } from './Tabs';
 
+/** The stable id of one workspace section. */
 export type WorkspaceTabId = 'overview' | 'budget' | 'timeline' | 'vendors' | 'ideas' | 'assistant';
 
 /** The six sections, with a badge when a section is waiting for attention. */
@@ -38,25 +39,32 @@ export function workspaceTabs(view: PlanView, t: Dictionary): TabDefinition<Work
  *
  * One list drives both, so a section can never be reachable in one layout and
  * missing in the other.
- * long-function: one list drives both layouts, so a section can never be reachable in one and missing in the other.
  */
 export function WorkspaceTabs({
   tabs,
   activeTab,
   onChange,
+  sectionsLabel,
 }: {
   tabs: readonly TabDefinition<WorkspaceTabId>[];
   activeTab: WorkspaceTabId;
   onChange: (tab: WorkspaceTabId) => void;
+  sectionsLabel: string;
 }) {
   return (
     <>
       <div className="no-print hidden lg:block">
-        <Tabs tabs={tabs} active={activeTab} onChange={onChange} idPrefix="workspace" />
+        <Tabs
+          tabs={tabs}
+          active={activeTab}
+          onChange={onChange}
+          idPrefix="workspace"
+          ariaLabel={sectionsLabel}
+        />
       </div>
 
       <nav
-        aria-label="Plan sections"
+        aria-label={sectionsLabel}
         className="no-print fixed inset-x-0 bottom-0 z-40 border-t border-line bg-raised/95 backdrop-blur lg:hidden"
       >
         <ul className="flex items-stretch justify-between">

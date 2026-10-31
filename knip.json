@@ -1,0 +1,22 @@
+{
+  "$schema": "./node_modules/knip/schema.json",
+  "workspaces": {
+    ".": {
+      "entry": [
+        "src/app/**/{page,layout,route,error,global-error,not-found}.{ts,tsx}",
+        "src/middleware.ts",
+        "src/instrumentation.ts",
+        "scripts/**/*.mjs",
+        "vitest.config.mts",
+        "playwright.config.ts"
+      ],
+      "project": [
+        "src/**/*.{ts,tsx,css}",
+        "scripts/**/*.mjs",
+        "tests/**/*.{ts,tsx}",
+        "*.{ts,mts,mjs}"
+      ],
+      "ignoreDependencies": ["eslint-config-next", "eslint-plugin-jsx-a11y", "postcss-load-config"]
+    }
+  }
+}

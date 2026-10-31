@@ -81,13 +81,13 @@ function fakeRedis(clock: { now: number }) {
 }
 
 function limiterOn(clock: { now: number }): UpstashRateLimiter {
-  return new UpstashRateLimiter(
-    'https://redis.test',
-    'token',
-    CAPACITY,
-    WINDOW_MS,
-    () => clock.now,
-  );
+  return new UpstashRateLimiter({
+    url: 'https://redis.test',
+    token: 'token',
+    capacity: CAPACITY,
+    windowMs: WINDOW_MS,
+    now: () => clock.now,
+  });
 }
 
 beforeEach(() => {

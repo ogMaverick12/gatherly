@@ -25,13 +25,13 @@ vi.mock('next/link', () => ({
 
 describe('the wordmark', () => {
   it('shows the name and a labelled mark', () => {
-    render(<Wordmark />);
+    render(<Wordmark markLabel="Gatherly mark" />);
     expect(screen.getByText('Gatherly')).toBeInTheDocument();
     expect(screen.getByLabelText('Gatherly mark')).toBeInTheDocument();
   });
 
   it('renders the mark on its own', () => {
-    const { container } = render(<CelebrationMark className="h-4 w-4" />);
+    const { container } = render(<CelebrationMark className="h-4 w-4" label="Gatherly mark" />);
     expect(container.querySelector('svg')).toHaveClass('h-4');
   });
 });
@@ -68,7 +68,15 @@ describe('the tab strip', () => {
   ] as const;
 
   it('marks the selected tab', () => {
-    render(<Tabs tabs={tabs} active="two" onChange={() => undefined} idPrefix="test" />);
+    render(
+      <Tabs
+        tabs={tabs}
+        active="two"
+        onChange={() => undefined}
+        idPrefix="test"
+        ariaLabel="Plan sections"
+      />,
+    );
     expect(screen.getByRole('tab', { name: 'Two' })).toHaveAttribute('aria-selected', 'true');
     expect(screen.getByRole('tab', { name: 'One' })).toHaveAttribute('aria-selected', 'false');
   });
@@ -76,7 +84,15 @@ describe('the tab strip', () => {
   it('moves to the next tab with the arrow key', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    render(<Tabs tabs={tabs} active="one" onChange={onChange} idPrefix="test" />);
+    render(
+      <Tabs
+        tabs={tabs}
+        active="one"
+        onChange={onChange}
+        idPrefix="test"
+        ariaLabel="Plan sections"
+      />,
+    );
 
     screen.getByRole('tab', { name: 'One' }).focus();
     await user.keyboard('{ArrowRight}');
@@ -86,7 +102,15 @@ describe('the tab strip', () => {
   it('wraps around at the end', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    render(<Tabs tabs={tabs} active="three" onChange={onChange} idPrefix="test" />);
+    render(
+      <Tabs
+        tabs={tabs}
+        active="three"
+        onChange={onChange}
+        idPrefix="test"
+        ariaLabel="Plan sections"
+      />,
+    );
 
     screen.getByRole('tab', { name: 'Three' }).focus();
     await user.keyboard('{ArrowRight}');
@@ -96,7 +120,15 @@ describe('the tab strip', () => {
   it('jumps to the first tab with Home', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    render(<Tabs tabs={tabs} active="two" onChange={onChange} idPrefix="test" />);
+    render(
+      <Tabs
+        tabs={tabs}
+        active="two"
+        onChange={onChange}
+        idPrefix="test"
+        ariaLabel="Plan sections"
+      />,
+    );
 
     screen.getByRole('tab', { name: 'Two' }).focus();
     await user.keyboard('{Home}');
@@ -106,7 +138,15 @@ describe('the tab strip', () => {
   it('calls onChange when a tab is clicked', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    render(<Tabs tabs={tabs} active="one" onChange={onChange} idPrefix="test" />);
+    render(
+      <Tabs
+        tabs={tabs}
+        active="one"
+        onChange={onChange}
+        idPrefix="test"
+        ariaLabel="Plan sections"
+      />,
+    );
 
     await user.click(screen.getByRole('tab', { name: 'Three' }));
     expect(onChange).toHaveBeenCalledWith('three');
@@ -119,6 +159,7 @@ describe('the tab strip', () => {
         active="one"
         onChange={() => undefined}
         idPrefix="test"
+        ariaLabel="Plan sections"
       />,
     );
     expect(screen.getByText('3')).toBeInTheDocument();
@@ -142,7 +183,7 @@ describe('the site header', () => {
 
 describe('the site footer', () => {
   it('says the plan stays on the device', () => {
-    render(<SiteFooter />);
+    renderWithProvider(<SiteFooter />);
     expect(screen.getByText(/stays on this device/i)).toBeInTheDocument();
   });
 });

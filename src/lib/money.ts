@@ -109,15 +109,3 @@ export function formatMinorPlain(
     minimumFractionDigits: 0,
   }).format(amount);
 }
-
-/**
- * The symbol used for a currency, for labels and compact tables.
- *
- * @param currency the plan's currency
- * @returns the symbol, e.g. '₹' or '$'
- * @example
- * currencySymbol('INR'); // '₹'
- */
-export function currencySymbol(currency: Currency): string {
-  return CURRENCY_META[currency].symbol;
-}

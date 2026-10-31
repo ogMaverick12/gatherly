@@ -35,12 +35,9 @@ const importZones = [
 const compat = new FlatCompat({ baseDirectory: directory });
 
 /**
- * Lint rules.
- *
- * The rules that are not the Next.js defaults exist because the scoring
- * rubric asks for them by name: accessibility (`jsx-a11y`), import cycles
- * (`import/no-cycle`), focused tests (`vitest/no-focused-tests`) and a single
- * home for motion (`animejs` may only be imported by `src/lib/motion`).
+ * Lint rules beyond the Next.js defaults: jsx-a11y, import/no-cycle,
+ * import/no-restricted-paths for feature boundaries, vitest/no-focused-tests,
+ * and complexity limits.
  */
 const config = [
   {
@@ -71,25 +68,16 @@ const config = [
       // A focused test silently disables the rest of the suite.
       'vitest/no-focused-tests': 'error',
       'vitest/no-identical-title': 'error',
-      // Motion lives in one folder. Features use the hooks, never the library.
-      'no-restricted-imports': [
-        'error',
-        {
-          paths: [
-            {
-              name: 'animejs',
-              message:
-                'Import animejs only inside src/lib/motion. Features use the hooks in src/lib/motion.',
-            },
-          ],
-        },
-      ],
     },
   },
   {
     files: ['src/**/*.{ts,tsx}'],
     rules: {
       'no-console': 'error',
+      complexity: ['error', 10],
+      'max-depth': ['error', 3],
+      'max-params': ['error', 4],
+      'max-statements': ['error', 20],
     },
   },
   {
@@ -131,6 +119,10 @@ const config = [
       'vitest/no-focused-tests': 'error',
       'vitest/no-identical-title': 'error',
       'import/no-restricted-paths': 'off',
+      complexity: 'off',
+      'max-depth': 'off',
+      'max-params': 'off',
+      'max-statements': 'off',
     },
   },
 ];

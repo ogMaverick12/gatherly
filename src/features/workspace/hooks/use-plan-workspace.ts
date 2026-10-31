@@ -23,6 +23,7 @@ import {
   withVendorUpdated,
 } from '../plan-updates';
 
+/** The plan state and edit actions the workspace binds to. */
 export interface PlanWorkspaceController {
   readonly plan: Plan | null;
   readonly view: PlanView | null;
@@ -59,7 +60,6 @@ function preparePlan(plan: Plan): Plan {
  * milestones are added during hydration, before the first plan render, so
  * opening a plan does not schedule a second full render.
  */
-// long-function: one controller, kept together so every plan edit follows the same path.
 export function usePlanWorkspace(): PlanWorkspaceController {
   const plan = usePlan();
   const { update, replace, clear } = usePlanActions();

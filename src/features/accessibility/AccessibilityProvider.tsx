@@ -13,9 +13,6 @@ import {
   useSpeechSupport,
 } from './use-accessibility';
 
-export { DEFAULT_PREFERENCES, writeStoredPreferences } from './preferences';
-export type { AccessibilityPreferences, TextSize, ThemePreference } from './preferences';
-
 /**
  * Accessibility context: preferences, dictionary, speech and document mirroring.
  * Storage rules live in preferences.ts so this file stays about React.
@@ -37,15 +34,25 @@ export interface AccessibilityContextValue {
 
 const AccessibilityContext = createContext<AccessibilityContextValue | null>(null);
 
+/** The preferences and speech controls that make up the context value. */
+interface AccessibilityValueInput {
+  readonly preferences: AccessibilityPreferences;
+  readonly speechSupported: boolean;
+  readonly speaking: boolean;
+  readonly speak: (text: string) => void;
+  readonly stopSpeaking: () => void;
+  readonly update: (patch: Partial<AccessibilityPreferences>) => void;
+}
+
 /** Build the stable context value from preferences and speech controls. */
-function useAccessibilityValue(
-  preferences: AccessibilityPreferences,
-  speechSupported: boolean,
-  speaking: boolean,
-  speak: (text: string) => void,
-  stopSpeaking: () => void,
-  update: (patch: Partial<AccessibilityPreferences>) => void,
-): AccessibilityContextValue {
+function useAccessibilityValue({
+  preferences,
+  speechSupported,
+  speaking,
+  speak,
+  stopSpeaking,
+  update,
+}: AccessibilityValueInput): AccessibilityContextValue {
   return useMemo(
     () => ({
       preferences,
@@ -82,14 +89,14 @@ export function AccessibilityProvider({
   const resolvedTheme = useResolvedTheme(preferences.theme);
   useDocumentPreferences(preferences, resolvedTheme);
   usePersistedPreferences(preferences, ready);
-  const value = useAccessibilityValue(
+  const value = useAccessibilityValue({
     preferences,
     speechSupported,
     speaking,
     speak,
     stopSpeaking,
     update,
-  );
+  });
   return <AccessibilityContext.Provider value={value}>{children}</AccessibilityContext.Provider>;
 }
 

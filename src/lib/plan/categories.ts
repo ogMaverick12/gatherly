@@ -25,6 +25,7 @@ export const BUDGET_CATEGORIES = [
  * The budget category enum, derived from `BUDGET_CATEGORIES`.
  */
 export const BudgetCategorySchema = z.enum(BUDGET_CATEGORIES);
+/** The stable id of a budget category. */
 export type BudgetCategoryId = z.infer<typeof BudgetCategorySchema>;
 
 /**
@@ -65,6 +66,7 @@ export const VENDOR_CATEGORIES = [
  * The vendor category enum, derived from `VENDOR_CATEGORIES`.
  */
 export const VendorCategorySchema = z.enum(VENDOR_CATEGORIES);
+/** The stable id of a vendor category. */
 export type VendorCategoryId = z.infer<typeof VendorCategorySchema>;
 
 /**
@@ -92,6 +94,7 @@ export const VENDOR_STATUSES = ['to_contact', 'contacted', 'quoted', 'booked', '
  * The vendor status enum, derived from `VENDOR_STATUSES`.
  */
 export const VendorStatusSchema = z.enum(VENDOR_STATUSES);
+/** The booking state of a vendor. */
 export type VendorStatus = z.infer<typeof VendorStatusSchema>;
 
 /**
@@ -123,4 +126,5 @@ export const TASK_AREAS = [
  * The task area enum, derived from `TASK_AREAS`.
  */
 export const TaskAreaSchema = z.enum(TASK_AREAS);
+/** The planning area a task belongs to. */
 export type TaskArea = z.infer<typeof TaskAreaSchema>;

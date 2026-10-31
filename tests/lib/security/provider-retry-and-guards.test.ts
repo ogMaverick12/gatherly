@@ -126,7 +126,12 @@ describe('the request log', () => {
   it('writes the route, the status, the duration and the correlation id', () => {
     const spy = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
     try {
-      logRequest('chat', 200, 12, new Request('https://gatherly.test/api/chat'));
+      logRequest({
+        route: 'chat',
+        status: 200,
+        durationMs: 12,
+        request: new Request('https://gatherly.test/api/chat'),
+      });
       const payload = JSON.parse(String(spy.mock.calls[0]?.[0])) as Record<string, unknown>;
 
       expect(payload['route']).toBe('chat');
@@ -152,7 +157,7 @@ describe('the request log', () => {
         method: 'POST',
         body: 'a secret plan',
       });
-      logRequest('chat', 200, 1, request);
+      logRequest({ route: 'chat', status: 200, durationMs: 1, request });
       expect(String(spy.mock.calls[0]?.[0])).not.toContain('secret');
     } finally {
       spy.mockRestore();
@@ -204,7 +209,11 @@ describe('the rate limiter', () => {
     );
     vi.stubGlobal('fetch', fetchMock);
 
-    const limiter = new UpstashRateLimiter('https://redis.test', 'token', 20);
+    const limiter = new UpstashRateLimiter({
+      url: 'https://redis.test',
+      token: 'token',
+      capacity: 20,
+    });
     const result = await limiter.check('chat:1.2.3.4');
 
     expect(result.allowed).toBe(true);
@@ -220,7 +229,11 @@ describe('the rate limiter', () => {
       vi.fn(async () => new Response(JSON.stringify([{ result: [21, 30_000] }]), { status: 200 })),
     );
 
-    const limiter = new UpstashRateLimiter('https://redis.test', 'token', 20);
+    const limiter = new UpstashRateLimiter({
+      url: 'https://redis.test',
+      token: 'token',
+      capacity: 20,
+    });
     const result = await limiter.check('chat:1.2.3.4');
 
     expect(result.allowed).toBe(false);
@@ -233,7 +246,11 @@ describe('the rate limiter', () => {
       vi.fn(async () => new Response('nope', { status: 500 })),
     );
 
-    const limiter = new UpstashRateLimiter('https://redis.test', 'token', 20);
+    const limiter = new UpstashRateLimiter({
+      url: 'https://redis.test',
+      token: 'token',
+      capacity: 20,
+    });
     const result = await limiter.check('chat:1.2.3.4');
 
     expect(result).toMatchObject({ allowed: true, remaining: 20, degraded: true });

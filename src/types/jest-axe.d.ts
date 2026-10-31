@@ -7,6 +7,7 @@
  */
 
 declare module 'jest-axe' {
+  /** The subset of an axe result the accessibility tests read. */
   export interface AxeResult {
     readonly violations: readonly unknown[];
     readonly passes: readonly unknown[];

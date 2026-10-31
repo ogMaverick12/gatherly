@@ -22,4 +22,4 @@ export interface IdeaContext {
   readonly perGuestMinor: number;
 }
 
-export type PlanCurrency = Parameters<typeof formatMinor>[1];
+type PlanCurrency = Parameters<typeof formatMinor>[1];

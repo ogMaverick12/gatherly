@@ -10,7 +10,7 @@ import type { Vendor } from '@/lib/plan';
  * the reason it earned what it did.
  */
 
-export interface ScoreComponent {
+interface ScoreComponent {
   readonly id: string;
   readonly label: string;
   readonly earned: number;
@@ -18,6 +18,7 @@ export interface ScoreComponent {
   readonly detail: string;
 }
 
+/** The deterministic score and notes for one vendor quote. */
 export interface QuoteAssessment {
   readonly score: number;
   readonly components: readonly ScoreComponent[];

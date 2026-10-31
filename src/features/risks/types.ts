@@ -13,9 +13,9 @@ import type { VendorCoverage } from '@/features/vendors';
 
 export type RiskSeverity = 'low' | 'medium' | 'high';
 
-export type RiskArea =
-  'budget' | 'timeline' | 'vendors' | 'catering' | 'guest-experience' | 'planning';
+type RiskArea = 'budget' | 'timeline' | 'vendors' | 'catering' | 'guest-experience' | 'planning';
 
+/** One risk surfaced from the plan. */
 export interface Risk {
   readonly id: string;
   readonly severity: RiskSeverity;
@@ -25,6 +25,7 @@ export interface Risk {
   readonly mitigation: string;
 }
 
+/** The plan values the risk check reads. */
 export interface RiskInputs {
   readonly plan: Plan;
   readonly budget: BudgetAllocation;

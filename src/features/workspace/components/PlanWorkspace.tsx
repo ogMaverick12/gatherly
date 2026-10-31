@@ -17,9 +17,11 @@ import { WorkspaceTabs, workspaceTabs, type WorkspaceTabId } from './WorkspaceTa
 
 /** A neutral panel placeholder; it holds the page height while a tab loads. */
 function PanelSkeleton() {
+  const { dictionary } = useAccessibility();
+
   return (
     <div role="status" aria-busy="true" className="min-h-[50svh] space-y-4">
-      <span className="sr-only">Loading plan section</span>
+      <span className="sr-only">{dictionary.workspace.loadingSection}</span>
       <div className="h-8 w-40 rounded-card bg-line/70" />
       <div className="h-4 w-2/3 rounded-card bg-line/50" />
       <div className="h-56 rounded-card border border-line bg-raised/60" />
@@ -28,11 +30,11 @@ function PanelSkeleton() {
 }
 
 /** The neutral first paint: never claim there is no plan before the store is read. */
-function WorkspaceSkeleton() {
+function WorkspaceSkeleton({ label }: { readonly label: string }) {
   return (
     <div aria-busy="true" className="mx-auto min-h-[100svh] max-w-7xl px-5 pb-28 pt-8 lg:pb-14">
       <span role="status" className="sr-only">
-        Loading your plan
+        {label}
       </span>
       <div className="h-4 w-24 rounded-card bg-line/60" />
       <div className="mt-3 h-9 w-72 rounded-card bg-line/70" />
@@ -117,7 +119,7 @@ export function PlanWorkspace() {
   const wide = useWideLayout();
   const { plan, view, activeTab, hydrated } = controller;
 
-  if (!hydrated) return <WorkspaceSkeleton />;
+  if (!hydrated) return <WorkspaceSkeleton label={dictionary.workspace.loadingPlan} />;
   if (!plan || !view) return <NoPlanScreen onOpen={controller.replace} />;
 
   const tabs = workspaceTabs(view, dictionary);
@@ -130,7 +132,12 @@ export function PlanWorkspace() {
 
       <div className="mt-4 grid gap-8 lg:mt-8 lg:grid-cols-[minmax(0,1fr)_19rem]">
         <div className="min-w-0">
-          <WorkspaceTabs tabs={tabs} activeTab={activeTab} onChange={controller.setActiveTab} />
+          <WorkspaceTabs
+            tabs={tabs}
+            activeTab={activeTab}
+            onChange={controller.setActiveTab}
+            sectionsLabel={dictionary.workspace.planSections}
+          />
 
           <div
             id={`workspace-panel-${activeTab}`}

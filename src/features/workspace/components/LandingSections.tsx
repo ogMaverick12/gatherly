@@ -61,7 +61,7 @@ export function LandingHero({
 }
 
 /** The live sample-plan card in the hero. */
-export function SamplePreview({ preview }: { readonly preview: LandingPreview }) {
+function SamplePreview({ preview }: { readonly preview: LandingPreview }) {
   return (
     <Card padding="xl" className="shadow-card">
       <div className="flex items-center gap-5">

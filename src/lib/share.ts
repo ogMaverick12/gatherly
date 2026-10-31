@@ -18,10 +18,10 @@ import {
  * supports it, encoded as base64url so it is safe in a URL.
  */
 
-export const SHARE_VERSION = 'g1' as const;
 const COMPRESSED_PREFIX = 'g1z';
 const PLAIN_PREFIX = 'g1j';
 
+/** The plan data carried in a share link. */
 export interface SharePayload {
   readonly v: 1;
   readonly intake: Intake;

@@ -14,7 +14,7 @@ import { formatMoney } from '@/lib/money';
 import type { Plan } from '@/lib/plan';
 
 /** The eight column headings. */
-export function BudgetTableHead({ t }: { readonly t: Dictionary }) {
+function BudgetTableHead({ t }: { readonly t: Dictionary }) {
   return (
     <thead>
       <tr className="border-b border-line text-left">
@@ -48,7 +48,7 @@ export function BudgetTableHead({ t }: { readonly t: Dictionary }) {
 }
 
 /** One category row with its weights, shares and variance. */
-export function BudgetTableRow({
+function BudgetTableRow({
   category,
   currency,
 }: {
@@ -104,7 +104,7 @@ export function BudgetTableRow({
 }
 
 /** The contingency and total rows. */
-export function BudgetTableFoot({
+function BudgetTableFoot({
   budget,
   guests,
   currency,

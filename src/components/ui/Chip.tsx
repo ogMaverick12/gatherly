@@ -1,9 +1,10 @@
 import type { HTMLAttributes, ReactNode } from 'react';
 
-export type ChipTone =
+type ChipTone =
   'muted' | 'strong' | 'accent' | 'warning' | 'outline' | 'teal' | 'tealSoft' | 'danger';
-export type ChipSize = 'xs' | 'sm' | 'md' | 'inline';
+type ChipSize = 'xs' | 'sm' | 'md' | 'inline';
 
+/** Props accepted by the chip component. */
 export interface ChipProps extends HTMLAttributes<HTMLSpanElement> {
   children: ReactNode;
   tone?: ChipTone;

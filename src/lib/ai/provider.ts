@@ -6,8 +6,9 @@
  * fallback is always available.
  */
 
-export type ProviderId = 'gemini' | 'openrouter' | 'basic';
+type ProviderId = 'gemini' | 'openrouter' | 'basic';
 
+/** Whether an answer came from a live provider or the basic fallback. */
 export type GenerationMode = 'basic' | 'provider';
 
 /**
@@ -19,6 +20,7 @@ export type GenerationMode = 'basic' | 'provider';
 export type ProviderErrorKind =
   'timeout' | 'rate_limited' | 'model_not_found' | 'auth' | 'bad_output' | 'server' | 'network';
 
+/** One bounded request to a provider. */
 export interface GenerationRequest {
   /** A short machine-readable intent such as "chat" or "ideas". */
   readonly intent: string;
@@ -39,6 +41,7 @@ export interface GenerationRequest {
   readonly signal?: AbortSignal;
 }
 
+/** The text and usage returned by a successful provider call. */
 export interface GenerationResult {
   readonly mode: GenerationMode;
   readonly provider: ProviderId;
@@ -47,6 +50,7 @@ export interface GenerationResult {
   readonly notices: readonly string[];
 }
 
+/** The adapter contract every AI provider implements. */
 export interface Provider {
   readonly id: ProviderId;
   generate(request: GenerationRequest): Promise<GenerationResult>;
@@ -59,6 +63,7 @@ export interface Provider {
   stream(request: GenerationRequest): AsyncIterable<string>;
 }
 
+/** A provider failure whose kind and retryability are safe to expose. */
 export class ProviderError extends Error {
   constructor(
     message: string,
@@ -73,6 +78,7 @@ export class ProviderError extends Error {
 /** The one retry the product allows, and the backoff it waits for. */
 export const RETRY_BACKOFF_MS = 400;
 
+/** A clock the provider retry loop can await. */
 export type Sleep = (ms: number) => Promise<void>;
 
 /**

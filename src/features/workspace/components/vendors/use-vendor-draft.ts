@@ -9,6 +9,7 @@ import { useEffect, useState } from 'react';
 import { fromMajorUnits, toMajorUnits } from '@/lib/money';
 import type { Currency, Vendor } from '@/lib/plan';
 
+/** The editable fields of a vendor form. */
 export interface VendorDraft {
   readonly name: string;
   readonly quote: string;

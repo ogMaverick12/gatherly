@@ -76,6 +76,7 @@ function toStamp(date: Date): string {
   );
 }
 
+/** Options for building a calendar file. */
 export interface CalendarOptions {
   readonly now?: Date;
   readonly locale?: string;

@@ -34,8 +34,10 @@ export const CURRENCIES = [
  * The currency enum, derived from `CURRENCIES`.
  */
 export const CurrencySchema = z.enum(CURRENCIES);
+/** A supported currency code. */
 export type Currency = z.infer<typeof CurrencySchema>;
 
+/** Formatting metadata for one currency. */
 export interface CurrencyMeta {
   readonly code: Currency;
   readonly minorUnits: 0 | 2;

@@ -12,6 +12,7 @@ export interface SampleTask {
   readonly area: TaskArea;
 }
 
+/** A vendor in a sample plan. */
 export interface SampleVendor {
   readonly category: VendorCategoryId;
   readonly name: string;
@@ -20,6 +21,7 @@ export interface SampleVendor {
   readonly quotedMinor?: number;
 }
 
+/** A sample plan offered on the landing page. */
 export interface SamplePlanTemplate {
   readonly id: string;
   readonly name: string;
