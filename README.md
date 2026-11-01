@@ -13,6 +13,60 @@ in use. Without a network, or without an API key, the plan still works.
 
 ---
 
+## Chosen vertical
+
+**Challenge 5: Celebration & Event Planner.** Gatherly is designed around one persona: a person
+organising a wedding, a birthday or a community gathering who has a date, a guest list and a budget
+but no planning experience. Every screen answers the same question for that person: "what should we
+do next?"
+
+## Approach and logic
+
+The plan is **derived from the user's context**, not typed in by hand. Event type, date, guest count,
+city tier, venue type, currency, priorities, and dietary and access needs feed a set of small,
+pure, deterministic engines. Each decision follows a visible rule:
+
+| Decision            | The rule                                                                                                                                                    |
+| ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Budget              | Benchmark shares per event type, adjusted for city tier, venue and priorities, in whole minor units with largest-remainder rounding, plus an 8% contingency |
+| Timeline            | Milestones worked backwards from the event date, each with an owner, a date and the reason it matters                                                       |
+| Vendors             | A checklist per category; coverage is booked and quoted spend against the planned allocation                                                                |
+| Health score        | Five weighted parts (budget, timeline, vendors, tasks, guest experience) that sum to 100                                                                    |
+| Risks, next action  | Rules over the same plan pick the risks worth showing and the one most useful next step                                                                     |
+| Ideas and assistant | Grounded in the plan; a model (Gemini or OpenRouter) is an optional layer, and a labelled Basic mode answers deterministically when none is configured      |
+
+## How the solution works
+
+1. **Start.** The landing page offers three one-click sample plans, or the four-step intake.
+2. **Intake.** Event type, date, guests, city tier, venue, currency, budget, priorities and needs.
+   Every field is validated with Zod, and the review step shows exactly what will be used.
+3. **Workspace.** The engines turn those answers into six tabs: overview, budget, timeline,
+   vendors, ideas and an assistant. Editing anything (a quote, a task, the budget) recomputes the
+   rest.
+4. **Take it with you.** Print-to-PDF, an `.ics` calendar, a budget CSV and a share link.
+
+The plan lives in the browser (a versioned `localStorage` entry). The server is stateless: guarded
+API routes handle only the optional AI calls, and a badge always says whether an answer came from a
+model or from Basic mode. See [Architecture at a glance](#architecture-at-a-glance) below.
+
+## Assumptions
+
+- **Numbers are estimates, not quotes.** They come from a model of a typical event, adjusted for
+  what you entered. There is no market data; replace a figure with a real quote before relying on it.
+- **City tier is a coarse band**, and the contingency is a flat percentage, not a risk calculation.
+- **One person, one browser.** There are no accounts, no collaboration and no history; the JSON
+  export and the share link are the only ways out.
+- **Traditions are never inferred.** Tradition and festival packs apply only when you choose them,
+  and they are starting points to confirm with family, elders or organisers.
+- **AI is optional.** Without a key or a network the app works in Basic mode, and the health score
+  is a weighted checklist, not a verdict.
+- **Currency and language are your choice.** Amounts are held in minor units; app labels are
+  available in English, Hindi and Bengali.
+
+Fuller detail, including what the app is not good at, is in [`docs/LIMITATIONS.md`](docs/LIMITATIONS.md).
+
+---
+
 ## How Gatherly meets the product promise
 
 The product promise is _"a GenAI-powered planning assistant that helps users organize weddings,

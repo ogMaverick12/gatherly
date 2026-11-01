@@ -38,7 +38,7 @@ public/               manifest, icons and the shell-cache service worker
 - Every API route uses `createRoute` for POST or `createGetRoute` for GET from
   `src/lib/security/route.ts`; the factory supplies validation, rate limiting, the body cap,
   timeout, logging and no-store headers.
-- Naming (Q3): files and hooks are kebab-case; React components and their files are PascalCase;
+- Naming: files and hooks are kebab-case; React components and their files are PascalCase;
   functions are camelCase; module constants are SCREAMING_SNAKE_CASE.
 - Money is an integer number of minor units (paise, cents, ...) in every calculation; format only
   through `src/lib/money.ts`.
